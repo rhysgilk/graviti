@@ -3,6 +3,7 @@ import SwiftUI
 struct DestinationSelectionCard: View {
     let node: OrbitNode
     let onClose: () -> Void
+    let onOpen: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -45,6 +46,23 @@ struct DestinationSelectionCard: View {
             }
             .font(.subheadline.weight(.medium))
             .foregroundStyle(.white.opacity(0.82))
+
+            if let onOpen {
+                Button(action: onOpen) {
+                    HStack {
+                        Text("See areas")
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(minHeight: 44)
+                    .padding(.horizontal, 14)
+                    .background(GravitiColors.iris.opacity(0.45), in: RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint("Opens smaller areas within \(node.name)")
+            }
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)

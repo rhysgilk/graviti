@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selectedNodeID: UUID?
+    @State private var fieldPath: [OrbitItem] = []
     @AccessibilityFocusState private var isDetailFocused: Bool
 
     private static let orbitItems: [OrbitItem] = [
@@ -129,7 +130,8 @@ struct HomeView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let gravities = Self.orbitItems.map(\.node.gravity)
+            let items = currentItems
+            let gravities = items.map(\.node.gravity)
             let minimumGravity = gravities.min() ?? 0
             let maximumGravity = gravities.max() ?? 1
 
@@ -144,9 +146,9 @@ struct HomeView: View {
                         .accessibilityHidden(true)
                 }
 
-                wordmark
+                header
 
-                ForEach(Self.orbitItems) { item in
+                ForEach(items) { item in
                     let isSelected = selectedNodeID == item.id
                     let diameter = GravityScale.diameter(
                         for: item.node.gravity,
@@ -175,6 +177,7 @@ struct HomeView: View {
                         yDuration: item.driftDurationY,
                         isActive: selectedNodeID == nil
                     )
+                    .transition(.opacity.combined(with: .scale(scale: 0.94)))
                     .zIndex(isSelected ? 1 : 0)
                     .accessibilityLabel("\(item.node.name), \(item.node.level.displayName), Gravity \(Int(item.node.gravity)), \(item.node.saveCount) saved items")
                     .accessibilityHint(isSelected ? "Closes destination" : "Opens destination")
@@ -202,7 +205,13 @@ struct HomeView: View {
                 }
 
                 if let selectedItem {
-                    DestinationSelectionCard(node: selectedItem.node, onClose: clearSelection)
+                    DestinationSelectionCard(
+                        node: selectedItem.node,
+                        onClose: clearSelection,
+                        onOpen: SampleOrbitChildren.children(for: selectedItem).isEmpty
+                            ? nil
+                            : { open(selectedItem) }
+                    )
                         .accessibilityElement(children: .contain)
                         .accessibilityFocused($isDetailFocused)
                         .padding(.horizontal, 20)
@@ -213,6 +222,7 @@ struct HomeView: View {
                 }
             }
             .animation(reduceMotion ? .easeOut(duration: 0.2) : .easeInOut(duration: 0.55), value: selectedNodeID)
+            .animation(.easeInOut(duration: reduceMotion ? 0.2 : 0.4), value: fieldPath.map(\.id))
         }
         .onChange(of: selectedNodeID) { _, newValue in
             isDetailFocused = newValue != nil
@@ -220,7 +230,12 @@ struct HomeView: View {
     }
 
     private var selectedItem: OrbitItem? {
-        Self.orbitItems.first { $0.id == selectedNodeID }
+        currentItems.first { $0.id == selectedNodeID }
+    }
+
+    private var currentItems: [OrbitItem] {
+        guard let parent = fieldPath.last else { return Self.orbitItems }
+        return SampleOrbitChildren.children(for: parent)
     }
 
     private func planet(for item: OrbitItem, diameter: CGFloat) -> some View {
@@ -242,10 +257,34 @@ struct HomeView: View {
         selectedNodeID = nil
     }
 
-    private var wordmark: some View {
+    private func open(_ item: OrbitItem) {
+        fieldPath.append(item)
+        selectedNodeID = nil
+    }
+
+    private func goBack() {
+        selectedNodeID = fieldPath.popLast()?.id
+    }
+
+    private var header: some View {
         VStack {
             HStack {
-                GravitiWordmark(size: .small)
+                if let parent = fieldPath.last {
+                    Button(action: goBack) {
+                        Label("Back", systemImage: "chevron.backward")
+                            .labelStyle(.iconOnly)
+                            .frame(width: 44, height: 44)
+                    }
+                    .accessibilityLabel("Back to Gravity Field")
+
+                    Text(parent.node.name)
+                        .font(.custom("Sora-SemiBold", size: 18, relativeTo: .headline))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .accessibilityAddTraits(.isHeader)
+                } else {
+                    GravitiWordmark(size: .small)
+                }
 
                 Spacer()
             }
@@ -254,26 +293,6 @@ struct HomeView: View {
         }
         .padding(.horizontal, 22)
         .padding(.top, 10)
-    }
-}
-
-private struct OrbitItem: Identifiable {
-    let node: OrbitNode
-
-    let x: CGFloat
-    let y: CGFloat
-
-    let primaryColor: Color
-    let highlightColor: Color
-
-    let driftX: CGFloat
-    let driftY: CGFloat
-
-    let driftDurationX: Double
-    let driftDurationY: Double
-
-    var id: UUID {
-        node.id
     }
 }
 
