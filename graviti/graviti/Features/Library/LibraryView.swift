@@ -183,7 +183,7 @@ private struct ArtifactRow: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            Image(systemName: artifact.kind == .url ? "link" : "note.text")
+            Image(systemName: artifact.kind == .url ? "link" : (artifact.kind == .photo ? "photo" : "note.text"))
                 .font(.title3)
                 .foregroundStyle(GravitiColors.signalMint)
                 .frame(width: 44, height: 44)
@@ -222,6 +222,8 @@ private struct ArtifactRow: View {
             return URLComponents(string: source)?.host ?? source
         case .manual:
             return artifact.originalText?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Saved note"
+        case .photo:
+            return artifact.userNote?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Saved photo"
         }
     }
 }

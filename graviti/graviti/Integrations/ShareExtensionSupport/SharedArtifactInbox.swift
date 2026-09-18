@@ -5,7 +5,52 @@ struct SharedArtifactEnvelope: Codable {
     let sourceURL: String?
     let originalText: String?
     let userNote: String?
+    let mediaKey: String?
     let capturedAt: Date
+}
+
+enum SharedMediaStore {
+    static func store(_ data: Data, id: UUID, fileExtension: String) throws -> String {
+        guard !data.isEmpty, data.count <= 50_000_000,
+              ["jpg", "jpeg", "png", "heic", "heif", "webp", "gif"].contains(fileExtension.lowercased()) else {
+            throw MediaStoreError.unsupportedImage
+        }
+        let key = "\(id.uuidString).\(fileExtension.lowercased())"
+        let destination = try mediaDirectory().appendingPathComponent(key)
+        try data.write(to: destination, options: .atomic)
+        return key
+    }
+
+    static func url(for key: String) throws -> URL {
+        guard key == URL(fileURLWithPath: key).lastPathComponent,
+              !key.contains("..") else { throw MediaStoreError.unsupportedImage }
+        return try mediaDirectory().appendingPathComponent(key)
+    }
+
+    static func remove(_ key: String) throws {
+        try FileManager.default.removeItem(at: url(for: key))
+    }
+
+    private static func mediaDirectory() throws -> URL {
+        guard let container = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: SharedArtifactInbox.groupIdentifier
+        ) else { throw MediaStoreError.unavailable }
+        let directory = container.appendingPathComponent("MediaAssets", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+}
+
+private enum MediaStoreError: LocalizedError {
+    case unsupportedImage
+    case unavailable
+
+    var errorDescription: String? {
+        switch self {
+        case .unsupportedImage: "This image format or size isn't supported yet."
+        case .unavailable: "Graviti's local media storage is unavailable."
+        }
+    }
 }
 
 enum SharedArtifactInbox {

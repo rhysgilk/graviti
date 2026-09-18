@@ -1,5 +1,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import PhotosUI
+import UIKit
 
 struct SaveView: View {
     @ObservedObject var library: ArtifactLibrary
@@ -9,6 +11,7 @@ struct SaveView: View {
     @State private var kind: ArtifactKind = .url
     @State private var urlText = ""
     @State private var noteText = ""
+    @State private var selectedPhoto: PhotosPickerItem?
     @State private var optionalNote = ""
     @State private var isSaving = false
     @State private var didSave = false
@@ -28,6 +31,7 @@ struct SaveView: View {
                     Picker("Save type", selection: $kind) {
                         Text("Link").tag(ArtifactKind.url)
                         Text("Note").tag(ArtifactKind.manual)
+                        Text("Photo").tag(ArtifactKind.photo)
                     }
                     .pickerStyle(.segmented)
 
@@ -52,7 +56,7 @@ struct SaveView: View {
                                 .padding(14)
                                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 12))
                         }
-                    } else {
+                    } else if kind == .manual {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Your note")
                                 .font(.headline)
@@ -60,6 +64,28 @@ struct SaveView: View {
                                 .scrollContentBackground(.hidden)
                                 .frame(minHeight: 140)
                                 .padding(10)
+                                .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 12))
+                        }
+                    } else {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Photo or screenshot")
+                                .font(.headline)
+                            PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                                Label(selectedPhoto == nil ? "Choose from Photos" : "Change photo", systemImage: "photo.on.rectangle")
+                                    .frame(maxWidth: .infinity, minHeight: 48)
+                                    .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                            }
+                            .buttonStyle(.plain)
+
+                            if selectedPhoto != nil {
+                                Label("Photo selected", systemImage: "checkmark.circle.fill")
+                                    .foregroundStyle(GravitiColors.signalMint)
+                                    .font(.subheadline)
+                            }
+
+                            TextField("What caught your eye? (optional)", text: $optionalNote, axis: .vertical)
+                                .lineLimit(2...4)
+                                .padding(14)
                                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 12))
                         }
                     }
@@ -214,6 +240,8 @@ struct SaveView: View {
             return true
         case .manual:
             return !noteText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        case .photo:
+            return selectedPhoto != nil
         }
     }
 
@@ -223,35 +251,50 @@ struct SaveView: View {
         didSave = false
         saveError = nil
 
-        let artifact: Artifact
-        switch kind {
-        case .url:
-            artifact = Artifact(
-                kind: .url,
-                sourceURL: urlText.trimmingCharacters(in: .whitespacesAndNewlines),
-                originalText: MapLinkMetadata.placeName(
-                    from: urlText.trimmingCharacters(in: .whitespacesAndNewlines)
-                ),
-                userNote: optionalNote.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
-            )
-        case .manual:
-            artifact = Artifact(
-                kind: .manual,
-                originalText: noteText.trimmingCharacters(in: .whitespacesAndNewlines)
-            )
-        }
-
         do {
-            try await library.save(artifact)
+            switch kind {
+            case .url:
+                let url = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+                try await library.save(Artifact(
+                    kind: .url,
+                    sourceURL: url,
+                    originalText: MapLinkMetadata.placeName(from: url),
+                    userNote: optionalNote.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+                ))
+            case .manual:
+                try await library.save(Artifact(
+                    kind: .manual,
+                    originalText: noteText.trimmingCharacters(in: .whitespacesAndNewlines)
+                ))
+            case .photo:
+                guard let selectedPhoto,
+                      let data = try await selectedPhoto.loadTransferable(type: Data.self),
+                      UIImage(data: data) != nil else { throw PhotoCaptureError.unsupported }
+                let fileExtension = selectedPhoto.supportedContentTypes
+                    .first(where: { $0.conforms(to: .image) })?
+                    .preferredFilenameExtension ?? "jpg"
+                try await library.savePhoto(
+                    data,
+                    fileExtension: fileExtension,
+                    note: optionalNote.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+                )
+            }
             urlText = ""
             noteText = ""
             optionalNote = ""
+            selectedPhoto = nil
             didSave = true
         } catch {
             saveError = error.localizedDescription
         }
         isSaving = false
     }
+}
+
+private enum PhotoCaptureError: LocalizedError {
+    case unsupported
+
+    var errorDescription: String? { "This photo couldn't be read. Try another image." }
 }
 
 private extension String {

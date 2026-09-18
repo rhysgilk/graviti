@@ -13,9 +13,15 @@ struct SavedArtifactDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Label(sourceLabel, systemImage: current.kind == .url ? "link" : "note.text")
+                Label(sourceLabel, systemImage: current.kind == .url ? "link" : (current.kind == .photo ? "photo" : "note.text"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(GravitiColors.signalMint)
+
+                if let mediaKey = current.mediaKey {
+                    MediaPreviewView(mediaKey: mediaKey, maximumPixelSize: 1400)
+                        .frame(maxWidth: .infinity)
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                }
 
                 if let sourceURL = current.sourceURL {
                     Text(sourceURL)
@@ -84,11 +90,17 @@ struct SavedArtifactDetailView: View {
                         .foregroundStyle(GravitiColors.opportunityCoral)
                 }
 
-                if current.place == nil,
-                   let sourceURL = current.sourceURL,
-                   MapLinkMetadata.provider(for: sourceURL) != nil,
-                   !MapLinkMetadata.isCollectionLink(sourceURL) {
-                    placeStatus
+                if current.place == nil {
+                    if current.kind == .photo {
+                        Button("Add a place to this photo") { showingPlaceReview = true }
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                            .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                    } else if let sourceURL = current.sourceURL,
+                              MapLinkMetadata.provider(for: sourceURL) != nil,
+                              !MapLinkMetadata.isCollectionLink(sourceURL) {
+                        placeStatus
+                    }
                 }
 
                 if let userNote = current.userNote {
@@ -154,6 +166,7 @@ struct SavedArtifactDetailView: View {
     }
 
     private var sourceLabel: String {
+        if current.kind == .photo { return "Photo" }
         guard current.kind == .url else { return "Note" }
         if let sourceURL = current.sourceURL,
            let provider = MapLinkMetadata.provider(for: sourceURL) {

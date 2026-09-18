@@ -15,6 +15,7 @@ final class ShareViewController: SLComposeServiceViewController {
         let hasAttachment = providers.contains {
             $0.hasItemConformingToTypeIdentifier(UTType.url.identifier)
                 || $0.hasItemConformingToTypeIdentifier(UTType.plainText.identifier)
+                || $0.hasItemConformingToTypeIdentifier(UTType.image.identifier)
         }
         return hasAttachment || !(contentText ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -23,7 +24,12 @@ final class ShareViewController: SLComposeServiceViewController {
         Task {
             do {
                 let envelope = try await makeEnvelope()
-                try SharedArtifactInbox.enqueue(envelope)
+                do {
+                    try SharedArtifactInbox.enqueue(envelope)
+                } catch {
+                    if let mediaKey = envelope.mediaKey { try? SharedMediaStore.remove(mediaKey) }
+                    throw error
+                }
                 extensionContext?.completeRequest(returningItems: nil)
             } catch {
                 let alert = UIAlertController(
@@ -48,19 +54,52 @@ final class ShareViewController: SLComposeServiceViewController {
         let composedText = (contentText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
 
         let sourceURL = validWebURL(sharedURL ?? sharedText)
-        let originalText = sourceURL == nil ? (sharedText ?? composedText).nilIfEmpty : sharedTitle
+        let image = sourceURL == nil ? try await firstImage() : nil
+        let id = UUID()
+        let mediaKey: String?
+        if let image {
+            mediaKey = try SharedMediaStore.store(image.data, id: id, fileExtension: image.fileExtension)
+        } else {
+            mediaKey = nil
+        }
+        let originalText = sourceURL == nil && mediaKey == nil
+            ? (sharedText ?? composedText).nilIfEmpty : sharedTitle
         let userNote = sourceURL != nil && composedText != sharedText &&
             composedText != sharedURL && composedText != sharedTitle
-            ? composedText.nilIfEmpty : nil
+            ? composedText.nilIfEmpty : (mediaKey != nil ? composedText.nilIfEmpty : nil)
 
-        guard sourceURL != nil || originalText != nil else { throw ShareError.empty }
+        guard sourceURL != nil || originalText != nil || mediaKey != nil else { throw ShareError.empty }
         return SharedArtifactEnvelope(
-            id: UUID(),
+            id: id,
             sourceURL: sourceURL,
             originalText: originalText,
             userNote: userNote,
+            mediaKey: mediaKey,
             capturedAt: .now
         )
+    }
+
+    private func firstImage() async throws -> (data: Data, fileExtension: String)? {
+        guard let provider = providers.first(where: {
+            $0.hasItemConformingToTypeIdentifier(UTType.image.identifier)
+        }) else { return nil }
+        let identifier = provider.registeredTypeIdentifiers.first {
+            UTType($0)?.conforms(to: .image) == true
+        } ?? UTType.image.identifier
+        let fileExtension = UTType(identifier)?.preferredFilenameExtension ?? "jpg"
+        let data: Data = try await withCheckedThrowingContinuation { continuation in
+            provider.loadDataRepresentation(forTypeIdentifier: identifier) { data, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else if let data {
+                    continuation.resume(returning: data)
+                } else {
+                    continuation.resume(throwing: ShareError.unsupported)
+                }
+            }
+        }
+        guard UIImage(data: data) != nil else { throw ShareError.unsupported }
+        return (data, fileExtension)
     }
 
     private func firstItem(of type: UTType) async throws -> String? {

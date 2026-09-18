@@ -38,9 +38,11 @@ struct PlaceReviewView: View {
                     }
                     .disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).count < 2 || isSearching)
                 } header: {
-                    Text("Find the place in this save")
+                    Text(artifact.kind == .photo ? "Find the place in this photo" : "Find the place in this save")
                 } footer: {
-                    Text("The original link stays in your Library even if you leave this unmatched.")
+                    Text(artifact.kind == .photo
+                         ? "The photo stays in your Library even if you leave it unmatched."
+                         : "The original link stays in your Library even if you leave this unmatched.")
                 }
 
                 if let errorMessage {

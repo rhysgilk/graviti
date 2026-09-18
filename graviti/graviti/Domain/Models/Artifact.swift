@@ -3,6 +3,7 @@ import Foundation
 enum ArtifactKind: String, Codable, CaseIterable {
     case url
     case manual
+    case photo
 }
 
 enum ArtifactProcessingState: String, Codable {
@@ -19,6 +20,7 @@ struct Artifact: Identifiable, Hashable {
     let sourceURL: String?
     let originalText: String?
     let userNote: String?
+    let mediaKey: String?
     let place: SavedPlace?
     let processingState: ArtifactProcessingState
     let capturedAt: Date
@@ -29,6 +31,7 @@ struct Artifact: Identifiable, Hashable {
         sourceURL: String? = nil,
         originalText: String? = nil,
         userNote: String? = nil,
+        mediaKey: String? = nil,
         place: SavedPlace? = nil,
         processingState: ArtifactProcessingState = .saved,
         capturedAt: Date = .now
@@ -38,6 +41,7 @@ struct Artifact: Identifiable, Hashable {
         self.sourceURL = sourceURL
         self.originalText = originalText
         self.userNote = userNote
+        self.mediaKey = mediaKey
         self.place = place
         self.processingState = processingState
         self.capturedAt = capturedAt
@@ -50,6 +54,7 @@ struct Artifact: Identifiable, Hashable {
             sourceURL: sourceURL,
             originalText: originalText,
             userNote: userNote,
+            mediaKey: mediaKey,
             place: place,
             processingState: state,
             capturedAt: capturedAt

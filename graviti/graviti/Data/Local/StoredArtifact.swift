@@ -8,6 +8,7 @@ final class StoredArtifact {
     var sourceURL: String?
     var originalText: String?
     var userNote: String?
+    var mediaKey: String?
     var placeJSON: Data?
     var processingStateRawValue: String
     var capturedAt: Date
@@ -18,6 +19,7 @@ final class StoredArtifact {
         sourceURL = artifact.sourceURL
         originalText = artifact.originalText
         userNote = artifact.userNote
+        mediaKey = artifact.mediaKey
         placeJSON = try? artifact.place.map { try JSONEncoder().encode($0) }
         processingStateRawValue = artifact.processingState.rawValue
         capturedAt = artifact.capturedAt
@@ -34,6 +36,7 @@ final class StoredArtifact {
             sourceURL: sourceURL,
             originalText: originalText,
             userNote: userNote,
+            mediaKey: mediaKey,
             place: try placeJSON.map { try JSONDecoder().decode(SavedPlace.self, from: $0) },
             processingState: state,
             capturedAt: capturedAt

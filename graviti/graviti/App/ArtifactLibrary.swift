@@ -114,6 +114,22 @@ final class ArtifactLibrary: ObservableObject {
         ))
     }
 
+    func savePhoto(_ data: Data, fileExtension: String, note: String?) async throws {
+        let id = UUID()
+        let key = try SharedMediaStore.store(data, id: id, fileExtension: fileExtension)
+        do {
+            try await save(Artifact(
+                id: id,
+                kind: .photo,
+                userNote: note,
+                mediaKey: key
+            ))
+        } catch {
+            try? SharedMediaStore.remove(key)
+            throw error
+        }
+    }
+
     func importSharedArtifacts() async {
         do {
             for fileURL in try SharedArtifactInbox.pendingFiles() {
@@ -121,10 +137,11 @@ final class ArtifactLibrary: ObservableObject {
                 if !artifacts.contains(where: { $0.id == envelope.id }) {
                     let artifact = Artifact(
                         id: envelope.id,
-                        kind: envelope.sourceURL == nil ? .manual : .url,
+                        kind: envelope.mediaKey != nil ? .photo : (envelope.sourceURL == nil ? .manual : .url),
                         sourceURL: envelope.sourceURL,
                         originalText: envelope.originalText ?? envelope.sourceURL.flatMap(MapLinkMetadata.placeName),
                         userNote: envelope.userNote,
+                        mediaKey: envelope.mediaKey,
                         capturedAt: envelope.capturedAt
                     )
                     try await save(artifact)
