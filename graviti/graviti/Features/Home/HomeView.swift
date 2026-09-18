@@ -23,7 +23,11 @@ struct HomeView: View {
                 red: 170 / 255,
                 green: 151 / 255,
                 blue: 255 / 255
-            )
+            ),
+            driftX: 7,
+            driftY: -5,
+            driftDurationX: 9,
+            driftDurationY: 11
         ),
 
         OrbitItem(
@@ -40,7 +44,11 @@ struct HomeView: View {
                 red: 126 / 255,
                 green: 244 / 255,
                 blue: 207 / 255
-            )
+            ),
+            driftX: -5,
+            driftY: 6,
+            driftDurationX: 10,
+            driftDurationY: 8
         ),
 
         OrbitItem(
@@ -61,7 +69,11 @@ struct HomeView: View {
                 red: 138 / 255,
                 green: 221 / 255,
                 blue: 255 / 255
-            )
+            ),
+            driftX: 6,
+            driftY: 4,
+            driftDurationX: 8,
+            driftDurationY: 10
         ),
 
         OrbitItem(
@@ -82,7 +94,11 @@ struct HomeView: View {
                 red: 255 / 255,
                 green: 203 / 255,
                 blue: 97 / 255
-            )
+            ),
+            driftX: -6,
+            driftY: -5,
+            driftDurationX: 11,
+            driftDurationY: 9
         ),
 
         OrbitItem(
@@ -99,7 +115,11 @@ struct HomeView: View {
                 red: 139 / 255,
                 green: 247 / 255,
                 blue: 211 / 255
-            )
+            ),
+            driftX: 4,
+            driftY: 6,
+            driftDurationX: 7,
+            driftDurationY: 10
         )
     ]
 
@@ -132,6 +152,12 @@ struct HomeView: View {
                         x: geometry.size.width * item.x,
                         y: geometry.size.height * item.y
                     )
+                    .orbitDrift(
+                        x: item.driftX,
+                        y: item.driftY,
+                        xDuration: item.driftDurationX,
+                        yDuration: item.driftDurationY
+                    )
                 }
             }
         }
@@ -154,10 +180,18 @@ struct HomeView: View {
 
 private struct OrbitItem: Identifiable {
     let node: OrbitNode
+
     let x: CGFloat
     let y: CGFloat
+
     let primaryColor: Color
     let highlightColor: Color
+
+    let driftX: CGFloat
+    let driftY: CGFloat
+
+    let driftDurationX: Double
+    let driftDurationY: Double
 
     var id: UUID {
         node.id
