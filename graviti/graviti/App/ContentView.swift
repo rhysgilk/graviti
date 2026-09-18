@@ -63,10 +63,14 @@ struct ContentView: View {
         .task {
             await library.load()
             await library.importSharedArtifacts()
+            await library.processPendingMaps()
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
-            Task { await library.importSharedArtifacts() }
+            Task {
+                await library.importSharedArtifacts()
+                await library.processPendingMaps()
+            }
         }
     }
 }

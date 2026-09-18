@@ -66,7 +66,7 @@ struct LibraryView: View {
         } else {
             List(savedPlaces) { place in
                 NavigationLink {
-                    SavedPlaceDetailView(place: place, artifacts: library.artifacts.filter { $0.place?.id == place.id })
+                    SavedPlaceDetailView(place: place, artifacts: library.artifacts.filter { $0.place?.id == place.id }, library: library)
                 } label: {
                     VStack(alignment: .leading, spacing: 5) {
                         Text(place.name).font(.headline)
@@ -119,7 +119,7 @@ struct LibraryView: View {
         } else {
             List(library.artifacts) { artifact in
                 NavigationLink {
-                    SavedArtifactDetailView(artifact: artifact)
+                    SavedArtifactDetailView(artifact: artifact, library: library)
                 } label: {
                     ArtifactRow(artifact: artifact)
                 }
@@ -177,6 +177,12 @@ private struct ArtifactRow: View {
                 Text(artifact.capturedAt, format: .dateTime.month().day().year())
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.58))
+
+                if artifact.processingState == .needsReview || artifact.processingState == .failed {
+                    Text(artifact.processingState == .needsReview ? "Needs place review" : "Place lookup failed")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(GravitiColors.opportunityCoral)
+                }
             }
         }
         .padding(.vertical, 6)

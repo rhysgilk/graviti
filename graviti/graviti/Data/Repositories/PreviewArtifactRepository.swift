@@ -15,4 +15,9 @@ final class PreviewArtifactRepository: ArtifactRepository {
     func artifacts() async throws -> [Artifact] {
         stored
     }
+
+    func update(_ artifact: Artifact) async throws {
+        guard let index = stored.firstIndex(where: { $0.id == artifact.id }) else { return }
+        stored[index] = artifact
+    }
 }

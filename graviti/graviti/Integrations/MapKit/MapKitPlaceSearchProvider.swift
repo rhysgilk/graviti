@@ -6,7 +6,12 @@ struct MapKitPlaceSearchProvider: PlaceSearchProviding {
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = query
         request.resultTypes = [.pointOfInterest, .address]
-        let response = try await MKLocalSearch(request: request).start()
+        let response: MKLocalSearch.Response
+        do {
+            response = try await MKLocalSearch(request: request).start()
+        } catch let error as MKError where error.code == .placemarkNotFound {
+            return []
+        }
 
         return response.mapItems.compactMap { item in
             guard let name = item.name, !name.isEmpty else { return nil }

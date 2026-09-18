@@ -42,4 +42,17 @@ struct Artifact: Identifiable, Hashable {
         self.processingState = processingState
         self.capturedAt = capturedAt
     }
+
+    func withResolution(place: SavedPlace?, state: ArtifactProcessingState) -> Artifact {
+        Artifact(
+            id: id,
+            kind: kind,
+            sourceURL: sourceURL,
+            originalText: originalText,
+            userNote: userNote,
+            place: place,
+            processingState: state,
+            capturedAt: capturedAt
+        )
+    }
 }

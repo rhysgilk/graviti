@@ -8,9 +8,15 @@ final class ArtifactLibrary: ObservableObject {
     @Published private(set) var loadError: String?
 
     private let repository: any ArtifactRepository
+    private let placeResolver: MapPlaceResolver
+    private var processingIDs: Set<UUID> = []
 
-    init(repository: any ArtifactRepository) {
+    init(repository: any ArtifactRepository, placeResolver: MapPlaceResolver? = nil) {
         self.repository = repository
+        self.placeResolver = placeResolver ?? MapPlaceResolver(
+            searchProvider: MapKitPlaceSearchProvider(),
+            linkExpander: URLSessionMapLinkExpander()
+        )
     }
 
     func load() async {
@@ -25,6 +31,77 @@ final class ArtifactLibrary: ObservableObject {
     func save(_ artifact: Artifact) async throws {
         try await repository.save(artifact)
         artifacts.insert(artifact, at: 0)
+        if shouldProcess(artifact) {
+            Task { await process(artifact.id) }
+        }
+    }
+
+    func processPendingMaps() async {
+        for artifact in artifacts where shouldProcess(artifact) ||
+            (artifact.processingState == .processing && artifact.place == nil && artifact.sourceURL.map { MapLinkMetadata.provider(for: $0) != nil } == true) {
+            await process(artifact.id)
+        }
+    }
+
+    func retryProcessing(_ id: UUID) async {
+        guard let artifact = artifacts.first(where: { $0.id == id }),
+              !processingIDs.contains(id),
+              artifact.place == nil,
+              artifact.sourceURL.map({ MapLinkMetadata.provider(for: $0) != nil }) == true else { return }
+        do {
+            try await update(artifact.withResolution(place: nil, state: .saved))
+            await process(id)
+        } catch {
+            loadError = error.localizedDescription
+        }
+    }
+
+    func assignPlace(_ place: SavedPlace, to artifactID: UUID) async throws {
+        guard let artifact = artifacts.first(where: { $0.id == artifactID }) else { return }
+        try await update(artifact.withResolution(place: place, state: .processed))
+    }
+
+    func removePlaceMatch(from artifactID: UUID) async throws {
+        guard let artifact = artifacts.first(where: { $0.id == artifactID }) else { return }
+        try await update(artifact.withResolution(place: nil, state: .needsReview))
+    }
+
+    private func process(_ id: UUID) async {
+        guard let artifact = artifacts.first(where: { $0.id == id }),
+              shouldProcess(artifact) || artifact.processingState == .processing else { return }
+        guard processingIDs.insert(id).inserted else { return }
+        defer { processingIDs.remove(id) }
+
+        do {
+            try await update(artifact.withResolution(place: nil, state: .processing))
+            let result = try await placeResolver.resolve(artifact)
+            guard let current = artifacts.first(where: { $0.id == id }),
+                  current.processingState == .processing else { return }
+            switch result {
+            case .matched(let place):
+                try await update(current.withResolution(place: place, state: .processed))
+            case .needsReview:
+                try await update(current.withResolution(place: nil, state: .needsReview))
+            case .collection:
+                try await update(current.withResolution(place: nil, state: .processed))
+            }
+        } catch {
+            guard let current = artifacts.first(where: { $0.id == id }),
+                  current.processingState == .processing else { return }
+            let state: ArtifactProcessingState = error is CancellationError ? .saved : .failed
+            try? await update(current.withResolution(place: nil, state: state))
+        }
+    }
+
+    private func shouldProcess(_ artifact: Artifact) -> Bool {
+        artifact.processingState == .saved && artifact.place == nil &&
+            artifact.sourceURL.map { MapLinkMetadata.provider(for: $0) != nil } == true
+    }
+
+    private func update(_ artifact: Artifact) async throws {
+        try await repository.update(artifact)
+        guard let index = artifacts.firstIndex(where: { $0.id == artifact.id }) else { return }
+        artifacts[index] = artifact
     }
 
     func savePlace(_ candidate: PlaceCandidate) async throws {
@@ -99,6 +176,7 @@ final class ArtifactLibrary: ObservableObject {
         if !newArtifacts.isEmpty {
             try await repository.saveMany(newArtifacts)
             artifacts.insert(contentsOf: newArtifacts, at: 0)
+            Task { await processPendingMaps() }
         }
         return CSVImportSummary(
             imported: newArtifacts.count,

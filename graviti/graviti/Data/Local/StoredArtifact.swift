@@ -39,6 +39,11 @@ final class StoredArtifact {
             capturedAt: capturedAt
         )
     }
+
+    @MainActor func applyResolution(_ artifact: Artifact) throws {
+        placeJSON = try artifact.place.map { try JSONEncoder().encode($0) }
+        processingStateRawValue = artifact.processingState.rawValue
+    }
 }
 
 private enum StoredArtifactError: Error {

@@ -4,6 +4,7 @@ import MapKit
 struct SavedPlaceDetailView: View {
     let place: SavedPlace
     let artifacts: [Artifact]
+    @ObservedObject var library: ArtifactLibrary
 
     var body: some View {
         ScrollView {
@@ -29,7 +30,7 @@ struct SavedPlaceDetailView: View {
                     .font(.headline)
                 ForEach(artifacts) { artifact in
                     NavigationLink {
-                        SavedArtifactDetailView(artifact: artifact)
+                        SavedArtifactDetailView(artifact: artifact, library: library)
                     } label: {
                         HStack {
                             Text(artifact.originalText ?? "Saved link")
