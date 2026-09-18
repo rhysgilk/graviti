@@ -20,4 +20,12 @@ final class PreviewArtifactRepository: ArtifactRepository {
         guard let index = stored.firstIndex(where: { $0.id == artifact.id }) else { return }
         stored[index] = artifact
     }
+
+    func updateMany(_ artifacts: [Artifact]) async throws {
+        for artifact in artifacts { try await update(artifact) }
+    }
+
+    func delete(_ id: UUID) async throws {
+        stored.removeAll { $0.id == id }
+    }
 }

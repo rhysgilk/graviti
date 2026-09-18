@@ -67,6 +67,25 @@ final class ArtifactLibrary: ObservableObject {
         try await update(artifact.withResolution(place: nil, state: .needsReview))
     }
 
+    func removePlaceFromLibrary(_ placeID: String) async throws {
+        let changed = artifacts
+            .filter { $0.place?.id == placeID }
+            .map { $0.withResolution(place: nil, state: .needsReview) }
+        guard !changed.isEmpty else { return }
+        try await repository.updateMany(changed)
+        let replacements = Dictionary(uniqueKeysWithValues: changed.map { ($0.id, $0) })
+        artifacts = artifacts.map { replacements[$0.id] ?? $0 }
+    }
+
+    func deleteArtifact(_ id: UUID) async throws {
+        guard let artifact = artifacts.first(where: { $0.id == id }) else { return }
+        try await repository.delete(id)
+        artifacts.removeAll { $0.id == id }
+        if let mediaKey = artifact.mediaKey {
+            try? SharedMediaStore.remove(mediaKey)
+        }
+    }
+
     private func process(_ id: UUID) async {
         guard let artifact = artifacts.first(where: { $0.id == id }),
               shouldProcess(artifact) || artifact.processingState == .processing else { return }

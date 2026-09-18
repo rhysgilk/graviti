@@ -2,9 +2,16 @@ import SwiftUI
 import MapKit
 
 struct SavedPlaceDetailView: View {
+    @Environment(\.dismiss) private var dismiss
     let place: SavedPlace
-    let artifacts: [Artifact]
     @ObservedObject var library: ArtifactLibrary
+    @State private var showingRemoveConfirmation = false
+    @State private var actionError: String?
+    @State private var isRemoving = false
+
+    private var artifacts: [Artifact] {
+        library.artifacts.filter { $0.place?.id == place.id }
+    }
 
     var body: some View {
         ScrollView {
@@ -42,11 +49,44 @@ struct SavedPlaceDetailView: View {
                     }
                     .buttonStyle(.plain)
                 }
+
+                if let actionError {
+                    Text(actionError)
+                        .font(.subheadline)
+                        .foregroundStyle(GravitiColors.opportunityCoral)
+                }
+
+                Button(role: .destructive) { showingRemoveConfirmation = true } label: {
+                    Label("Remove place from Library", systemImage: "mappin.slash")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .disabled(isRemoving)
+                .padding(.top, 8)
             }
             .padding(20)
         }
         .background(GravitiColors.appBackground)
         .navigationTitle(place.name)
         .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog(
+            "Remove \(place.name) from your places?",
+            isPresented: $showingRemoveConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Remove place", role: .destructive) {
+                isRemoving = true
+                Task {
+                    do {
+                        try await library.removePlaceFromLibrary(place.id)
+                        dismiss()
+                    } catch {
+                        actionError = error.localizedDescription
+                        isRemoving = false
+                    }
+                }
+            }
+        } message: {
+            Text("The \(artifacts.count) associated saves stay in your Library without a place. You can match them again later.")
+        }
     }
 }

@@ -33,12 +33,32 @@ final class SwiftDataArtifactRepository: ArtifactRepository {
     }
 
     func update(_ artifact: Artifact) async throws {
-        let id = artifact.id
+        try await updateMany([artifact])
+    }
+
+    func updateMany(_ artifacts: [Artifact]) async throws {
+        do {
+            for artifact in artifacts {
+                let id = artifact.id
+                let descriptor = FetchDescriptor<StoredArtifact>(predicate: #Predicate { $0.id == id })
+                guard let stored = try context.fetch(descriptor).first else {
+                    throw ArtifactRepositoryError.notFound
+                }
+                try stored.applyResolution(artifact)
+            }
+            try context.save()
+        } catch {
+            context.rollback()
+            throw error
+        }
+    }
+
+    func delete(_ id: UUID) async throws {
         let descriptor = FetchDescriptor<StoredArtifact>(predicate: #Predicate { $0.id == id })
         guard let stored = try context.fetch(descriptor).first else {
             throw ArtifactRepositoryError.notFound
         }
-        try stored.applyResolution(artifact)
+        context.delete(stored)
         do {
             try context.save()
         } catch {

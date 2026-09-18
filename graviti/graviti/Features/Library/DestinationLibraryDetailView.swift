@@ -39,7 +39,6 @@ struct DestinationLibraryDetailView: View {
                         NavigationLink {
                             SavedPlaceDetailView(
                                 place: place,
-                                artifacts: library.artifacts.filter { $0.place?.id == place.id },
                                 library: library
                             )
                         } label: {

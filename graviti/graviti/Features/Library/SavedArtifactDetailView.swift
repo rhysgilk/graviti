@@ -1,12 +1,15 @@
 import SwiftUI
 
 struct SavedArtifactDetailView: View {
+    @Environment(\.dismiss) private var dismiss
     let artifact: Artifact
     @ObservedObject var library: ArtifactLibrary
     @State private var showingPlaceReview = false
     @State private var actionError: String?
     @State private var isImportingGuide = false
     @State private var guideImportMessage: String?
+    @State private var showingDeleteConfirmation = false
+    @State private var isDeleting = false
 
     private var current: Artifact {
         library.artifacts.first(where: { $0.id == artifact.id }) ?? artifact
@@ -134,6 +137,11 @@ struct SavedArtifactDetailView: View {
                               MapLinkMetadata.provider(for: sourceURL) != nil,
                               !MapLinkMetadata.isCollectionLink(sourceURL) {
                         placeStatus
+                    } else if !isCollectionSave {
+                        Button("Add a place to this save") { showingPlaceReview = true }
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                            .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
                     }
                 }
 
@@ -151,6 +159,13 @@ struct SavedArtifactDetailView: View {
                 Text("Saved \(current.capturedAt, format: .dateTime.month().day().year())")
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.58))
+
+                Button(role: .destructive) { showingDeleteConfirmation = true } label: {
+                    Label("Delete saved item", systemImage: "trash")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .disabled(isDeleting)
+                .padding(.top, 8)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(20)
@@ -160,6 +175,26 @@ struct SavedArtifactDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingPlaceReview) {
             PlaceReviewView(artifact: current, library: library)
+        }
+        .confirmationDialog(
+            "Delete this saved item?",
+            isPresented: $showingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete saved item", role: .destructive) {
+                isDeleting = true
+                Task {
+                    do {
+                        try await library.deleteArtifact(current.id)
+                        dismiss()
+                    } catch {
+                        actionError = error.localizedDescription
+                        isDeleting = false
+                    }
+                }
+            }
+        } message: {
+            Text(deletionMessage)
         }
     }
 
@@ -207,5 +242,17 @@ struct SavedArtifactDetailView: View {
             return provider.displayName
         }
         return "Link"
+    }
+
+    private var deletionMessage: String {
+        if isCollectionSave {
+            return "This removes the guide or list link. Places already imported from it remain saved."
+        }
+        return "This removes the save from your Library and updates its place and Gravity."
+    }
+
+    private var isCollectionSave: Bool {
+        guard let sourceURL = current.sourceURL else { return false }
+        return MapLinkMetadata.isCollectionLink(sourceURL)
     }
 }

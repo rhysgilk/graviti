@@ -87,7 +87,7 @@ struct LibraryView: View {
         } else {
             List(savedPlaces) { place in
                 NavigationLink {
-                    SavedPlaceDetailView(place: place, artifacts: library.artifacts.filter { $0.place?.id == place.id }, library: library)
+                    SavedPlaceDetailView(place: place, library: library)
                 } label: {
                     VStack(alignment: .leading, spacing: 5) {
                         Text(place.name).font(.headline)
