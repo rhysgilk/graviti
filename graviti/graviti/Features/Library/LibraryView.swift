@@ -152,7 +152,12 @@ private struct ArtifactRow: View {
     private var title: String {
         switch artifact.kind {
         case .url:
+            if let title = artifact.originalText, !title.isEmpty { return title }
             guard let source = artifact.sourceURL else { return "Saved link" }
+            if MapLinkMetadata.isCollectionLink(source),
+               let provider = MapLinkMetadata.provider(for: source) {
+                return provider == .apple ? "Apple Maps guide" : "Google Maps list"
+            }
             return URLComponents(string: source)?.host ?? source
         case .manual:
             return artifact.originalText?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Saved note"

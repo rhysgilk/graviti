@@ -6,7 +6,7 @@ struct SavedArtifactDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Label(artifact.kind == .url ? "Link" : "Note", systemImage: artifact.kind == .url ? "link" : "note.text")
+                Label(sourceLabel, systemImage: artifact.kind == .url ? "link" : "note.text")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(GravitiColors.signalMint)
 
@@ -15,6 +15,14 @@ struct SavedArtifactDetailView: View {
                         .font(.body)
                         .textSelection(.enabled)
                         .foregroundStyle(.white)
+
+                    if MapLinkMetadata.isCollectionLink(sourceURL) {
+                        Text(MapLinkMetadata.provider(for: sourceURL) == .google
+                             ? "This saves the list link. To add each place, import its Google Saved CSV from the Save tab."
+                             : "This saves the guide link. Its places aren't imported individually yet.")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.68))
+                    }
 
                     if let url = openableURL(sourceURL) {
                         Link(destination: url) {
@@ -28,6 +36,12 @@ struct SavedArtifactDetailView: View {
                 }
 
                 if let originalText = artifact.originalText {
+                    if artifact.kind == .url {
+                        Text(MapLinkMetadata.provider(for: artifact.sourceURL ?? "") == nil
+                             ? "Source title" : "Saved place")
+                            .font(.headline)
+                            .foregroundStyle(.white.opacity(0.65))
+                    }
                     Text(originalText)
                         .font(.body)
                         .textSelection(.enabled)
@@ -65,5 +79,14 @@ struct SavedArtifactDetailView: View {
             return nil
         }
         return components.url
+    }
+
+    private var sourceLabel: String {
+        guard artifact.kind == .url else { return "Note" }
+        if let sourceURL = artifact.sourceURL,
+           let provider = MapLinkMetadata.provider(for: sourceURL) {
+            return provider.displayName
+        }
+        return "Link"
     }
 }

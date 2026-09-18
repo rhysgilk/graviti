@@ -10,7 +10,13 @@ final class SwiftDataArtifactRepository: ArtifactRepository {
     }
 
     func save(_ artifact: Artifact) async throws {
-        context.insert(StoredArtifact(artifact))
+        try await saveMany([artifact])
+    }
+
+    func saveMany(_ artifacts: [Artifact]) async throws {
+        for artifact in artifacts {
+            context.insert(StoredArtifact(artifact))
+        }
         do {
             try context.save()
         } catch {

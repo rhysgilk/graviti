@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var library: ArtifactLibrary
     @State private var selectedTab: AppTab = .home
     @State private var libraryNavigationResetID = UUID()
@@ -62,6 +63,11 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
         .task {
             await library.load()
+            await library.importSharedArtifacts()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            Task { await library.importSharedArtifacts() }
         }
     }
 }

@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SaveView: View {
     @ObservedObject var library: ArtifactLibrary
@@ -11,6 +12,9 @@ struct SaveView: View {
     @State private var isSaving = false
     @State private var didSave = false
     @State private var saveError: String?
+    @State private var showingCSVImporter = false
+    @State private var showingMapsLinkImporter = false
+    @State private var importMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -96,6 +100,45 @@ struct SaveView: View {
                             .font(.subheadline)
                             .foregroundStyle(GravitiColors.opportunityCoral)
                     }
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Bring in saved places")
+                            .font(.headline)
+
+                        Text("Share an Apple Maps or Google Maps place, paste its link, or import a .webloc file. Guide and list links stay clickable in your Library. To add places from a Google Maps list, select Saved in Google Takeout and import its CSV.")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.7))
+
+                        Link("Open Google Takeout", destination: URL(string: "https://takeout.google.com")!)
+                            .font(.subheadline.weight(.semibold))
+
+                        Button {
+                            showingCSVImporter = true
+                        } label: {
+                            Label("Import Google Saved CSV", systemImage: "square.and.arrow.down")
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity, minHeight: 48)
+                                .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            showingMapsLinkImporter = true
+                        } label: {
+                            Label("Import Maps link file", systemImage: "link.badge.plus")
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity, minHeight: 48)
+                                .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                        }
+                        .buttonStyle(.plain)
+
+                        if let importMessage {
+                            Text(importMessage)
+                                .font(.subheadline)
+                                .foregroundStyle(GravitiColors.signalMint)
+                        }
+                    }
+                    .padding(.top, 8)
                 }
                 .padding(20)
             }
@@ -111,6 +154,42 @@ struct SaveView: View {
         }
         .onChange(of: noteText) { _, newValue in
             if !newValue.isEmpty { didSave = false }
+        }
+        .fileImporter(
+            isPresented: $showingCSVImporter,
+            allowedContentTypes: [.commaSeparatedText]
+        ) { result in
+            switch result {
+            case .success(let fileURL):
+                Task {
+                    do {
+                        let summary = try await library.importGoogleSavedCSV(from: fileURL)
+                        importMessage = "Imported \(summary.imported) saves. \(summary.skipped) skipped."
+                    } catch {
+                        importMessage = error.localizedDescription
+                    }
+                }
+            case .failure(let error):
+                importMessage = error.localizedDescription
+            }
+        }
+        .fileImporter(
+            isPresented: $showingMapsLinkImporter,
+            allowedContentTypes: [UTType(filenameExtension: "webloc") ?? .data]
+        ) { result in
+            switch result {
+            case .success(let fileURL):
+                Task {
+                    do {
+                        try await library.importMapsLinkFile(from: fileURL)
+                        importMessage = "Maps link saved to Library."
+                    } catch {
+                        importMessage = error.localizedDescription
+                    }
+                }
+            case .failure(let error):
+                importMessage = error.localizedDescription
+            }
         }
     }
 
@@ -141,6 +220,9 @@ struct SaveView: View {
             artifact = Artifact(
                 kind: .url,
                 sourceURL: urlText.trimmingCharacters(in: .whitespacesAndNewlines),
+                originalText: MapLinkMetadata.placeName(
+                    from: urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+                ),
                 userNote: optionalNote.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
             )
         case .manual:
