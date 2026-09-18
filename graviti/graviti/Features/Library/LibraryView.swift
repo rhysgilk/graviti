@@ -205,7 +205,7 @@ private struct ArtifactRow: View {
                         .foregroundStyle(GravitiColors.opportunityCoral)
                 }
 
-                if let category = artifact.enrichment?.category {
+                if let category = artifact.effectiveCategory {
                     Text(category.displayName)
                         .font(.caption)
                         .foregroundStyle(GravitiColors.signalMint)
