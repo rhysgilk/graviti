@@ -12,6 +12,7 @@ struct OrbitDriftModifier: ViewModifier {
     let yDistance: CGFloat
     let xDuration: Double
     let yDuration: Double
+    let isActive: Bool
 
     @Environment(\.accessibilityReduceMotion)
     private var reduceMotion
@@ -25,24 +26,24 @@ struct OrbitDriftModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .offset(
-                x: reduceMotion
+                x: reduceMotion || !isActive
                     ? 0
                     : (moveX ? xDistance : 0)
             )
             .animation(
-                reduceMotion
+                reduceMotion || !isActive
                     ? nil
                     : .easeInOut(duration: xDuration)
                         .repeatForever(autoreverses: true),
                 value: moveX
             )
             .offset(
-                y: reduceMotion
+                y: reduceMotion || !isActive
                     ? 0
                     : (moveY ? yDistance : 0)
             )
             .animation(
-                reduceMotion
+                reduceMotion || !isActive
                     ? nil
                     : .easeInOut(duration: yDuration)
                         .repeatForever(autoreverses: true),
@@ -59,10 +60,18 @@ struct OrbitDriftModifier: ViewModifier {
                     startMotion()
                 }
             }
+            .onChange(of: isActive) { _, active in
+                if active {
+                    startMotion()
+                } else {
+                    moveX = false
+                    moveY = false
+                }
+            }
     }
 
     private func startMotion() {
-        guard !reduceMotion else {
+        guard !reduceMotion && isActive else {
             return
         }
 
@@ -76,14 +85,16 @@ extension View {
         x: CGFloat,
         y: CGFloat,
         xDuration: Double,
-        yDuration: Double
+        yDuration: Double,
+        isActive: Bool = true
     ) -> some View {
         modifier(
             OrbitDriftModifier(
                 xDistance: x,
                 yDistance: y,
                 xDuration: xDuration,
-                yDuration: yDuration
+                yDuration: yDuration,
+                isActive: isActive
             )
         )
     }
