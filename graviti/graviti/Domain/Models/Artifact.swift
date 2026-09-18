@@ -23,6 +23,7 @@ struct Artifact: Identifiable, Hashable {
     let mediaKey: String?
     let place: SavedPlace?
     let enrichment: ArtifactEnrichment?
+    let userDetails: ArtifactUserDetails?
     let processingState: ArtifactProcessingState
     let capturedAt: Date
 
@@ -35,6 +36,7 @@ struct Artifact: Identifiable, Hashable {
         mediaKey: String? = nil,
         place: SavedPlace? = nil,
         enrichment: ArtifactEnrichment? = nil,
+        userDetails: ArtifactUserDetails? = nil,
         processingState: ArtifactProcessingState = .saved,
         capturedAt: Date = .now
     ) {
@@ -46,6 +48,7 @@ struct Artifact: Identifiable, Hashable {
         self.mediaKey = mediaKey
         self.place = place
         self.enrichment = enrichment
+        self.userDetails = userDetails
         self.processingState = processingState
         self.capturedAt = capturedAt
     }
@@ -60,6 +63,7 @@ struct Artifact: Identifiable, Hashable {
             mediaKey: mediaKey,
             place: place,
             enrichment: place?.id == self.place?.id ? enrichment : nil,
+            userDetails: userDetails,
             processingState: state,
             capturedAt: capturedAt
         )
@@ -75,8 +79,29 @@ struct Artifact: Identifiable, Hashable {
             mediaKey: mediaKey,
             place: place,
             enrichment: enrichment,
+            userDetails: userDetails,
             processingState: processingState,
             capturedAt: capturedAt
         )
     }
+
+    func withEditedDetails(_ details: ArtifactUserDetails?, note: String?) -> Artifact {
+        Artifact(
+            id: id,
+            kind: kind,
+            sourceURL: sourceURL,
+            originalText: originalText,
+            userNote: note,
+            mediaKey: mediaKey,
+            place: place,
+            enrichment: enrichment,
+            userDetails: details,
+            processingState: processingState,
+            capturedAt: capturedAt
+        )
+    }
+
+    var effectiveSummary: String? { userDetails == nil ? enrichment?.summary : userDetails?.summary }
+    var effectiveCategory: ExperienceCategory? { userDetails == nil ? enrichment?.category : userDetails?.category }
+    var effectiveInterests: [String] { userDetails?.interests ?? enrichment?.interests ?? [] }
 }

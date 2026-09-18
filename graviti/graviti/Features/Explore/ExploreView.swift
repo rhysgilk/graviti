@@ -119,7 +119,7 @@ private struct InterestEvidenceView: View {
     @ObservedObject var library: ArtifactLibrary
 
     private var matchingArtifacts: [Artifact] {
-        library.artifacts.filter { $0.enrichment?.interests.contains(interest) == true }
+        library.artifacts.filter { $0.effectiveInterests.contains(interest) }
     }
 
     var body: some View {

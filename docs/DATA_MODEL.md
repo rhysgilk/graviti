@@ -124,6 +124,8 @@ The Artifact is never deleted merely because extraction fails.
 
 `user_note` may contain the optional description a user supplied with a photo. Keep user-authored text separate from generated descriptions and preserve it when enrichment is rerun.
 
+User corrections to a save's description, category, and interests are stored separately from generated enrichment. Explore uses the corrected values when present. Refreshing enrichment must not overwrite corrections; users can explicitly return to the suggested values.
+
 ## 6. MediaAsset
 
 ```text

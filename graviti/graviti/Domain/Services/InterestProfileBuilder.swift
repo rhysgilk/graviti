@@ -43,11 +43,10 @@ enum InterestProfileBuilder {
         var categoryCounts: [ExperienceCategory: Int] = [:]
 
         for artifact in artifacts {
-            guard let enrichment = artifact.enrichment else { continue }
-            for interest in Set(enrichment.interests) {
+            for interest in Set(artifact.effectiveInterests) {
                 grouped[interest, default: []].append(artifact)
             }
-            if let category = enrichment.category, category != .other {
+            if let category = artifact.effectiveCategory, category != .other {
                 categoryCounts[category, default: 0] += 1
             }
         }

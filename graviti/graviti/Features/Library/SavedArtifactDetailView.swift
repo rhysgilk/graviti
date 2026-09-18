@@ -11,6 +11,7 @@ struct SavedArtifactDetailView: View {
     @State private var showingDeleteConfirmation = false
     @State private var isDeleting = false
     @State private var isRefreshingDetails = false
+    @State private var showingDetailsEditor = false
 
     private var current: Artifact {
         library.artifacts.first(where: { $0.id == artifact.id }) ?? artifact
@@ -98,42 +99,51 @@ struct SavedArtifactDetailView: View {
                         .foregroundStyle(.white)
                 }
 
-                if let enrichment = current.enrichment {
+                if current.enrichment != nil || current.userDetails != nil {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("About this save")
                             .font(.headline)
-                        if let summary = enrichment.summary {
+                        if let summary = current.effectiveSummary {
                             Text(summary)
                                 .font(.subheadline)
                                 .textSelection(.enabled)
                         }
-                        if let category = enrichment.category {
+                        if let category = current.effectiveCategory {
                             Label(category.displayName, systemImage: "square.grid.2x2")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(GravitiColors.signalMint)
                         }
-                        if !enrichment.interests.isEmpty {
-                            Text(enrichment.interests.joined(separator: " · "))
+                        if !current.effectiveInterests.isEmpty {
+                            Text(current.effectiveInterests.joined(separator: " · "))
                                 .font(.subheadline)
                                 .foregroundStyle(.white.opacity(0.8))
                         }
-                        Text("Suggested from \(enrichment.source.displayName)")
+                        Text(current.userDetails == nil
+                             ? "Suggested from \(current.enrichment?.source.displayName ?? "saved details")"
+                             : "Details edited by you")
                             .font(.caption)
                             .foregroundStyle(.white.opacity(0.55))
-                        Button(isRefreshingDetails ? "Refreshing…" : "Refresh details") {
-                            isRefreshingDetails = true
-                            Task {
-                                await library.refreshEnrichment(current.id)
-                                isRefreshingDetails = false
+                        if current.enrichment != nil {
+                            Button(isRefreshingDetails ? "Refreshing…" : "Refresh suggestions") {
+                                isRefreshingDetails = true
+                                Task {
+                                    await library.refreshEnrichment(current.id)
+                                    isRefreshingDetails = false
+                                }
                             }
+                            .disabled(isRefreshingDetails)
+                            .font(.caption.weight(.semibold))
                         }
-                        .disabled(isRefreshingDetails)
-                        .font(.caption.weight(.semibold))
                     }
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
                 }
+
+                Button("Edit description and interests") { showingDetailsEditor = true }
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity, minHeight: 48)
+                    .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
 
                 if let place = current.place {
                     VStack(alignment: .leading, spacing: 5) {
@@ -213,6 +223,9 @@ struct SavedArtifactDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingPlaceReview) {
             PlaceReviewView(artifact: current, library: library)
+        }
+        .sheet(isPresented: $showingDetailsEditor) {
+            SavedItemDetailsEditor(artifact: current, library: library)
         }
         .confirmationDialog(
             "Delete this saved item?",

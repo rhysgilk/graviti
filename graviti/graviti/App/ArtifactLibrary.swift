@@ -51,6 +51,11 @@ final class ArtifactLibrary: ObservableObject {
         await enrich(id, force: true)
     }
 
+    func saveEditedDetails(_ details: ArtifactUserDetails?, note: String?, for id: UUID) async throws {
+        guard let artifact = artifacts.first(where: { $0.id == id }) else { return }
+        try await update(artifact.withEditedDetails(details, note: note))
+    }
+
     func processPendingMaps() async {
         for artifact in artifacts where shouldProcess(artifact) ||
             (artifact.processingState == .processing && artifact.place == nil && artifact.sourceURL.map { MapLinkMetadata.provider(for: $0) != nil } == true) {
