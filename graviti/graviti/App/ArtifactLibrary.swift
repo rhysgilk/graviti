@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import MapKit
 
 @MainActor
 final class ArtifactLibrary: ObservableObject {
@@ -201,7 +202,7 @@ final class ArtifactLibrary: ObservableObject {
         )
     }
 
-    func importMapsLinkFile(from fileURL: URL) async throws {
+    func importMapsLinkFile(from fileURL: URL) async throws -> String {
         let hasAccess = fileURL.startAccessingSecurityScopedResource()
         defer { if hasAccess { fileURL.stopAccessingSecurityScopedResource() } }
 
@@ -214,15 +215,78 @@ final class ArtifactLibrary: ObservableObject {
             throw MapsLinkFileError.invalidFile
         }
 
-        guard !artifacts.contains(where: { $0.sourceURL == rawURL }) else {
-            throw MapsLinkFileError.alreadySaved
+        if artifacts.contains(where: { $0.sourceURL == rawURL }) {
+            return rawURL
         }
         try await save(Artifact(
             kind: .url,
             sourceURL: rawURL,
             originalText: MapLinkMetadata.placeName(from: rawURL)
         ))
+        return rawURL
     }
+
+    func importAppleGuidePlaces(from rawURL: String) async throws -> AppleGuideImportSummary {
+        let expanded = await URLSessionMapLinkExpander().expandedURL(for: rawURL)
+        let guide = try AppleMapsGuideParser.parse(expanded)
+        var existingURLs = Set(artifacts.compactMap(\.sourceURL))
+        var additions: [Artifact] = []
+        var skipped = 0
+
+        for rawIdentifier in guide.placeIdentifiers {
+            let placeURL = "https://maps.apple.com/place?place-id=\(rawIdentifier)"
+            guard existingURLs.insert(placeURL).inserted else {
+                skipped += 1
+                continue
+            }
+            guard let identifier = MKMapItem.Identifier(rawValue: rawIdentifier) else {
+                skipped += 1
+                continue
+            }
+            do {
+                let item = try await MKMapItemRequest(mapItemIdentifier: identifier).mapItem
+                guard let name = item.name, !name.isEmpty else {
+                    skipped += 1
+                    continue
+                }
+                let coordinate = item.location.coordinate
+                let place = SavedPlace(
+                    id: item.identifier?.rawValue ?? rawIdentifier,
+                    name: name,
+                    latitude: coordinate.latitude,
+                    longitude: coordinate.longitude,
+                    locality: item.addressRepresentations?.cityName,
+                    region: nil,
+                    country: item.addressRepresentations?.regionName
+                )
+                additions.append(Artifact(
+                    kind: .url,
+                    sourceURL: placeURL,
+                    originalText: name,
+                    place: place,
+                    processingState: .processed
+                ))
+            } catch {
+                skipped += 1
+            }
+        }
+
+        if !additions.isEmpty {
+            try await repository.saveMany(additions)
+            artifacts.insert(contentsOf: additions, at: 0)
+        }
+        return AppleGuideImportSummary(
+            title: guide.title,
+            imported: additions.count,
+            skipped: skipped
+        )
+    }
+}
+
+struct AppleGuideImportSummary {
+    let title: String
+    let imported: Int
+    let skipped: Int
 }
 
 struct CSVImportSummary {
@@ -238,12 +302,10 @@ private enum CSVImportError: LocalizedError {
 
 private enum MapsLinkFileError: LocalizedError {
     case invalidFile
-    case alreadySaved
 
     var errorDescription: String? {
         switch self {
         case .invalidFile: "This file doesn't contain an Apple Maps or Google Maps link."
-        case .alreadySaved: "This Maps link is already in your Library."
         }
     }
 }

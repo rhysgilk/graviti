@@ -122,6 +122,8 @@ failed
 
 The Artifact is never deleted merely because extraction fails.
 
+`user_note` may contain the optional description a user supplied with a photo. Keep user-authored text separate from generated descriptions and preserve it when enrichment is rerun.
+
 ## 6. MediaAsset
 
 ```text
@@ -161,6 +163,8 @@ Experience
 - created_at
 - updated_at
 ```
+
+Enrichment for an Experience should retain provenance, confidence, and the last successful processing time. Categories and interests should reflect what the user wanted to do or see, not only the venue type. For example, a café save may also imply matcha, desserts, interior design, or neighborhood exploration when supported by the artifact or user note. Recommendation signals derive from accepted or sufficiently confident enrichment across all destinations, while explicit saves remain a separate signal.
 
 Examples:
 

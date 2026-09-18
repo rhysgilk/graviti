@@ -5,6 +5,8 @@ struct SavedArtifactDetailView: View {
     @ObservedObject var library: ArtifactLibrary
     @State private var showingPlaceReview = false
     @State private var actionError: String?
+    @State private var isImportingGuide = false
+    @State private var guideImportMessage: String?
 
     private var current: Artifact {
         library.artifacts.first(where: { $0.id == artifact.id }) ?? artifact
@@ -32,9 +34,41 @@ struct SavedArtifactDetailView: View {
                     if MapLinkMetadata.isCollectionLink(sourceURL) {
                         Text(MapLinkMetadata.provider(for: sourceURL) == .google
                              ? "This saves the list link. To add each place, import its Google Saved CSV from the Save tab."
-                             : "This saves the guide link. Its places aren't imported individually yet.")
+                             : "Import the places in this Apple Maps guide into your Library.")
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.68))
+
+                        if MapLinkMetadata.provider(for: sourceURL) == .apple {
+                            Button {
+                                isImportingGuide = true
+                                guideImportMessage = nil
+                                Task {
+                                    defer { isImportingGuide = false }
+                                    do {
+                                        let summary = try await library.importAppleGuidePlaces(from: sourceURL)
+                                        guideImportMessage = "\(summary.title): \(summary.imported) places imported, \(summary.skipped) skipped."
+                                    } catch {
+                                        guideImportMessage = error.localizedDescription
+                                    }
+                                }
+                            } label: {
+                                if isImportingGuide {
+                                    ProgressView("Importing guide")
+                                } else {
+                                    Label("Import guide places", systemImage: "square.and.arrow.down")
+                                }
+                            }
+                            .disabled(isImportingGuide)
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                            .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                        }
+
+                        if let guideImportMessage {
+                            Text(guideImportMessage)
+                                .font(.subheadline)
+                                .foregroundStyle(GravitiColors.signalMint)
+                        }
                     }
 
                     if let url = openableURL(sourceURL) {

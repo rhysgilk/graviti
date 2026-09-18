@@ -250,6 +250,8 @@ MVP recommendations use:
 
 Recommendations should not constantly over-explain themselves.
 
+Recommendation synthesis must look across the full Library. Repeated interests such as scenery, matcha, architecture, or hiking across many saved destinations should influence Fit for new destinations that match those interests. The app should explain a recommendation using the underlying pattern and supporting saves, even when the recommended destination has little or no explicit Gravity yet.
+
 Prefer concise evidence:
 
 > **Taipei · 93% fit**  
@@ -367,6 +369,12 @@ A Saved Item screen can show:
 
 Users can correct inferred metadata without destroying the original Artifact.
 
+Each save should gain a short, useful description of what it represents, such as a restaurant, attraction, food, viewpoint, or activity. The description, category, interests, and richer details may be filled in asynchronously after the original save is secure. A user can add their own description when saving a photo or screenshot; their words remain distinct from generated text and are never silently overwritten.
+
+Enrichment should identify the specific attraction of a save where possible: a scenic overlook, a matcha dessert, a museum collection, or a walking trail, rather than only a place name. Store the evidence and confidence behind generated details so users can review or correct them.
+
+Users can delete individual saved items. They can also remove a place from their Library, with a clear explanation of what happens to saves associated with that place. Deletion updates Library, map, Gravity, and interest signals.
+
 ## 21. Duplicate Handling
 
 Multiple Artifacts that refer to the same Place should not create unnecessary duplicate Place records.
@@ -392,6 +400,8 @@ The user can correct:
 - interests
 
 The user may preserve an Artifact as a note even if Graviti cannot resolve it to a Place.
+
+Background enrichment may use place data, source metadata, user notes, and, with appropriate permission, image understanding. It should run without blocking capture. A failed or uncertain enrichment leaves the original save intact and visible.
 
 ## 23. Import Payoff
 
