@@ -8,12 +8,21 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var library: ArtifactLibrary
+    @State private var selectedTab: AppTab = .home
+    @State private var libraryNavigationResetID = UUID()
+
+    init(repository: any ArtifactRepository) {
+        _library = StateObject(wrappedValue: ArtifactLibrary(repository: repository))
+    }
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             HomeView()
                 .tabItem {
                     Label("Home", systemImage: "circle.grid.cross")
                 }
+                .tag(AppTab.home)
 
             PlaceholderFeatureView(
                 title: "Explore",
@@ -22,22 +31,23 @@ struct ContentView: View {
             .tabItem {
                 Label("Explore", systemImage: "sparkles")
             }
+            .tag(AppTab.explore)
 
-            PlaceholderFeatureView(
-                title: "Save",
-                icon: "plus.circle"
-            )
+            SaveView(library: library) {
+                libraryNavigationResetID = UUID()
+                selectedTab = .library
+            }
             .tabItem {
                 Label("Save", systemImage: "plus.circle.fill")
             }
+            .tag(AppTab.save)
 
-            PlaceholderFeatureView(
-                title: "Library",
-                icon: "square.stack"
-            )
+            LibraryView(library: library)
+            .id(libraryNavigationResetID)
             .tabItem {
                 Label("Library", systemImage: "square.stack")
             }
+            .tag(AppTab.library)
 
             PlaceholderFeatureView(
                 title: "Search",
@@ -46,9 +56,22 @@ struct ContentView: View {
             .tabItem {
                 Label("Search", systemImage: "magnifyingglass")
             }
+            .tag(AppTab.search)
         }
         .tint(GravitiColors.iris)
+        .preferredColorScheme(.dark)
+        .task {
+            await library.load()
+        }
     }
+}
+
+private enum AppTab: Hashable {
+    case home
+    case explore
+    case save
+    case library
+    case search
 }
 
 private struct PlaceholderFeatureView: View {
@@ -71,5 +94,5 @@ private struct PlaceholderFeatureView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(repository: PreviewArtifactRepository())
 }
