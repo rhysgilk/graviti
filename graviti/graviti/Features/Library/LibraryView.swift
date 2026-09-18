@@ -13,11 +13,7 @@ struct LibraryView: View {
                 Group {
                     switch mode {
                     case .destinations:
-                        emptyState(
-                            "No destinations yet",
-                            icon: "globe",
-                            detail: "Destinations appear as your saves are connected to places."
-                        )
+                        destinationsContent
                     case .places:
                         placesContent
                     case .saves:
@@ -56,6 +52,31 @@ struct LibraryView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
+        }
+    }
+
+    @ViewBuilder
+    private var destinationsContent: some View {
+        let destinations = DestinationOrbitBuilder.nodes(from: library.artifacts, limit: nil)
+        if destinations.isEmpty {
+            emptyState("No destinations yet", icon: "globe", detail: "Destinations appear as your saves are connected to places.")
+        } else {
+            List(destinations) { node in
+                NavigationLink {
+                    DestinationLibraryDetailView(node: node, library: library)
+                } label: {
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(node.name).font(.headline)
+                        Text("\(node.level.displayName) · \(node.saveCount) saved \(node.saveCount == 1 ? "item" : "items")")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 6)
+                }
+                .listRowBackground(GravitiColors.deepInk)
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
     }
 

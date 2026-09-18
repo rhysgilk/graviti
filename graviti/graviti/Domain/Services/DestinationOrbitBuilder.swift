@@ -2,17 +2,17 @@ import Foundation
 import CryptoKit
 
 enum DestinationOrbitBuilder {
-    static func nodes(from artifacts: [Artifact]) -> [OrbitNode] {
+    static func nodes(from artifacts: [Artifact], limit: Int? = 10) -> [OrbitNode] {
         let raw = ungroupedNodes(from: artifacts)
         var countries: [String: (name: String, cityIDs: Set<UUID>, placeIDs: Set<String>, count: Int)] = [:]
         for artifact in artifacts {
             guard let place = artifact.place,
-                  let country = place.country?.trimmingCharacters(in: .whitespacesAndNewlines), !country.isEmpty,
-                  let city = place.locality?.trimmingCharacters(in: .whitespacesAndNewlines), !city.isEmpty else { continue }
+                  let country = place.country?.trimmingCharacters(in: .whitespacesAndNewlines), !country.isEmpty else { continue }
             let countryKey = normalized(country)
-            let cityID = stableID(for: normalized("city|\(country)|\(city)"))
             var group = countries[countryKey] ?? (country, [], [], 0)
-            group.cityIDs.insert(cityID)
+            if let city = place.locality?.trimmingCharacters(in: .whitespacesAndNewlines), !city.isEmpty {
+                group.cityIDs.insert(stableID(for: normalized("city|\(country)|\(city)")))
+            }
             group.placeIDs.insert(place.id)
             group.count += 1
             countries[countryKey] = group
@@ -30,16 +30,32 @@ enum DestinationOrbitBuilder {
             )
         }
         let countryIDs = Set(countryNodes.map(\.id))
-        return sorted(raw.filter { !hiddenCityIDs.contains($0.id) && !countryIDs.contains($0.id) } + countryNodes)
+        return sorted(raw.filter { !hiddenCityIDs.contains($0.id) && !countryIDs.contains($0.id) } + countryNodes, limit: limit)
     }
 
-    static func children(of country: OrbitNode, from artifacts: [Artifact]) -> [OrbitNode] {
+    static func children(of country: OrbitNode, from artifacts: [Artifact], limit: Int? = 10) -> [OrbitNode] {
         guard country.level == .country else { return [] }
         let matching = artifacts.filter {
             guard let name = $0.place?.country else { return false }
             return normalized(name) == normalized(country.name)
         }
-        return sorted(ungroupedNodes(from: matching).filter { $0.level == .city })
+        return sorted(ungroupedNodes(from: matching).filter { $0.level == .city }, limit: limit)
+    }
+
+    static func artifacts(for node: OrbitNode, from artifacts: [Artifact]) -> [Artifact] {
+        artifacts.filter { artifact in
+            guard let place = artifact.place else { return false }
+            let country = place.country?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let city = place.locality?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            switch node.level {
+            case .country:
+                return stableID(for: normalized("country|\(country)|\(country)")) == node.id
+            case .city:
+                return stableID(for: normalized("city|\(country)|\(city)")) == node.id
+            case .stateProvince, .district, .neighborhood:
+                return false
+            }
+        }
     }
 
     private static func ungroupedNodes(from artifacts: [Artifact]) -> [OrbitNode] {
@@ -92,13 +108,12 @@ enum DestinationOrbitBuilder {
         value.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
     }
 
-    private static func sorted(_ nodes: [OrbitNode]) -> [OrbitNode] {
-        nodes.sorted {
+    private static func sorted(_ nodes: [OrbitNode], limit: Int?) -> [OrbitNode] {
+        let ordered = nodes.sorted {
             if $0.gravity != $1.gravity { return $0.gravity > $1.gravity }
             return $0.name.localizedStandardCompare($1.name) == .orderedAscending
         }
-        .prefix(10)
-        .map { $0 }
+        return limit.map { Array(ordered.prefix($0)) } ?? ordered
     }
 
     private static func stableID(for key: String) -> UUID {
