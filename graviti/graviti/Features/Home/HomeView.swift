@@ -13,13 +13,14 @@ struct HomeView: View {
             GravitiColors.appBackground
                 .ignoresSafeArea()
 
-            VStack(spacing: 10) {
-                Text("graviti")
-                    .font(.system(size: 42, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+            VStack(spacing: 18) {
+                GravitiWordmark(
+                    size: .large,
+                    animated: true
+                )
 
                 Text("Save what pulls you.")
-                    .font(.subheadline)
+                    .font(.system(size: 17))
                     .foregroundStyle(.white.opacity(0.55))
             }
         }
