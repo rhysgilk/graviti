@@ -22,6 +22,7 @@ struct Artifact: Identifiable, Hashable {
     let userNote: String?
     let mediaKey: String?
     let place: SavedPlace?
+    let enrichment: ArtifactEnrichment?
     let processingState: ArtifactProcessingState
     let capturedAt: Date
 
@@ -33,6 +34,7 @@ struct Artifact: Identifiable, Hashable {
         userNote: String? = nil,
         mediaKey: String? = nil,
         place: SavedPlace? = nil,
+        enrichment: ArtifactEnrichment? = nil,
         processingState: ArtifactProcessingState = .saved,
         capturedAt: Date = .now
     ) {
@@ -43,6 +45,7 @@ struct Artifact: Identifiable, Hashable {
         self.userNote = userNote
         self.mediaKey = mediaKey
         self.place = place
+        self.enrichment = enrichment
         self.processingState = processingState
         self.capturedAt = capturedAt
     }
@@ -56,7 +59,23 @@ struct Artifact: Identifiable, Hashable {
             userNote: userNote,
             mediaKey: mediaKey,
             place: place,
+            enrichment: place?.id == self.place?.id ? enrichment : nil,
             processingState: state,
+            capturedAt: capturedAt
+        )
+    }
+
+    func withEnrichment(_ enrichment: ArtifactEnrichment) -> Artifact {
+        Artifact(
+            id: id,
+            kind: kind,
+            sourceURL: sourceURL,
+            originalText: originalText,
+            userNote: userNote,
+            mediaKey: mediaKey,
+            place: place,
+            enrichment: enrichment,
+            processingState: processingState,
             capturedAt: capturedAt
         )
     }

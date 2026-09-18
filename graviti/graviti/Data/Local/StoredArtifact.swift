@@ -10,6 +10,7 @@ final class StoredArtifact {
     var userNote: String?
     var mediaKey: String?
     var placeJSON: Data?
+    var enrichmentJSON: Data?
     var processingStateRawValue: String
     var capturedAt: Date
 
@@ -21,6 +22,7 @@ final class StoredArtifact {
         userNote = artifact.userNote
         mediaKey = artifact.mediaKey
         placeJSON = try? artifact.place.map { try JSONEncoder().encode($0) }
+        enrichmentJSON = try? artifact.enrichment.map { try JSONEncoder().encode($0) }
         processingStateRawValue = artifact.processingState.rawValue
         capturedAt = artifact.capturedAt
     }
@@ -38,6 +40,7 @@ final class StoredArtifact {
             userNote: userNote,
             mediaKey: mediaKey,
             place: try placeJSON.map { try JSONDecoder().decode(SavedPlace.self, from: $0) },
+            enrichment: enrichmentJSON.flatMap { try? JSONDecoder().decode(ArtifactEnrichment.self, from: $0) },
             processingState: state,
             capturedAt: capturedAt
         )
@@ -45,6 +48,7 @@ final class StoredArtifact {
 
     @MainActor func applyResolution(_ artifact: Artifact) throws {
         placeJSON = try artifact.place.map { try JSONEncoder().encode($0) }
+        enrichmentJSON = try artifact.enrichment.map { try JSONEncoder().encode($0) }
         processingStateRawValue = artifact.processingState.rawValue
     }
 }

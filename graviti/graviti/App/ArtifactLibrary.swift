@@ -11,6 +11,7 @@ final class ArtifactLibrary: ObservableObject {
     private let repository: any ArtifactRepository
     private let placeResolver: MapPlaceResolver
     private var processingIDs: Set<UUID> = []
+    private var enrichingIDs: Set<UUID> = []
 
     init(repository: any ArtifactRepository, placeResolver: MapPlaceResolver? = nil) {
         self.repository = repository
@@ -35,6 +36,19 @@ final class ArtifactLibrary: ObservableObject {
         if shouldProcess(artifact) {
             Task { await process(artifact.id) }
         }
+        if shouldEnrich(artifact) {
+            Task { await enrich(artifact.id) }
+        }
+    }
+
+    func processPendingEnrichment() {
+        for artifact in artifacts where shouldEnrich(artifact) {
+            Task { await enrich(artifact.id) }
+        }
+    }
+
+    func refreshEnrichment(_ id: UUID) async {
+        await enrich(id, force: true)
     }
 
     func processPendingMaps() async {
@@ -75,6 +89,7 @@ final class ArtifactLibrary: ObservableObject {
         try await repository.updateMany(changed)
         let replacements = Dictionary(uniqueKeysWithValues: changed.map { ($0.id, $0) })
         artifacts = artifacts.map { replacements[$0.id] ?? $0 }
+        processPendingEnrichment()
     }
 
     func deleteArtifact(_ id: UUID) async throws {
@@ -118,10 +133,37 @@ final class ArtifactLibrary: ObservableObject {
             artifact.sourceURL.map { MapLinkMetadata.provider(for: $0) != nil } == true
     }
 
+    private func shouldEnrich(_ artifact: Artifact) -> Bool {
+        artifact.enrichment == nil &&
+            (artifact.place != nil || artifact.originalText != nil || artifact.userNote != nil) &&
+            artifact.sourceURL.map(MapLinkMetadata.isCollectionLink) != true
+    }
+
+    private func enrich(_ id: UUID, force: Bool = false) async {
+        guard let artifact = artifacts.first(where: { $0.id == id }),
+              force || shouldEnrich(artifact),
+              enrichingIDs.insert(id).inserted else { return }
+        defer { enrichingIDs.remove(id) }
+
+        guard let enrichment = await ArtifactEnricher().enrich(artifact),
+              let current = artifacts.first(where: { $0.id == id }),
+              current.place?.id == artifact.place?.id,
+              current.originalText == artifact.originalText,
+              current.userNote == artifact.userNote else { return }
+        do {
+            try await update(current.withEnrichment(enrichment))
+        } catch {
+            loadError = error.localizedDescription
+        }
+    }
+
     private func update(_ artifact: Artifact) async throws {
         try await repository.update(artifact)
         guard let index = artifacts.firstIndex(where: { $0.id == artifact.id }) else { return }
         artifacts[index] = artifact
+        if shouldEnrich(artifact) {
+            Task { await enrich(artifact.id) }
+        }
     }
 
     func savePlace(_ candidate: PlaceCandidate) async throws {
@@ -214,6 +256,7 @@ final class ArtifactLibrary: ObservableObject {
             try await repository.saveMany(newArtifacts)
             artifacts.insert(contentsOf: newArtifacts, at: 0)
             Task { await processPendingMaps() }
+            processPendingEnrichment()
         }
         return CSVImportSummary(
             imported: newArtifacts.count,
@@ -293,6 +336,7 @@ final class ArtifactLibrary: ObservableObject {
         if !additions.isEmpty {
             try await repository.saveMany(additions)
             artifacts.insert(contentsOf: additions, at: 0)
+            processPendingEnrichment()
         }
         return AppleGuideImportSummary(
             title: guide.title,

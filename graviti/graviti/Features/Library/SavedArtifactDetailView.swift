@@ -10,6 +10,7 @@ struct SavedArtifactDetailView: View {
     @State private var guideImportMessage: String?
     @State private var showingDeleteConfirmation = false
     @State private var isDeleting = false
+    @State private var isRefreshingDetails = false
 
     private var current: Artifact {
         library.artifacts.first(where: { $0.id == artifact.id }) ?? artifact
@@ -97,6 +98,43 @@ struct SavedArtifactDetailView: View {
                         .foregroundStyle(.white)
                 }
 
+                if let enrichment = current.enrichment {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("About this save")
+                            .font(.headline)
+                        if let summary = enrichment.summary {
+                            Text(summary)
+                                .font(.subheadline)
+                                .textSelection(.enabled)
+                        }
+                        if let category = enrichment.category {
+                            Label(category.displayName, systemImage: "square.grid.2x2")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(GravitiColors.signalMint)
+                        }
+                        if !enrichment.interests.isEmpty {
+                            Text(enrichment.interests.joined(separator: " · "))
+                                .font(.subheadline)
+                                .foregroundStyle(.white.opacity(0.8))
+                        }
+                        Text("Suggested from \(enrichment.source.displayName)")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.55))
+                        Button(isRefreshingDetails ? "Refreshing…" : "Refresh details") {
+                            isRefreshingDetails = true
+                            Task {
+                                await library.refreshEnrichment(current.id)
+                                isRefreshingDetails = false
+                            }
+                        }
+                        .disabled(isRefreshingDetails)
+                        .font(.caption.weight(.semibold))
+                    }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
+                }
+
                 if let place = current.place {
                     VStack(alignment: .leading, spacing: 5) {
                         Text("Place").font(.headline)
@@ -147,7 +185,7 @@ struct SavedArtifactDetailView: View {
 
                 if let userNote = current.userNote {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Your note")
+                        Text(current.kind == .photo ? "Your description" : "Your note")
                             .font(.headline)
                             .foregroundStyle(.white.opacity(0.65))
                         Text(userNote)

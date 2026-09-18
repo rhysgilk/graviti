@@ -64,12 +64,14 @@ struct ContentView: View {
             await library.load()
             await library.importSharedArtifacts()
             await library.processPendingMaps()
+            library.processPendingEnrichment()
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
             Task {
                 await library.importSharedArtifacts()
                 await library.processPendingMaps()
+                library.processPendingEnrichment()
             }
         }
     }

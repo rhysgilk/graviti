@@ -204,6 +204,12 @@ private struct ArtifactRow: View {
                         .font(.caption.weight(.medium))
                         .foregroundStyle(GravitiColors.opportunityCoral)
                 }
+
+                if let category = artifact.enrichment?.category {
+                    Text(category.displayName)
+                        .font(.caption)
+                        .foregroundStyle(GravitiColors.signalMint)
+                }
             }
         }
         .padding(.vertical, 6)
