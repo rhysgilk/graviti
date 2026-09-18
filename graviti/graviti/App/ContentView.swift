@@ -25,10 +25,7 @@ struct ContentView: View {
                 }
                 .tag(AppTab.home)
 
-            PlaceholderFeatureView(
-                title: "Explore",
-                icon: "sparkles"
-            )
+            ExploreView(library: library) { selectedTab = .search }
             .tabItem {
                 Label("Explore", systemImage: "sparkles")
             }
@@ -83,25 +80,6 @@ private enum AppTab: Hashable {
     case save
     case library
     case search
-}
-
-private struct PlaceholderFeatureView: View {
-    let title: String
-    let icon: String
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 16) {
-                Image(systemName: icon)
-                    .font(.system(size: 34))
-                    .foregroundStyle(GravitiColors.iris)
-
-                Text(title)
-                    .font(.title2.weight(.semibold))
-            }
-            .navigationTitle(title)
-        }
-    }
 }
 
 #Preview {
