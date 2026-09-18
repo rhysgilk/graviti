@@ -9,9 +9,10 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var selectedNodeID: UUID?
+    @State private var presentation: HomePresentation = .field
     @State private var fieldPath: [OrbitItem] = []
     @AccessibilityFocusState private var isDetailFocused: Bool
+    @AccessibilityFocusState private var isInsightFocused: Bool
 
     private static let orbitItems: [OrbitItem] = [
         OrbitItem(
@@ -118,6 +119,8 @@ struct HomeView: View {
         )
     ]
 
+    private static let homeInsight = HomeInsight(nodes: orbitItems.map(\.node))
+
     var body: some View {
         GeometryReader { geometry in
             let items = currentItems
@@ -126,32 +129,30 @@ struct HomeView: View {
             ZStack {
                 GravitiColors.appBackground
                     .ignoresSafeArea()
-
-                if selectedNodeID != nil {
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .onTapGesture(perform: clearSelection)
-                        .accessibilityHidden(true)
-                }
+                    .onTapGesture {
+                        if presentation != .field { clearPresentation() }
+                    }
 
                 header
 
                 ForEach(items) { item in
                     let isSelected = selectedNodeID == item.id
+                    let isInsightLeader = presentation == .insight && item.id == Self.homeInsight?.leadingDestination.id
+                    let isFocusedPlanet = isSelected || isInsightLeader
                     let diameter = layout.diameter(for: item)
 
                     Button {
                         select(item)
                     } label: {
                         planet(for: item, diameter: diameter)
+                            .opacity(reduceMotion && isFocusedPlanet ? 0 : (presentation == .field || isFocusedPlanet ? 1 : 0.24))
                     }
                     .buttonStyle(.plain)
                     .frame(minWidth: 44, minHeight: 44)
                     .contentShape(Circle())
-                    .scaleEffect(isSelected ? (reduceMotion ? 1 : 1.12) : (selectedNodeID == nil ? 1 : 0.90))
-                    .opacity(reduceMotion && isSelected ? 0 : (selectedNodeID == nil || isSelected ? 1 : 0.24))
+                    .scaleEffect(isFocusedPlanet ? (reduceMotion ? 1 : 1.12) : (presentation == .field ? 1 : 0.90))
                     .position(
-                        isSelected && !reduceMotion
+                        isFocusedPlanet && !reduceMotion
                             ? layout.focusPoint
                             : layout.position(for: item)
                     )
@@ -160,21 +161,21 @@ struct HomeView: View {
                         y: item.driftY,
                         xDuration: item.driftDurationX,
                         yDuration: item.driftDurationY,
-                        isActive: selectedNodeID == nil && layout.allowsDrift
+                        isActive: presentation == .field && layout.allowsDrift
                     )
                     .transition(.opacity.combined(with: .scale(scale: 0.94)))
-                    .zIndex(isSelected ? 1 : 0)
+                    .zIndex(isFocusedPlanet ? 1 : 0)
                     .accessibilityLabel("\(item.node.name), \(item.node.level.displayName), Gravity \(Int(item.node.gravity)), \(item.node.saveCount) saved items")
                     .accessibilityHint(isSelected ? "Closes destination" : "Opens destination")
-                    .accessibilityValue(isSelected ? "Selected" : "")
+                    .accessibilityValue(isSelected ? "Selected" : (isInsightLeader ? "Leading destination" : ""))
                     .accessibilitySortPriority(item.node.gravity)
-                    .accessibilityHidden(reduceMotion && isSelected)
+                    .accessibilityHidden(reduceMotion && isFocusedPlanet)
                 }
 
-                if reduceMotion, let selectedItem {
+                if reduceMotion, let focusedItem {
                     planet(
-                        for: selectedItem,
-                        diameter: layout.diameter(for: selectedItem)
+                        for: focusedItem,
+                        diameter: layout.diameter(for: focusedItem)
                     )
                     .scaleEffect(1.08)
                     .position(layout.focusPoint)
@@ -182,33 +183,69 @@ struct HomeView: View {
                     .accessibilityHidden(true)
                 }
 
-                if let selectedItem {
-                    DestinationSelectionCard(
-                        node: selectedItem.node,
-                        onClose: clearSelection,
-                        onOpen: SampleOrbitChildren.children(for: selectedItem).isEmpty
-                            ? nil
-                            : { open(selectedItem) }
-                    )
-                        .accessibilityElement(children: .contain)
-                        .accessibilityFocused($isDetailFocused)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 20)
-                        .frame(maxHeight: .infinity, alignment: .bottom)
-                        .transition(reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 12)))
-                        .zIndex(2)
-                }
             }
-            .animation(reduceMotion ? .easeOut(duration: 0.2) : .easeInOut(duration: 0.55), value: selectedNodeID)
+            .overlay(alignment: .bottom) {
+                presentedCard
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
+            }
+            .animation(reduceMotion ? .easeOut(duration: 0.2) : .easeInOut(duration: 0.55), value: presentation)
             .animation(.easeInOut(duration: reduceMotion ? 0.2 : 0.4), value: fieldPath.map(\.id))
         }
-        .onChange(of: selectedNodeID) { _, newValue in
-            isDetailFocused = newValue != nil
+        .onChange(of: presentation) { _, newValue in
+            isDetailFocused = selectedNodeID != nil
+            isInsightFocused = newValue == .insight
         }
+    }
+
+    private var selectedNodeID: UUID? {
+        if case let .destination(id) = presentation { return id }
+        return nil
     }
 
     private var selectedItem: OrbitItem? {
         currentItems.first { $0.id == selectedNodeID }
+    }
+
+    private var insightLeaderItem: OrbitItem? {
+        guard fieldPath.isEmpty, let leaderID = Self.homeInsight?.leadingDestination.id else {
+            return nil
+        }
+        return Self.orbitItems.first { $0.id == leaderID }
+    }
+
+    private var focusedItem: OrbitItem? {
+        selectedItem ?? (presentation == .insight ? insightLeaderItem : nil)
+    }
+
+    @ViewBuilder
+    private var presentedCard: some View {
+        if let selectedItem {
+            DestinationSelectionCard(
+                node: selectedItem.node,
+                onClose: clearPresentation,
+                onOpen: SampleOrbitChildren.children(for: selectedItem).isEmpty
+                    ? nil
+                    : { open(selectedItem) }
+            )
+            .accessibilityElement(children: .contain)
+            .accessibilityFocused($isDetailFocused)
+            .transition(cardTransition)
+        } else if presentation == .insight, let insight = Self.homeInsight,
+                  let leader = insightLeaderItem {
+            HomeInsightCard(
+                insight: insight,
+                onClose: clearPresentation,
+                onViewDestination: { select(leader) }
+            )
+            .accessibilityElement(children: .contain)
+            .accessibilityFocused($isInsightFocused)
+            .transition(cardTransition)
+        }
+    }
+
+    private var cardTransition: AnyTransition {
+        reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 12))
     }
 
     private var currentItems: [OrbitItem] {
@@ -228,20 +265,25 @@ struct HomeView: View {
     }
 
     private func select(_ item: OrbitItem) {
-        selectedNodeID = selectedNodeID == item.id ? nil : item.id
+        presentation = selectedNodeID == item.id ? .field : .destination(item.id)
     }
 
-    private func clearSelection() {
-        selectedNodeID = nil
+    private func clearPresentation() {
+        presentation = .field
+    }
+
+    private func showInsight() {
+        guard fieldPath.isEmpty, Self.homeInsight != nil else { return }
+        presentation = presentation == .insight ? .field : .insight
     }
 
     private func open(_ item: OrbitItem) {
         fieldPath.append(item)
-        selectedNodeID = nil
+        presentation = .field
     }
 
     private func goBack() {
-        selectedNodeID = fieldPath.popLast()?.id
+        presentation = fieldPath.popLast().map { .destination($0.id) } ?? .field
     }
 
     private var header: some View {
@@ -260,11 +302,26 @@ struct HomeView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                         .accessibilityAddTraits(.isHeader)
+
+                    Spacer()
                 } else {
                     GravitiWordmark(size: .small)
-                }
 
-                Spacer()
+                    Spacer()
+
+                    if Self.homeInsight != nil {
+                        Button(action: showInsight) {
+                            Label("Insight", systemImage: "chart.bar.xaxis")
+                                .font(.subheadline.weight(.medium))
+                                .frame(minHeight: 44)
+                                .padding(.horizontal, 12)
+                                .background(.white.opacity(0.08), in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(presentation == .insight ? "Close field insight" : "Open field insight")
+                        .accessibilityValue(presentation == .insight ? "Selected" : "")
+                    }
+                }
             }
 
             Spacer()
@@ -272,6 +329,12 @@ struct HomeView: View {
         .padding(.horizontal, 22)
         .padding(.top, 10)
     }
+}
+
+private enum HomePresentation: Equatable {
+    case field
+    case destination(UUID)
+    case insight
 }
 
 #Preview {
