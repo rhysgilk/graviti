@@ -30,9 +30,9 @@ struct HomeView: View {
                 // Tokyo
                 GravityPlanet(
                     name: "Tokyo",
-                    level: "City",
+                    level: .city,
                     saveCount: 14,
-                    diameter: 154,
+                    diameter: 150,
                     primaryColor: GravitiColors.iris,
                     highlightColor: Color(
                         red: 170 / 255,
@@ -48,7 +48,7 @@ struct HomeView: View {
                 // California
                 GravityPlanet(
                     name: "California",
-                    level: "State",
+                    level: .stateProvince,
                     saveCount: 18,
                     diameter: 108,
                     primaryColor: GravitiColors.signalMint,
@@ -66,7 +66,7 @@ struct HomeView: View {
                 // Montreal
                 GravityPlanet(
                     name: "Montreal",
-                    level: "City",
+                    level: .city,
                     saveCount: 9,
                     diameter: 90,
                     primaryColor: Color(
@@ -88,7 +88,7 @@ struct HomeView: View {
                 // Kyoto
                 GravityPlanet(
                     name: "Kyoto",
-                    level: "City",
+                    level: .city,
                     saveCount: 8,
                     diameter: 94,
                     primaryColor: Color(
@@ -110,7 +110,7 @@ struct HomeView: View {
                 // Uji
                 GravityPlanet(
                     name: "Uji",
-                    level: "City",
+                    level: .city,
                     saveCount: 3,
                     diameter: 66,
                     primaryColor: GravitiColors.signalMint,

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GravityPlanet: View {
     let name: String
-    let level: String
+    let level: GeoLevel
     let saveCount: Int
     let diameter: CGFloat
     let primaryColor: Color
@@ -63,7 +63,7 @@ struct GravityPlanet: View {
                     .minimumScaleFactor(0.72)
 
                 if diameter >= 75 {
-                    Text("\(level.uppercased()) · \(saveCount)")
+                    Text("\(level.displayName.uppercased()) · \(saveCount)")
                         .font(.system(size: metadataFontSize, weight: .medium))
                         .foregroundStyle(.white.opacity(0.55))
                 }
@@ -73,7 +73,7 @@ struct GravityPlanet: View {
         .frame(width: diameter, height: diameter)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(
-            "\(name), \(level), \(saveCount) saved items"
+            "\(name), \(level.displayName), \(saveCount) saved items"
         )
     }
 
@@ -102,7 +102,7 @@ struct GravityPlanet: View {
 
         GravityPlanet(
             name: "Tokyo",
-            level: "City",
+            level: .city,
             saveCount: 14,
             diameter: 150,
             primaryColor: GravitiColors.iris,
