@@ -8,118 +8,42 @@
 import SwiftUI
 
 struct HomeView: View {
+    @ObservedObject var library: ArtifactLibrary
+    let onSave: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var presentation: HomePresentation = .field
     @State private var fieldPath: [OrbitItem] = []
     @AccessibilityFocusState private var isDetailFocused: Bool
     @AccessibilityFocusState private var isInsightFocused: Bool
 
-    private static let orbitItems: [OrbitItem] = [
-        OrbitItem(
-            node: OrbitNode(
-                name: "Tokyo",
-                level: .city,
-                gravity: 86,
-                saveCount: 14
-            ),
-            primaryColor: GravitiColors.iris,
-            highlightColor: Color(
-                red: 170 / 255,
-                green: 151 / 255,
-                blue: 255 / 255
-            ),
-            driftX: 7,
-            driftY: -5,
-            driftDurationX: 9,
-            driftDurationY: 11
-        ),
+    private var orbitItems: [OrbitItem] {
+        items(for: DestinationOrbitBuilder.nodes(from: library.artifacts))
+    }
 
-        OrbitItem(
-            node: OrbitNode(
-                name: "California",
-                level: .stateProvince,
-                gravity: 72,
-                saveCount: 18
-            ),
-            primaryColor: GravitiColors.signalMint,
-            highlightColor: Color(
-                red: 126 / 255,
-                green: 244 / 255,
-                blue: 207 / 255
-            ),
-            driftX: -5,
-            driftY: 6,
-            driftDurationX: 10,
-            driftDurationY: 8
-        ),
+    private func items(for nodes: [OrbitNode]) -> [OrbitItem] {
+        let colors: [(Color, Color)] = [
+            (GravitiColors.iris, Color(red: 170 / 255, green: 151 / 255, blue: 255 / 255)),
+            (GravitiColors.signalMint, Color(red: 126 / 255, green: 244 / 255, blue: 207 / 255)),
+            (Color(red: 72 / 255, green: 168 / 255, blue: 240 / 255), Color(red: 138 / 255, green: 221 / 255, blue: 255 / 255)),
+            (Color(red: 236 / 255, green: 151 / 255, blue: 58 / 255), Color(red: 255 / 255, green: 203 / 255, blue: 97 / 255))
+        ]
+        return nodes.enumerated().map { index, node in
+            let color = colors[index % colors.count]
+            return OrbitItem(
+                node: node,
+                primaryColor: color.0,
+                highlightColor: color.1,
+                driftX: index.isMultiple(of: 2) ? 5 : -5,
+                driftY: index.isMultiple(of: 3) ? -4 : 5,
+                driftDurationX: Double(8 + index % 4),
+                driftDurationY: Double(9 + index % 3)
+            )
+        }
+    }
 
-        OrbitItem(
-            node: OrbitNode(
-                name: "Montreal",
-                level: .city,
-                gravity: 44,
-                saveCount: 9
-            ),
-            primaryColor: Color(
-                red: 72 / 255,
-                green: 168 / 255,
-                blue: 240 / 255
-            ),
-            highlightColor: Color(
-                red: 138 / 255,
-                green: 221 / 255,
-                blue: 255 / 255
-            ),
-            driftX: 6,
-            driftY: 4,
-            driftDurationX: 8,
-            driftDurationY: 10
-        ),
-
-        OrbitItem(
-            node: OrbitNode(
-                name: "Kyoto",
-                level: .city,
-                gravity: 37,
-                saveCount: 8
-            ),
-            primaryColor: Color(
-                red: 236 / 255,
-                green: 151 / 255,
-                blue: 58 / 255
-            ),
-            highlightColor: Color(
-                red: 255 / 255,
-                green: 203 / 255,
-                blue: 97 / 255
-            ),
-            driftX: -6,
-            driftY: -5,
-            driftDurationX: 11,
-            driftDurationY: 9
-        ),
-
-        OrbitItem(
-            node: OrbitNode(
-                name: "Uji",
-                level: .city,
-                gravity: 18,
-                saveCount: 3
-            ),
-            primaryColor: GravitiColors.signalMint,
-            highlightColor: Color(
-                red: 139 / 255,
-                green: 247 / 255,
-                blue: 211 / 255
-            ),
-            driftX: 4,
-            driftY: 6,
-            driftDurationX: 7,
-            driftDurationY: 10
-        )
-    ]
-
-    private static let homeInsight = HomeInsight(nodes: orbitItems.map(\.node))
+    private var homeInsight: HomeInsight? {
+        HomeInsight(nodes: orbitItems.map(\.node))
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -135,9 +59,27 @@ struct HomeView: View {
 
                 header
 
+                if items.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "circle.grid.cross")
+                            .font(.system(size: 38))
+                            .foregroundStyle(GravitiColors.signalMint)
+                        Text("Your field starts here")
+                            .font(.custom("Sora-SemiBold", size: 23, relativeTo: .title2))
+                        Text("Save a place to see where your interests are pulling you.")
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(.white.opacity(0.7))
+                        Button("Find a place", action: onSave)
+                            .font(.headline)
+                            .frame(minWidth: 180, minHeight: 48)
+                            .background(GravitiColors.iris, in: Capsule())
+                    }
+                    .padding(28)
+                }
+
                 ForEach(items) { item in
                     let isSelected = selectedNodeID == item.id
-                    let isInsightLeader = presentation == .insight && item.id == Self.homeInsight?.leadingDestination.id
+                    let isInsightLeader = presentation == .insight && item.id == homeInsight?.leadingDestination.id
                     let isFocusedPlanet = isSelected || isInsightLeader
                     let diameter = layout.diameter(for: item)
 
@@ -165,7 +107,7 @@ struct HomeView: View {
                     )
                     .transition(.opacity.combined(with: .scale(scale: 0.94)))
                     .zIndex(isFocusedPlanet ? 1 : 0)
-                    .accessibilityLabel("\(item.node.name), \(item.node.level.displayName), Gravity \(Int(item.node.gravity)), \(item.node.saveCount) saved items")
+                    .accessibilityLabel("\(item.node.name), \(item.node.level.displayName), Gravity \(Int(item.node.gravity)), \(item.node.saveCount) saved \(item.node.saveCount == 1 ? "item" : "items")")
                     .accessibilityHint(isSelected ? "Closes destination" : "Opens destination")
                     .accessibilityValue(isSelected ? "Selected" : (isInsightLeader ? "Leading destination" : ""))
                     .accessibilitySortPriority(item.node.gravity)
@@ -190,7 +132,7 @@ struct HomeView: View {
                     .padding(.bottom, 20)
             }
             .animation(reduceMotion ? .easeOut(duration: 0.2) : .easeInOut(duration: 0.55), value: presentation)
-            .animation(.easeInOut(duration: reduceMotion ? 0.2 : 0.4), value: fieldPath.map(\.id))
+            .animation(.easeInOut(duration: reduceMotion ? 0.2 : 0.4), value: items.map(\.id))
         }
         .onChange(of: presentation) { _, newValue in
             isDetailFocused = selectedNodeID != nil
@@ -208,10 +150,10 @@ struct HomeView: View {
     }
 
     private var insightLeaderItem: OrbitItem? {
-        guard fieldPath.isEmpty, let leaderID = Self.homeInsight?.leadingDestination.id else {
+        guard fieldPath.isEmpty, let leaderID = homeInsight?.leadingDestination.id else {
             return nil
         }
-        return Self.orbitItems.first { $0.id == leaderID }
+        return orbitItems.first { $0.id == leaderID }
     }
 
     private var focusedItem: OrbitItem? {
@@ -224,14 +166,13 @@ struct HomeView: View {
             DestinationSelectionCard(
                 node: selectedItem.node,
                 onClose: clearPresentation,
-                onOpen: SampleOrbitChildren.children(for: selectedItem).isEmpty
-                    ? nil
-                    : { open(selectedItem) }
+                onOpen: DestinationOrbitBuilder.children(of: selectedItem.node, from: library.artifacts).isEmpty
+                    ? nil : { open(selectedItem) }
             )
             .accessibilityElement(children: .contain)
             .accessibilityFocused($isDetailFocused)
             .transition(cardTransition)
-        } else if presentation == .insight, let insight = Self.homeInsight,
+        } else if presentation == .insight, let insight = homeInsight,
                   let leader = insightLeaderItem {
             HomeInsightCard(
                 insight: insight,
@@ -249,8 +190,8 @@ struct HomeView: View {
     }
 
     private var currentItems: [OrbitItem] {
-        guard let parent = fieldPath.last else { return Self.orbitItems }
-        return SampleOrbitChildren.children(for: parent)
+        guard let parent = fieldPath.last else { return orbitItems }
+        return items(for: DestinationOrbitBuilder.children(of: parent.node, from: library.artifacts))
     }
 
     private func planet(for item: OrbitItem, diameter: CGFloat) -> some View {
@@ -273,7 +214,7 @@ struct HomeView: View {
     }
 
     private func showInsight() {
-        guard fieldPath.isEmpty, Self.homeInsight != nil else { return }
+        guard fieldPath.isEmpty, homeInsight != nil else { return }
         presentation = presentation == .insight ? .field : .insight
     }
 
@@ -309,7 +250,7 @@ struct HomeView: View {
 
                     Spacer()
 
-                    if Self.homeInsight != nil {
+                    if homeInsight != nil {
                         Button(action: showInsight) {
                             Label("Insight", systemImage: "chart.bar.xaxis")
                                 .font(.subheadline.weight(.medium))
@@ -338,5 +279,5 @@ private enum HomePresentation: Equatable {
 }
 
 #Preview {
-    HomeView()
+    HomeView(library: ArtifactLibrary(repository: PreviewArtifactRepository()), onSave: {})
 }

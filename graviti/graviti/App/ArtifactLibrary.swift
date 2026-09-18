@@ -32,7 +32,8 @@ final class ArtifactLibrary: ObservableObject {
             kind: .url,
             sourceURL: candidate.sourceURL,
             originalText: candidate.place.name,
-            place: candidate.place
+            place: candidate.place,
+            processingState: .processed
         ))
     }
 

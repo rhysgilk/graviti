@@ -60,7 +60,7 @@ struct HomeInsightCard: View {
     }
 
     private var statistics: some View {
-        Text("\(Int(insight.leadingDestination.gravity)) Gravity · \(insight.leadingDestination.saveCount) saved items")
+        Text("\(Int(insight.leadingDestination.gravity)) Gravity · \(insight.leadingDestination.saveCount) saved \(insight.leadingDestination.saveCount == 1 ? "item" : "items")")
             .font(.subheadline.weight(.medium))
             .foregroundStyle(.white.opacity(0.82))
     }
