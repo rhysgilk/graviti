@@ -1,11 +1,8 @@
 import SwiftUI
 
-// Temporary presentation data for a planet's position, appearance, and motion.
+// Temporary presentation data for a planet's appearance and motion.
 struct OrbitItem: Identifiable {
     let node: OrbitNode
-
-    let x: CGFloat
-    let y: CGFloat
 
     let primaryColor: Color
     let highlightColor: Color

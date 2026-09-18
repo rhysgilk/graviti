@@ -21,8 +21,6 @@ struct HomeView: View {
                 gravity: 86,
                 saveCount: 14
             ),
-            x: 0.43,
-            y: 0.30,
             primaryColor: GravitiColors.iris,
             highlightColor: Color(
                 red: 170 / 255,
@@ -42,8 +40,6 @@ struct HomeView: View {
                 gravity: 72,
                 saveCount: 18
             ),
-            x: 0.79,
-            y: 0.17,
             primaryColor: GravitiColors.signalMint,
             highlightColor: Color(
                 red: 126 / 255,
@@ -63,8 +59,6 @@ struct HomeView: View {
                 gravity: 44,
                 saveCount: 9
             ),
-            x: 0.18,
-            y: 0.51,
             primaryColor: Color(
                 red: 72 / 255,
                 green: 168 / 255,
@@ -88,8 +82,6 @@ struct HomeView: View {
                 gravity: 37,
                 saveCount: 8
             ),
-            x: 0.80,
-            y: 0.48,
             primaryColor: Color(
                 red: 236 / 255,
                 green: 151 / 255,
@@ -113,8 +105,6 @@ struct HomeView: View {
                 gravity: 18,
                 saveCount: 3
             ),
-            x: 0.68,
-            y: 0.68,
             primaryColor: GravitiColors.signalMint,
             highlightColor: Color(
                 red: 139 / 255,
@@ -131,9 +121,7 @@ struct HomeView: View {
     var body: some View {
         GeometryReader { geometry in
             let items = currentItems
-            let gravities = items.map(\.node.gravity)
-            let minimumGravity = gravities.min() ?? 0
-            let maximumGravity = gravities.max() ?? 1
+            let layout = OrbitLayoutEngine.layout(items: items, in: geometry.size)
 
             ZStack {
                 GravitiColors.appBackground
@@ -150,11 +138,7 @@ struct HomeView: View {
 
                 ForEach(items) { item in
                     let isSelected = selectedNodeID == item.id
-                    let diameter = GravityScale.diameter(
-                        for: item.node.gravity,
-                        minimumGravity: minimumGravity,
-                        maximumGravity: maximumGravity
-                    )
+                    let diameter = layout.diameter(for: item)
 
                     Button {
                         select(item)
@@ -167,15 +151,16 @@ struct HomeView: View {
                     .scaleEffect(isSelected ? (reduceMotion ? 1 : 1.12) : (selectedNodeID == nil ? 1 : 0.90))
                     .opacity(reduceMotion && isSelected ? 0 : (selectedNodeID == nil || isSelected ? 1 : 0.24))
                     .position(
-                        x: geometry.size.width * (isSelected && !reduceMotion ? 0.5 : item.x),
-                        y: geometry.size.height * (isSelected && !reduceMotion ? 0.35 : item.y)
+                        isSelected && !reduceMotion
+                            ? layout.focusPoint
+                            : layout.position(for: item)
                     )
                     .orbitDrift(
                         x: item.driftX,
                         y: item.driftY,
                         xDuration: item.driftDurationX,
                         yDuration: item.driftDurationY,
-                        isActive: selectedNodeID == nil
+                        isActive: selectedNodeID == nil && layout.allowsDrift
                     )
                     .transition(.opacity.combined(with: .scale(scale: 0.94)))
                     .zIndex(isSelected ? 1 : 0)
@@ -189,17 +174,10 @@ struct HomeView: View {
                 if reduceMotion, let selectedItem {
                     planet(
                         for: selectedItem,
-                        diameter: GravityScale.diameter(
-                            for: selectedItem.node.gravity,
-                            minimumGravity: minimumGravity,
-                            maximumGravity: maximumGravity
-                        )
+                        diameter: layout.diameter(for: selectedItem)
                     )
                     .scaleEffect(1.08)
-                    .position(
-                        x: geometry.size.width * 0.5,
-                        y: geometry.size.height * 0.35
-                    )
+                    .position(layout.focusPoint)
                     .transition(.opacity)
                     .accessibilityHidden(true)
                 }

@@ -28,17 +28,17 @@ enum SampleOrbitChildren {
     private static func tokyoAreas(color: Color, highlight: Color) -> [OrbitItem] {
         [
             OrbitItem(
-                node: tokyoNodes[0], x: 0.27, y: 0.31,
+                node: tokyoNodes[0],
                 primaryColor: color, highlightColor: highlight,
                 driftX: 5, driftY: -4, driftDurationX: 9, driftDurationY: 11
             ),
             OrbitItem(
-                node: tokyoNodes[1], x: 0.73, y: 0.47,
+                node: tokyoNodes[1],
                 primaryColor: color, highlightColor: highlight,
                 driftX: -4, driftY: 5, driftDurationX: 10, driftDurationY: 8
             ),
             OrbitItem(
-                node: tokyoNodes[2], x: 0.43, y: 0.71,
+                node: tokyoNodes[2],
                 primaryColor: color, highlightColor: highlight,
                 driftX: 4, driftY: 4, driftDurationX: 8, driftDurationY: 10
             )
@@ -48,17 +48,17 @@ enum SampleOrbitChildren {
     private static func californiaCities(color: Color, highlight: Color) -> [OrbitItem] {
         [
             OrbitItem(
-                node: californiaNodes[0], x: 0.28, y: 0.32,
+                node: californiaNodes[0],
                 primaryColor: color, highlightColor: highlight,
                 driftX: 5, driftY: -4, driftDurationX: 10, driftDurationY: 9
             ),
             OrbitItem(
-                node: californiaNodes[1], x: 0.72, y: 0.48,
+                node: californiaNodes[1],
                 primaryColor: color, highlightColor: highlight,
                 driftX: -5, driftY: 4, driftDurationX: 9, driftDurationY: 11
             ),
             OrbitItem(
-                node: californiaNodes[2], x: 0.45, y: 0.70,
+                node: californiaNodes[2],
                 primaryColor: color, highlightColor: highlight,
                 driftX: 4, driftY: 5, driftDurationX: 8, driftDurationY: 10
             )
