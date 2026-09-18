@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 struct SaveView: View {
     @ObservedObject var library: ArtifactLibrary
     let onViewLibrary: () -> Void
+    let onFindPlace: () -> Void
 
     @State private var kind: ArtifactKind = .url
     @State private var urlText = ""
@@ -104,6 +105,14 @@ struct SaveView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Bring in saved places")
                             .font(.headline)
+
+                        Button(action: onFindPlace) {
+                            Label("Find a place", systemImage: "magnifyingglass")
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity, minHeight: 48)
+                                .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                        }
+                        .buttonStyle(.plain)
 
                         Text("Share an Apple Maps or Google Maps place, paste its link, or import a .webloc file. Guide and list links stay clickable in your Library. To add places from a Google Maps list, select Saved in Google Takeout and import its CSV.")
                             .font(.subheadline)

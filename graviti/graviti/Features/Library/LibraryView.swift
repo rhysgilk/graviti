@@ -1,4 +1,5 @@
 import SwiftUI
+import MapKit
 
 struct LibraryView: View {
     @ObservedObject var library: ArtifactLibrary
@@ -18,19 +19,11 @@ struct LibraryView: View {
                             detail: "Destinations appear as your saves are connected to places."
                         )
                     case .places:
-                        emptyState(
-                            "No places yet",
-                            icon: "mappin.and.ellipse",
-                            detail: "Places from your saves will appear here."
-                        )
+                        placesContent
                     case .saves:
                         savesContent
                     case .map:
-                        emptyState(
-                            "No places on the map yet",
-                            icon: "map",
-                            detail: "Saved places will appear here when their locations are known."
-                        )
+                        mapContent
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -64,6 +57,47 @@ struct LibraryView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
         }
+    }
+
+    @ViewBuilder
+    private var placesContent: some View {
+        if savedPlaces.isEmpty {
+            emptyState("No places yet", icon: "mappin.and.ellipse", detail: "Search for a place to add it here.")
+        } else {
+            List(savedPlaces) { place in
+                NavigationLink {
+                    SavedPlaceDetailView(place: place, artifacts: library.artifacts.filter { $0.place?.id == place.id })
+                } label: {
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(place.name).font(.headline)
+                        Text(place.subtitle).font(.subheadline).foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 6)
+                }
+                .listRowBackground(GravitiColors.deepInk)
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+        }
+    }
+
+    @ViewBuilder
+    private var mapContent: some View {
+        if savedPlaces.isEmpty {
+            emptyState("No places on the map yet", icon: "map", detail: "Saved places will appear here when their locations are known.")
+        } else {
+            Map(initialPosition: .automatic) {
+                ForEach(savedPlaces) { place in
+                    Marker(place.name, coordinate: CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude))
+                }
+            }
+            .mapStyle(.standard(elevation: .flat))
+        }
+    }
+
+    private var savedPlaces: [SavedPlace] {
+        var seen = Set<String>()
+        return library.artifacts.compactMap(\.place).filter { seen.insert($0.id).inserted }
     }
 
     @ViewBuilder

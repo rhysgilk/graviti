@@ -27,6 +27,15 @@ final class ArtifactLibrary: ObservableObject {
         artifacts.insert(artifact, at: 0)
     }
 
+    func savePlace(_ candidate: PlaceCandidate) async throws {
+        try await save(Artifact(
+            kind: .url,
+            sourceURL: candidate.sourceURL,
+            originalText: candidate.place.name,
+            place: candidate.place
+        ))
+    }
+
     func importSharedArtifacts() async {
         do {
             for fileURL in try SharedArtifactInbox.pendingFiles() {

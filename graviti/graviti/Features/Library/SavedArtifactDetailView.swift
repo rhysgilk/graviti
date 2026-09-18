@@ -48,6 +48,16 @@ struct SavedArtifactDetailView: View {
                         .foregroundStyle(.white)
                 }
 
+                if let place = artifact.place {
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("Place").font(.headline)
+                        Text(place.name)
+                        if !place.subtitle.isEmpty {
+                            Text(place.subtitle).foregroundStyle(.white.opacity(0.68))
+                        }
+                    }
+                }
+
                 if let userNote = artifact.userNote {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Your note")

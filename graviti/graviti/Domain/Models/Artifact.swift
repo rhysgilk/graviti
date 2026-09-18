@@ -19,6 +19,7 @@ struct Artifact: Identifiable, Hashable {
     let sourceURL: String?
     let originalText: String?
     let userNote: String?
+    let place: SavedPlace?
     let processingState: ArtifactProcessingState
     let capturedAt: Date
 
@@ -28,6 +29,7 @@ struct Artifact: Identifiable, Hashable {
         sourceURL: String? = nil,
         originalText: String? = nil,
         userNote: String? = nil,
+        place: SavedPlace? = nil,
         processingState: ArtifactProcessingState = .saved,
         capturedAt: Date = .now
     ) {
@@ -36,6 +38,7 @@ struct Artifact: Identifiable, Hashable {
         self.sourceURL = sourceURL
         self.originalText = originalText
         self.userNote = userNote
+        self.place = place
         self.processingState = processingState
         self.capturedAt = capturedAt
     }

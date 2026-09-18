@@ -34,10 +34,12 @@ struct ContentView: View {
             }
             .tag(AppTab.explore)
 
-            SaveView(library: library) {
+            SaveView(library: library, onViewLibrary: {
                 libraryNavigationResetID = UUID()
                 selectedTab = .library
-            }
+            }, onFindPlace: {
+                selectedTab = .search
+            })
             .tabItem {
                 Label("Save", systemImage: "plus.circle.fill")
             }
@@ -50,10 +52,7 @@ struct ContentView: View {
             }
             .tag(AppTab.library)
 
-            PlaceholderFeatureView(
-                title: "Search",
-                icon: "magnifyingglass"
-            )
+            SearchView(library: library, provider: MapKitPlaceSearchProvider())
             .tabItem {
                 Label("Search", systemImage: "magnifyingglass")
             }
