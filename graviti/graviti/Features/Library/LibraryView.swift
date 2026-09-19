@@ -5,6 +5,7 @@ struct LibraryView: View {
     @ObservedObject var library: ArtifactLibrary
     @State private var mode: LibraryMode = .saves
     @State private var selectedMapPlace: SavedPlace?
+    @State private var query = ""
 
     var body: some View {
         NavigationStack {
@@ -27,6 +28,12 @@ struct LibraryView: View {
             }
             .background(GravitiColors.appBackground)
             .navigationTitle("Library")
+            .searchable(text: $query, prompt: "Places, interests, and saves")
+            .onChange(of: query) { _, _ in
+                if let selectedMapPlace, !savedPlaces.contains(where: { $0.id == selectedMapPlace.id }) {
+                    self.selectedMapPlace = nil
+                }
+            }
         }
     }
 
@@ -58,9 +65,13 @@ struct LibraryView: View {
 
     @ViewBuilder
     private var destinationsContent: some View {
-        let destinations = DestinationOrbitBuilder.nodes(from: library.artifacts, limit: nil)
+        let destinations = DestinationOrbitBuilder.nodes(from: filteredArtifacts, limit: nil)
         if destinations.isEmpty {
-            emptyState("No destinations yet", icon: "globe", detail: "Destinations appear as your saves are connected to places.")
+            if query.isEmpty {
+                emptyState("No destinations yet", icon: "globe", detail: "Destinations appear as your saves are connected to places.")
+            } else {
+                noResultsState()
+            }
         } else {
             List(destinations) { node in
                 NavigationLink {
@@ -84,7 +95,11 @@ struct LibraryView: View {
     @ViewBuilder
     private var placesContent: some View {
         if savedPlaces.isEmpty {
-            emptyState("No places yet", icon: "mappin.and.ellipse", detail: "Search for a place to add it here.")
+            if query.isEmpty {
+                emptyState("No places yet", icon: "mappin.and.ellipse", detail: "Search for a place to add it here.")
+            } else {
+                noResultsState()
+            }
         } else {
             List(savedPlaces) { place in
                 NavigationLink {
@@ -106,7 +121,11 @@ struct LibraryView: View {
     @ViewBuilder
     private var mapContent: some View {
         if savedPlaces.isEmpty {
-            emptyState("No places on the map yet", icon: "map", detail: "Saved places will appear here when their locations are known.")
+            if query.isEmpty {
+                emptyState("No places on the map yet", icon: "map", detail: "Saved places will appear here when their locations are known.")
+            } else {
+                noResultsState()
+            }
         } else {
             Map(initialPosition: .automatic, selection: $selectedMapPlace) {
                 ForEach(savedPlaces) { place in
@@ -130,7 +149,13 @@ struct LibraryView: View {
 
     private var savedPlaces: [SavedPlace] {
         var seen = Set<String>()
-        return library.artifacts.compactMap(\.place).filter { seen.insert($0.id).inserted }
+        return filteredArtifacts.compactMap(\.place).filter { seen.insert($0.id).inserted }
+    }
+
+    private var filteredArtifacts: [Artifact] {
+        let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !term.isEmpty else { return library.artifacts }
+        return library.artifacts.filter { $0.librarySearchText.localizedCaseInsensitiveContains(term) }
     }
 
     @ViewBuilder
@@ -143,14 +168,14 @@ struct LibraryView: View {
             } actions: {
                 Button("Try Again") { Task { await library.load() } }
             }
-        } else if library.artifacts.isEmpty {
-            emptyState(
-                "No saves yet",
-                icon: "square.stack",
-                detail: "Save a link or note to start your library."
-            )
+        } else if filteredArtifacts.isEmpty {
+            if query.isEmpty {
+                emptyState("No saves yet", icon: "square.stack", detail: "Save a link or note to start your library.")
+            } else {
+                noResultsState()
+            }
         } else {
-            List(library.artifacts) { artifact in
+            List(filteredArtifacts) { artifact in
                 NavigationLink {
                     SavedArtifactDetailView(artifact: artifact, library: library)
                 } label: {
@@ -169,6 +194,10 @@ struct LibraryView: View {
         } description: {
             Text(detail)
         }
+    }
+
+    private func noResultsState() -> some View {
+        ContentUnavailableView.search(text: query)
     }
 }
 
@@ -202,7 +231,7 @@ private struct ArtifactRow: View {
                 .background(GravitiColors.appBackground, in: RoundedRectangle(cornerRadius: 12))
 
             VStack(alignment: .leading, spacing: 5) {
-                Text(title)
+                Text(artifact.libraryTitle)
                     .font(.headline)
                     .foregroundStyle(.white)
                     .lineLimit(2)
@@ -228,20 +257,41 @@ private struct ArtifactRow: View {
         .accessibilityElement(children: .combine)
     }
 
-    private var title: String {
-        switch artifact.kind {
+}
+
+private extension Artifact {
+    var libraryTitle: String {
+        switch kind {
         case .url:
-            if let title = artifact.originalText, !title.isEmpty { return title }
-            guard let source = artifact.sourceURL else { return "Saved link" }
+            if let title = originalText, !title.isEmpty { return title }
+            guard let source = sourceURL else { return "Saved link" }
             if MapLinkMetadata.isCollectionLink(source),
                let provider = MapLinkMetadata.provider(for: source) {
                 return provider == .apple ? "Apple Maps guide" : "Google Maps list"
             }
             return URLComponents(string: source)?.host ?? source
         case .manual:
-            return artifact.originalText?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Saved note"
+            return originalText?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Saved note"
         case .photo:
-            return artifact.userNote?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Saved photo"
+            return userNote?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Saved photo"
         }
+    }
+
+    var librarySearchText: String {
+        [
+            libraryTitle,
+            sourceURL,
+            originalText,
+            userNote,
+            effectiveSummary,
+            effectiveCategory?.displayName,
+            effectiveInterests.joined(separator: " "),
+            place?.name,
+            place?.locality,
+            place?.region,
+            place?.country
+        ]
+        .compactMap { $0 }
+        .joined(separator: " ")
     }
 }
