@@ -3,13 +3,25 @@ import SwiftUI
 struct ExploreView: View {
     @ObservedObject var library: ArtifactLibrary
     let onFindPlace: (String) -> Void
+    @AppStorage("explore.region") private var regionRaw = RecommendationRegion.anywhere.rawValue
+    @AppStorage("explore.preferredInterests") private var preferredRaw = ""
+    @AppStorage("explore.avoidedInterests") private var avoidedRaw = ""
+    @State private var showingPreferences = false
 
     private var profile: InterestProfile {
         InterestProfileBuilder.build(from: library.artifacts)
     }
 
     private var recommendations: [DestinationRecommendation] {
-        DestinationFitEngine.recommendations(from: profile, artifacts: library.artifacts)
+        DestinationFitEngine.recommendations(from: profile, artifacts: library.artifacts, preferences: preferences)
+    }
+
+    private var preferences: ExplorePreferences {
+        ExplorePreferences(
+            region: RecommendationRegion(rawValue: regionRaw) ?? .anywhere,
+            preferredInterests: Self.decode(preferredRaw),
+            avoidedInterests: Self.decode(avoidedRaw)
+        )
     }
 
     var body: some View {
@@ -19,11 +31,24 @@ struct ExploreView: View {
                     Text("What draws you?")
                         .font(.custom("Sora-SemiBold", size: 28, relativeTo: .title))
 
+                    Button { showingPreferences = true } label: {
+                        HStack {
+                            Label(preferenceSummary, systemImage: "slider.horizontal.3")
+                            Spacer()
+                            Text("Tune")
+                                .fontWeight(.semibold)
+                        }
+                        .font(.subheadline)
+                        .padding(14)
+                        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                    }
+                    .buttonStyle(.plain)
+
                     if let leading = profile.strongestAcrossAreas {
                         leadingPattern(leading)
                     }
 
-                    if profile.interests.isEmpty {
+                    if profile.interests.isEmpty && recommendations.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             Label("Your patterns will appear here", systemImage: "sparkles")
                                 .font(.headline)
@@ -38,7 +63,20 @@ struct ExploreView: View {
                         .padding(18)
                         .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
                     } else {
-                        if !recommendations.isEmpty {
+                        if recommendations.isEmpty && hasActivePreferences {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Label("No destinations match every filter", systemImage: "line.3.horizontal.decrease.circle")
+                                    .font(.headline)
+                                Text("Try another region or remove an avoid rule. Your saved-interest patterns are still shown below.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.white.opacity(0.68))
+                                Button("Change preferences") { showingPreferences = true }
+                                    .font(.subheadline.weight(.semibold))
+                            }
+                            .padding(18)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
+                        } else if !recommendations.isEmpty {
                             VStack(alignment: .leading, spacing: 5) {
                                 Text("Places that fit you")
                                     .font(.headline)
@@ -60,33 +98,35 @@ struct ExploreView: View {
                             }
                         }
 
-                        Text("Interests across your saves")
-                            .font(.headline)
+                        if !profile.interests.isEmpty {
+                            Text("Interests across your saves")
+                                .font(.headline)
 
-                        ForEach(profile.interests) { pattern in
-                            NavigationLink {
-                                InterestEvidenceView(interest: pattern.name, library: library)
-                            } label: {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "sparkles")
-                                        .foregroundStyle(GravitiColors.signalMint)
-                                        .frame(width: 32)
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(pattern.name)
-                                            .font(.headline)
-                                        Text(pattern.evidenceSummary)
-                                            .font(.subheadline)
-                                            .foregroundStyle(.white.opacity(0.68))
+                            ForEach(profile.interests) { pattern in
+                                NavigationLink {
+                                    InterestEvidenceView(interest: pattern.name, library: library)
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "sparkles")
+                                            .foregroundStyle(GravitiColors.signalMint)
+                                            .frame(width: 32)
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(pattern.name)
+                                                .font(.headline)
+                                            Text(pattern.evidenceSummary)
+                                                .font(.subheadline)
+                                                .foregroundStyle(.white.opacity(0.68))
+                                        }
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(.white.opacity(0.45))
                                     }
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(.white.opacity(0.45))
+                                    .padding(16)
+                                    .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
                                 }
-                                .padding(16)
-                                .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
 
                         if !profile.categories.isEmpty {
@@ -115,7 +155,30 @@ struct ExploreView: View {
             .foregroundStyle(.white)
             .navigationTitle("Explore")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showingPreferences) {
+                ExplorePreferencesView(
+                    regionRaw: $regionRaw,
+                    preferredRaw: $preferredRaw,
+                    avoidedRaw: $avoidedRaw
+                )
+            }
         }
+    }
+
+    private var preferenceSummary: String {
+        let region = preferences.region.displayName
+        let selected = preferences.preferredInterests.count + preferences.avoidedInterests.count
+        return selected == 0 && preferences.region == .anywhere
+            ? "Anywhere · Based on your saves"
+            : "\(region) · \(selected) preference\(selected == 1 ? "" : "s")"
+    }
+
+    private var hasActivePreferences: Bool {
+        preferences.region != .anywhere || !preferences.preferredInterests.isEmpty || !preferences.avoidedInterests.isEmpty
+    }
+
+    private static func decode(_ raw: String) -> Set<String> {
+        Set(raw.split(separator: "|").map(String.init))
     }
 
     private func recommendationRow(_ recommendation: DestinationRecommendation) -> some View {
@@ -200,6 +263,11 @@ private struct DestinationRecommendationView: View {
                     Text("Based on \(recommendation.supportingArtifacts.count) of your saved items across the Library.")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.68))
+                    if !recommendation.explicitMatches.isEmpty {
+                        Text("Also matches what you asked for: \(recommendation.explicitMatches.joined(separator: ", ")).")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.68))
+                    }
                 }
                 .padding(18)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -220,6 +288,109 @@ private struct DestinationRecommendationView: View {
         .foregroundStyle(.white)
         .navigationTitle("Recommendation")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct ExplorePreferencesView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding var regionRaw: String
+    @Binding var preferredRaw: String
+    @Binding var avoidedRaw: String
+
+    private let interests = ["Matcha", "Tea", "Coffee", "Desserts", "Scenic views", "Hiking", "Nature", "Beaches", "Architecture", "Museums", "Gardens", "Shopping"]
+
+    private var preferred: Set<String> { decode(preferredRaw) }
+    private var avoided: Set<String> { decode(avoidedRaw) }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Where") {
+                    Picker("Region", selection: $regionRaw) {
+                        ForEach(RecommendationRegion.allCases) { region in
+                            Text(region.displayName).tag(region.rawValue)
+                        }
+                    }
+                }
+                Section("I want more of") {
+                    ForEach(interests, id: \.self) { interest in
+                        selectionRow(interest, selected: preferred.contains(interest)) {
+                            togglePreferred(interest)
+                        }
+                    }
+                }
+                Section("Avoid") {
+                    ForEach(interests, id: \.self) { interest in
+                        selectionRow(interest, selected: avoided.contains(interest)) {
+                            toggleAvoided(interest)
+                        }
+                    }
+                }
+                Section {
+                    Button("Reset preferences", role: .destructive) {
+                        regionRaw = RecommendationRegion.anywhere.rawValue
+                        preferredRaw = ""
+                        avoidedRaw = ""
+                    }
+                }
+            }
+            .navigationTitle("Tune Explore")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+
+    private func selectionRow(_ interest: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                Text(interest)
+                    .foregroundStyle(.primary)
+                Spacer()
+                if selected {
+                    Image(systemName: "checkmark")
+                        .foregroundStyle(GravitiColors.iris)
+                }
+            }
+        }
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
+    private func togglePreferred(_ interest: String) {
+        var target = preferred
+        var other = avoided
+        if target.contains(interest) {
+            target.remove(interest)
+        } else {
+            target.insert(interest)
+            other.remove(interest)
+        }
+        preferredRaw = encode(target)
+        avoidedRaw = encode(other)
+    }
+
+    private func toggleAvoided(_ interest: String) {
+        var target = avoided
+        var other = preferred
+        if target.contains(interest) {
+            target.remove(interest)
+        } else {
+            target.insert(interest)
+            other.remove(interest)
+        }
+        avoidedRaw = encode(target)
+        preferredRaw = encode(other)
+    }
+
+    private func decode(_ raw: String) -> Set<String> {
+        Set(raw.split(separator: "|").map(String.init))
+    }
+
+    private func encode(_ values: Set<String>) -> String {
+        values.sorted().joined(separator: "|")
     }
 }
 
