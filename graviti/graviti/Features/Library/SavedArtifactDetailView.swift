@@ -138,6 +138,13 @@ struct SavedArtifactDetailView: View {
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
+                } else if let enrichmentStatus {
+                    Label(enrichmentStatus.text, systemImage: enrichmentStatus.symbol)
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.68))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
                 }
 
                 Button("Edit description and interests") { showingDetailsEditor = true }
@@ -305,5 +312,18 @@ struct SavedArtifactDetailView: View {
     private var isCollectionSave: Bool {
         guard let sourceURL = current.sourceURL else { return false }
         return MapLinkMetadata.isCollectionLink(sourceURL)
+    }
+
+    private var enrichmentStatus: (text: String, symbol: String)? {
+        switch current.enrichmentState {
+        case .pending, .processing:
+            return ("Learning about this save…", "sparkles")
+        case .failed:
+            return ("Details will be tried again later.", "arrow.clockwise")
+        case .unavailable:
+            return ("Add a description or place to help Graviti understand this save.", "text.badge.plus")
+        case .processed:
+            return nil
+        }
     }
 }

@@ -3,19 +3,24 @@ import MapKit
 
 @MainActor
 struct ArtifactEnricher {
-    func enrich(_ artifact: Artifact) async -> ArtifactEnrichment? {
+    func enrich(_ artifact: Artifact) async throws -> ArtifactEnrichment? {
+        let text = [artifact.originalText, artifact.userNote]
+            .compactMap { $0 }
+            .joined(separator: " ")
         let item: MKMapItem?
         if let place = artifact.place,
            let identifier = MKMapItem.Identifier(rawValue: place.id) {
-            item = try? await MKMapItemRequest(mapItemIdentifier: identifier).mapItem
+            do {
+                item = try await MKMapItemRequest(mapItemIdentifier: identifier).mapItem
+            } catch {
+                guard !text.isEmpty else { throw error }
+                item = nil
+            }
         } else {
             item = nil
         }
 
         let classification = item?.pointOfInterestCategory.flatMap(classification(for:))
-        let text = [artifact.originalText, artifact.userNote]
-            .compactMap { $0 }
-            .joined(separator: " ")
         let interests = interestTags(in: text, category: classification?.category)
         let textCategory = categoryFromText(text)
         let category = classification?.category ?? textCategory

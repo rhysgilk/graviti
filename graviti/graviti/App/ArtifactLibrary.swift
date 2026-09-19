@@ -141,6 +141,7 @@ final class ArtifactLibrary: ObservableObject {
 
     private func shouldEnrich(_ artifact: Artifact) -> Bool {
         artifact.enrichment == nil &&
+            [.pending, .processing, .failed].contains(artifact.enrichmentState) &&
             (artifact.place != nil || artifact.originalText != nil || artifact.userNote != nil) &&
             artifact.sourceURL.map(MapLinkMetadata.isCollectionLink) != true
     }
@@ -151,14 +152,31 @@ final class ArtifactLibrary: ObservableObject {
               enrichingIDs.insert(id).inserted else { return }
         defer { enrichingIDs.remove(id) }
 
-        guard let enrichment = await ArtifactEnricher().enrich(artifact),
-              let current = artifacts.first(where: { $0.id == id }),
-              current.place?.id == artifact.place?.id,
-              current.originalText == artifact.originalText,
-              current.userNote == artifact.userNote else { return }
         do {
-            try await update(current.withEnrichment(enrichment))
+            if artifact.enrichment == nil {
+                try await update(artifact.withEnrichmentState(.processing))
+            }
+            let enrichment = try await ArtifactEnricher().enrich(artifact)
+            guard let current = artifacts.first(where: { $0.id == id }),
+                  current.place?.id == artifact.place?.id,
+                  current.originalText == artifact.originalText,
+                  current.userNote == artifact.userNote else { return }
+            if let enrichment {
+                try await update(current.withEnrichment(enrichment))
+            } else if current.enrichment != nil {
+                try await update(current.withEnrichmentState(.processed))
+            } else {
+                try await update(current.withEnrichmentState(.unavailable))
+            }
+        } catch is CancellationError {
+            if let current = artifacts.first(where: { $0.id == id }) {
+                try? await update(current.withEnrichmentState(.pending))
+            }
         } catch {
+            if let current = artifacts.first(where: { $0.id == id }) {
+                let state: ArtifactEnrichmentState = current.enrichment == nil ? .failed : .processed
+                try? await update(current.withEnrichmentState(state))
+            }
             loadError = error.localizedDescription
         }
     }

@@ -14,6 +14,14 @@ enum ArtifactProcessingState: String, Codable {
     case failed
 }
 
+enum ArtifactEnrichmentState: String, Codable {
+    case pending
+    case processing
+    case processed
+    case unavailable
+    case failed
+}
+
 struct Artifact: Identifiable, Hashable {
     let id: UUID
     let kind: ArtifactKind
@@ -23,6 +31,7 @@ struct Artifact: Identifiable, Hashable {
     let mediaKey: String?
     let place: SavedPlace?
     let enrichment: ArtifactEnrichment?
+    let enrichmentState: ArtifactEnrichmentState
     let userDetails: ArtifactUserDetails?
     let processingState: ArtifactProcessingState
     let capturedAt: Date
@@ -36,6 +45,7 @@ struct Artifact: Identifiable, Hashable {
         mediaKey: String? = nil,
         place: SavedPlace? = nil,
         enrichment: ArtifactEnrichment? = nil,
+        enrichmentState: ArtifactEnrichmentState = .pending,
         userDetails: ArtifactUserDetails? = nil,
         processingState: ArtifactProcessingState = .saved,
         capturedAt: Date = .now
@@ -48,6 +58,7 @@ struct Artifact: Identifiable, Hashable {
         self.mediaKey = mediaKey
         self.place = place
         self.enrichment = enrichment
+        self.enrichmentState = enrichmentState
         self.userDetails = userDetails
         self.processingState = processingState
         self.capturedAt = capturedAt
@@ -63,6 +74,7 @@ struct Artifact: Identifiable, Hashable {
             mediaKey: mediaKey,
             place: place,
             enrichment: place?.id == self.place?.id ? enrichment : nil,
+            enrichmentState: place?.id == self.place?.id ? enrichmentState : .pending,
             userDetails: userDetails,
             processingState: state,
             capturedAt: capturedAt
@@ -79,6 +91,7 @@ struct Artifact: Identifiable, Hashable {
             mediaKey: mediaKey,
             place: place,
             enrichment: enrichment,
+            enrichmentState: .processed,
             userDetails: userDetails,
             processingState: processingState,
             capturedAt: capturedAt
@@ -95,7 +108,25 @@ struct Artifact: Identifiable, Hashable {
             mediaKey: mediaKey,
             place: place,
             enrichment: enrichment,
+            enrichmentState: enrichmentState,
             userDetails: details,
+            processingState: processingState,
+            capturedAt: capturedAt
+        )
+    }
+
+    func withEnrichmentState(_ state: ArtifactEnrichmentState) -> Artifact {
+        Artifact(
+            id: id,
+            kind: kind,
+            sourceURL: sourceURL,
+            originalText: originalText,
+            userNote: userNote,
+            mediaKey: mediaKey,
+            place: place,
+            enrichment: enrichment,
+            enrichmentState: state,
+            userDetails: userDetails,
             processingState: processingState,
             capturedAt: capturedAt
         )

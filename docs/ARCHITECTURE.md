@@ -20,6 +20,8 @@ ARCHITECTURE
 9. Start simple; add distributed complexity only when actual load requires it.
 10. The MVP should remain debuggable by one developer.
 
+Artifact capture and enrichment have separate persisted lifecycles. Capturing the original source completes first. Description, category, interests, and other derived details then move through `pending`, `processing`, `processed`, `unavailable`, or `failed` without hiding or invalidating the saved Artifact. The app resumes interrupted and failed enrichment when it next becomes active. This contract stays the same when the local enricher is replaced or supplemented by backend jobs.
+
 ## 2. High-Level System
 
 ```text

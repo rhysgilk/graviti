@@ -120,6 +120,18 @@ needs_review
 failed
 ```
 
+Place resolution and descriptive enrichment are tracked separately. Enrichment uses:
+
+```text
+pending
+processing
+processed
+unavailable
+failed
+```
+
+This lets a save remain safely captured while richer descriptions, categories, and interests are generated locally or by a future background service. `unavailable` means the current inputs were insufficient; it is distinct from a processing failure and can return to `pending` when the user adds a place or description.
+
 The Artifact is never deleted merely because extraction fails.
 
 `user_note` may contain the optional description a user supplied with a photo. Keep user-authored text separate from generated descriptions and preserve it when enrichment is rerun.
