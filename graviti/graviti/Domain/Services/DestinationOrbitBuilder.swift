@@ -2,7 +2,24 @@ import Foundation
 import CryptoKit
 
 enum DestinationOrbitBuilder {
-    static func nodes(from artifacts: [Artifact], limit: Int? = 10) -> [OrbitNode] {
+    static func nodes(
+        from artifacts: [Artifact],
+        mode: OrbitResolutionMode = .automatic,
+        limit: Int? = 10
+    ) -> [OrbitNode] {
+        switch mode {
+        case .automatic:
+            automaticNodes(from: artifacts, limit: limit)
+        case .countries:
+            sorted(groupedNodes(from: artifacts, level: .country), limit: limit)
+        case .statesProvinces:
+            sorted(groupedNodes(from: artifacts, level: .stateProvince), limit: limit)
+        case .cities:
+            sorted(groupedNodes(from: artifacts, level: .city), limit: limit)
+        }
+    }
+
+    private static func automaticNodes(from artifacts: [Artifact], limit: Int?) -> [OrbitNode] {
         let raw = ungroupedNodes(from: artifacts)
         var countries: [String: (name: String, cityIDs: Set<UUID>, placeIDs: Set<String>, count: Int)] = [:]
         for artifact in artifacts {
@@ -46,15 +63,68 @@ enum DestinationOrbitBuilder {
         artifacts.filter { artifact in
             guard let place = artifact.place else { return false }
             let country = place.country?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let region = place.region?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             let city = place.locality?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             switch node.level {
             case .country:
                 return stableID(for: normalized("country|\(country)|\(country)")) == node.id
             case .city:
                 return stableID(for: normalized("city|\(country)|\(city)")) == node.id
-            case .stateProvince, .district, .neighborhood:
+            case .stateProvince:
+                return stableID(for: normalized("stateProvince|\(country)|\(region)")) == node.id
+            case .district, .neighborhood:
                 return false
             }
+        }
+    }
+
+    private static func groupedNodes(from artifacts: [Artifact], level requestedLevel: GeoLevel) -> [OrbitNode] {
+        struct Group {
+            let name: String
+            let level: GeoLevel
+            var artifactCount: Int
+            var placeIDs: Set<String>
+        }
+
+        var groups: [String: Group] = [:]
+        for artifact in artifacts {
+            guard let place = artifact.place else { continue }
+            let country = cleaned(place.country)
+            let region = cleaned(place.region)
+            let city = cleaned(place.locality)
+
+            let value: String?
+            let level: GeoLevel
+            switch requestedLevel {
+            case .country:
+                value = country
+                level = .country
+            case .stateProvince:
+                value = region ?? country
+                level = region == nil ? .country : .stateProvince
+            case .city:
+                value = city ?? region ?? country
+                level = city != nil ? .city : (region != nil ? .stateProvince : .country)
+            case .district, .neighborhood:
+                value = city ?? region ?? country
+                level = city != nil ? .city : (region != nil ? .stateProvince : .country)
+            }
+            guard let value else { continue }
+            let key = normalized("\(level.rawValue)|\(country ?? "")|\(value)")
+            var group = groups[key] ?? Group(name: value, level: level, artifactCount: 0, placeIDs: [])
+            group.artifactCount += 1
+            group.placeIDs.insert(place.id)
+            groups[key] = group
+        }
+
+        return groups.map { key, group in
+            OrbitNode(
+                id: stableID(for: key),
+                name: group.name,
+                level: group.level,
+                gravity: score(count: group.artifactCount, places: group.placeIDs.count),
+                saveCount: group.artifactCount
+            )
         }
     }
 
@@ -106,6 +176,13 @@ enum DestinationOrbitBuilder {
 
     private static func normalized(_ value: String) -> String {
         value.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+    }
+
+    private static func cleaned(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else {
+            return nil
+        }
+        return value
     }
 
     private static func sorted(_ nodes: [OrbitNode], limit: Int?) -> [OrbitNode] {

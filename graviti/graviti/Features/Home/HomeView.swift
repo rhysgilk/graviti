@@ -13,11 +13,17 @@ struct HomeView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var presentation: HomePresentation = .field
     @State private var fieldPath: [OrbitItem] = []
+    @AppStorage("orbit.resolutionMode") private var resolutionModeRawValue = OrbitResolutionMode.automatic.rawValue
     @AccessibilityFocusState private var isDetailFocused: Bool
     @AccessibilityFocusState private var isInsightFocused: Bool
 
     private var orbitItems: [OrbitItem] {
-        items(for: DestinationOrbitBuilder.nodes(from: library.artifacts))
+        items(for: DestinationOrbitBuilder.nodes(from: library.artifacts, mode: resolutionMode))
+    }
+
+    private var resolutionMode: OrbitResolutionMode {
+        get { OrbitResolutionMode(rawValue: resolutionModeRawValue) ?? .automatic }
+        nonmutating set { resolutionModeRawValue = newValue.rawValue }
     }
 
     private func items(for nodes: [OrbitNode]) -> [OrbitItem] {
@@ -138,6 +144,10 @@ struct HomeView: View {
             isDetailFocused = selectedNodeID != nil
             isInsightFocused = newValue == .insight
         }
+        .onChange(of: resolutionModeRawValue) { _, _ in
+            fieldPath.removeAll()
+            clearPresentation()
+        }
     }
 
     private var selectedNodeID: UUID? {
@@ -250,17 +260,21 @@ struct HomeView: View {
 
                     Spacer()
 
-                    if homeInsight != nil {
-                        Button(action: showInsight) {
-                            Label("Insight", systemImage: "chart.bar.xaxis")
-                                .font(.subheadline.weight(.medium))
-                                .frame(minHeight: 44)
-                                .padding(.horizontal, 12)
-                                .background(.white.opacity(0.08), in: Capsule())
+                    HStack(spacing: 8) {
+                        resolutionMenu
+
+                        if homeInsight != nil {
+                            Button(action: showInsight) {
+                                Label("Insight", systemImage: "chart.bar.xaxis")
+                                    .font(.subheadline.weight(.medium))
+                                    .frame(minHeight: 44)
+                                    .padding(.horizontal, 12)
+                                    .background(.white.opacity(0.08), in: Capsule())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(presentation == .insight ? "Close field insight" : "Open field insight")
+                            .accessibilityValue(presentation == .insight ? "Selected" : "")
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(presentation == .insight ? "Close field insight" : "Open field insight")
-                        .accessibilityValue(presentation == .insight ? "Selected" : "")
                     }
                 }
             }
@@ -269,6 +283,27 @@ struct HomeView: View {
         }
         .padding(.horizontal, 22)
         .padding(.top, 10)
+    }
+
+    private var resolutionMenu: some View {
+        Menu {
+            Picker("Orbit Resolution", selection: Binding(
+                get: { resolutionMode },
+                set: { resolutionMode = $0 }
+            )) {
+                ForEach(OrbitResolutionMode.allCases) { mode in
+                    Text(mode.displayName).tag(mode)
+                }
+            }
+        } label: {
+            Image(systemName: "scope")
+                .frame(width: 44, height: 44)
+                .background(.white.opacity(0.08), in: Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Orbit Resolution")
+        .accessibilityValue(resolutionMode.displayName)
+        .accessibilityHint("Changes how destinations are grouped")
     }
 }
 
