@@ -107,6 +107,12 @@ final class ArtifactLibrary: ObservableObject {
         }
     }
 
+    func deleteArtifacts(_ ids: Set<UUID>) async throws {
+        for id in ids where artifacts.contains(where: { $0.id == id }) {
+            try await deleteArtifact(id)
+        }
+    }
+
     private func process(_ id: UUID) async {
         guard let artifact = artifacts.first(where: { $0.id == id }),
               shouldProcess(artifact) || artifact.processingState == .processing else { return }
@@ -255,6 +261,10 @@ final class ArtifactLibrary: ObservableObject {
         guard let text = String(data: data, encoding: .utf8) else {
             throw CSVImportError.invalidEncoding
         }
+        return try await importGoogleSavedCSV(text)
+    }
+
+    func importGoogleSavedCSV(_ text: String) async throws -> CSVImportSummary {
         let parsed = try GoogleSavedCSVParser.parse(text)
 
         struct ImportKey: Hashable {
@@ -292,7 +302,8 @@ final class ArtifactLibrary: ObservableObject {
         return CSVImportSummary(
             imported: newArtifacts.count,
             duplicates: duplicateCount,
-            skipped: parsed.skippedRows
+            skipped: parsed.skippedRows,
+            importedIDs: newArtifacts.map(\.id)
         )
     }
 
@@ -395,6 +406,7 @@ struct CSVImportSummary {
     let imported: Int
     let duplicates: Int
     let skipped: Int
+    let importedIDs: [UUID]
 }
 
 private enum CSVImportError: LocalizedError {

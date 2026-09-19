@@ -20,6 +20,10 @@ struct SaveView: View {
     @State private var showingMapsLinkImporter = false
     @State private var importMessage: String?
     @State private var importSummary: SaveImportSummary?
+#if DEBUG
+    @AppStorage("debug.dogfoodArtifactIDs") private var dogfoodArtifactIDs = ""
+    @State private var isChangingDogfood = false
+#endif
 
     var body: some View {
         NavigationStack {
@@ -177,6 +181,10 @@ struct SaveView: View {
                                 .font(.subheadline)
                                 .foregroundStyle(GravitiColors.signalMint)
                         }
+
+#if DEBUG
+                        dogfoodControls
+#endif
                     }
                     .padding(.top, 8)
                 }
@@ -333,7 +341,130 @@ struct SaveView: View {
             importMessage = error.localizedDescription
         }
     }
+
+#if DEBUG
+    private var dogfoodControls: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Divider().overlay(.white.opacity(0.15))
+
+            Text("Development test data")
+                .font(.headline)
+
+            Text("Switch between focused libraries to test how Graviti combines different interests into destination suggestions.")
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.65))
+
+            Menu {
+                ForEach(DogfoodDataset.allCases) { dataset in
+                    Button(dataset.displayName) {
+                        Task { await loadDogfood(dataset) }
+                    }
+                }
+            } label: {
+                Label(isChangingDogfood ? "Changing test data…" : "Load test dataset", systemImage: "shippingbox.and.arrow.backward")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity, minHeight: 48)
+                    .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+            }
+            .disabled(isChangingDogfood)
+
+            if !dogfoodArtifactIDs.isEmpty {
+                Button(role: .destructive) {
+                    Task { await clearDogfood() }
+                } label: {
+                    Label("Remove test dataset", systemImage: "trash")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                }
+                .buttonStyle(.plain)
+                .disabled(isChangingDogfood)
+            }
+        }
+        .padding(.top, 8)
+    }
+
+    private func loadDogfood(_ dataset: DogfoodDataset) async {
+        isChangingDogfood = true
+        defer { isChangingDogfood = false }
+        do {
+            try await removeTrackedDogfood()
+            let text = try dataset.csvText()
+            let summary = try await library.importGoogleSavedCSV(text)
+            dogfoodArtifactIDs = summary.importedIDs.map(\.uuidString).joined(separator: ",")
+            importMessage = nil
+            importSummary = SaveImportSummary(
+                title: dataset.displayName,
+                imported: summary.imported,
+                duplicates: summary.duplicates,
+                skipped: summary.skipped,
+                processingContinues: summary.imported > 0
+            )
+        } catch {
+            importSummary = nil
+            importMessage = error.localizedDescription
+        }
+    }
+
+    private func clearDogfood() async {
+        isChangingDogfood = true
+        defer { isChangingDogfood = false }
+        do {
+            try await removeTrackedDogfood()
+            importSummary = nil
+            importMessage = "Test data removed."
+        } catch {
+            importSummary = nil
+            importMessage = error.localizedDescription
+        }
+    }
+
+    private func removeTrackedDogfood() async throws {
+        let ids = Set(dogfoodArtifactIDs
+            .split(separator: ",")
+            .compactMap { UUID(uuidString: String($0)) })
+        try await library.deleteArtifacts(ids)
+        dogfoodArtifactIDs = ""
+    }
+#endif
 }
+
+#if DEBUG
+private enum DogfoodDataset: String, CaseIterable, Identifiable {
+    case nationalParksAndScenery = "national-parks-and-scenery"
+    case cultureAndHistory = "culture-and-history"
+    case foodAndWater = "food-and-water"
+    case diverseLibrary = "diverse-library"
+
+    var id: Self { self }
+
+    var displayName: String {
+        switch self {
+        case .nationalParksAndScenery: "National parks & scenery"
+        case .cultureAndHistory: "Culture, architecture & history"
+        case .foodAndWater: "Seafood, markets & water"
+        case .diverseLibrary: "Diverse mixed library"
+        }
+    }
+
+    func csvText() throws -> String {
+        let url = Bundle.main.url(forResource: rawValue, withExtension: "csv", subdirectory: "Dogfood")
+            ?? Bundle.main.url(forResource: rawValue, withExtension: "csv")
+        guard let url else { throw DogfoodDatasetError.missingFile(displayName) }
+        return try String(contentsOf: url, encoding: .utf8)
+    }
+}
+
+private enum DogfoodDatasetError: LocalizedError {
+    case missingFile(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .missingFile(let name): "The \(name) test dataset isn't bundled in this build."
+        }
+    }
+}
+#endif
 
 private enum PhotoCaptureError: LocalizedError {
     case unsupported
