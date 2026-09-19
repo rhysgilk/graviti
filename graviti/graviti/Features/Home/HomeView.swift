@@ -13,6 +13,7 @@ struct HomeView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var presentation: HomePresentation = .field
     @State private var fieldPath: [OrbitItem] = []
+    @State private var presentedDestination: OrbitNode?
     @AppStorage("orbit.resolutionMode") private var resolutionModeRawValue = OrbitResolutionMode.automatic.rawValue
     @AccessibilityFocusState private var isDetailFocused: Bool
     @AccessibilityFocusState private var isInsightFocused: Bool
@@ -148,6 +149,16 @@ struct HomeView: View {
             fieldPath.removeAll()
             clearPresentation()
         }
+        .sheet(item: $presentedDestination) { node in
+            NavigationStack {
+                DestinationLibraryDetailView(node: node, library: library)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") { presentedDestination = nil }
+                        }
+                    }
+            }
+        }
     }
 
     private var selectedNodeID: UUID? {
@@ -177,7 +188,8 @@ struct HomeView: View {
                 node: selectedItem.node,
                 onClose: clearPresentation,
                 onOpen: DestinationOrbitBuilder.children(of: selectedItem.node, from: library.artifacts).isEmpty
-                    ? nil : { open(selectedItem) }
+                    ? nil : { open(selectedItem) },
+                onViewSaves: { presentedDestination = selectedItem.node }
             )
             .accessibilityElement(children: .contain)
             .accessibilityFocused($isDetailFocused)
