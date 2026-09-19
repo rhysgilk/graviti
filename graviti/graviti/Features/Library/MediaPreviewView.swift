@@ -4,6 +4,7 @@ import ImageIO
 struct MediaPreviewView: View {
     let mediaKey: String
     let maximumPixelSize: Int
+    var minimumHeight: CGFloat = 200
 
     @State private var preview: UIImage?
     @State private var finishedLoading = false
@@ -18,10 +19,10 @@ struct MediaPreviewView: View {
             } else if finishedLoading {
                 Label("Photo unavailable", systemImage: "photo.badge.exclamationmark")
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 200)
+                    .frame(maxWidth: .infinity, minHeight: minimumHeight)
             } else {
                 ProgressView("Loading photo")
-                    .frame(maxWidth: .infinity, minHeight: 200)
+                    .frame(maxWidth: .infinity, minHeight: minimumHeight)
             }
         }
         .task(id: mediaKey) {

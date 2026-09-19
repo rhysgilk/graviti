@@ -12,14 +12,14 @@ enum ExperienceCategory: String, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .foodAndDrink: "Food & drink"
-        case .sceneryAndNature: "Scenery & nature"
-        case .artsAndCulture: "Arts & culture"
-        case .activities: "Activities"
-        case .shopping: "Shopping"
-        case .landmarks: "Landmarks"
-        case .stay: "Stay"
-        case .other: "Place"
+        case .foodAndDrink: String(localized: "Food & drink")
+        case .sceneryAndNature: String(localized: "Scenery & nature")
+        case .artsAndCulture: String(localized: "Arts & culture")
+        case .activities: String(localized: "Activities")
+        case .shopping: String(localized: "Shopping")
+        case .landmarks: String(localized: "Landmarks")
+        case .stay: String(localized: "Stay")
+        case .other: String(localized: "Place")
         }
     }
 }
@@ -32,9 +32,9 @@ struct ArtifactEnrichment: Codable, Hashable {
 
         var displayName: String {
             switch self {
-            case .mapKit: "Apple Maps place details"
-            case .savedText: "Saved text"
-            case .mapKitAndSavedText: "Apple Maps place details and saved text"
+            case .mapKit: String(localized: "Apple Maps place details")
+            case .savedText: String(localized: "Saved text")
+            case .mapKitAndSavedText: String(localized: "Apple Maps place details and saved text")
             }
         }
     }

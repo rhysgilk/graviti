@@ -39,15 +39,15 @@ enum GeoLevel: String, Hashable {
     var displayName: String {
         switch self {
         case .country:
-            "Country"
+            String(localized: "Country")
         case .stateProvince:
-            "State"
+            String(localized: "State")
         case .city:
-            "City"
+            String(localized: "City")
         case .district:
-            "District"
+            String(localized: "District")
         case .neighborhood:
-            "Neighborhood"
+            String(localized: "Neighborhood")
         }
     }
 }
