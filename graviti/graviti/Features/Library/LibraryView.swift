@@ -4,6 +4,7 @@ import MapKit
 struct LibraryView: View {
     @ObservedObject var library: ArtifactLibrary
     @State private var mode: LibraryMode = .saves
+    @State private var selectedMapPlace: SavedPlace?
 
     var body: some View {
         NavigationStack {
@@ -107,12 +108,23 @@ struct LibraryView: View {
         if savedPlaces.isEmpty {
             emptyState("No places on the map yet", icon: "map", detail: "Saved places will appear here when their locations are known.")
         } else {
-            Map(initialPosition: .automatic) {
+            Map(initialPosition: .automatic, selection: $selectedMapPlace) {
                 ForEach(savedPlaces) { place in
                     Marker(place.name, coordinate: CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude))
+                        .tag(place)
                 }
             }
             .mapStyle(.standard(elevation: .flat))
+            .sheet(item: $selectedMapPlace) { place in
+                NavigationStack {
+                    SavedPlaceDetailView(place: place, library: library)
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Done") { selectedMapPlace = nil }
+                            }
+                        }
+                }
+            }
         }
     }
 
