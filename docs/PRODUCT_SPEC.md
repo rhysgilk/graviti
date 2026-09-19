@@ -252,6 +252,8 @@ Recommendations should not constantly over-explain themselves.
 
 Recommendation synthesis must look across the full Library. Repeated interests such as scenery, matcha, architecture, or hiking across many saved destinations should influence Fit for new destinations that match those interests. The app should explain a recommendation using the underlying pattern and supporting saves, even when the recommended destination has little or no explicit Gravity yet.
 
+The initial offline implementation uses a small versioned destination-interest catalog and deterministic weights. It excludes destinations already represented in the Library, labels every result as Fit, and exposes the matched interests and supporting-save count. Catalog coverage should expand or move to a reviewed service without changing the separation between recommendations and explicit Gravity.
+
 Prefer concise evidence:
 
 > **Taipei · 93% fit**  

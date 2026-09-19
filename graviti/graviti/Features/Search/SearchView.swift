@@ -4,7 +4,7 @@ struct SearchView: View {
     @ObservedObject var library: ArtifactLibrary
     let provider: any PlaceSearchProviding
 
-    @State private var query = ""
+    @Binding var query: String
     @State private var results: [PlaceCandidate] = []
     @State private var isSearching = false
     @State private var errorMessage: String?

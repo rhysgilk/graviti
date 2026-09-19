@@ -12,6 +12,7 @@ struct ContentView: View {
     @StateObject private var library: ArtifactLibrary
     @State private var selectedTab: AppTab = .home
     @State private var libraryNavigationResetID = UUID()
+    @State private var searchQuery = ""
 
     init(repository: any ArtifactRepository) {
         _library = StateObject(wrappedValue: ArtifactLibrary(repository: repository))
@@ -25,7 +26,10 @@ struct ContentView: View {
                 }
                 .tag(AppTab.home)
 
-            ExploreView(library: library) { selectedTab = .search }
+            ExploreView(library: library) { destination in
+                searchQuery = destination
+                selectedTab = .search
+            }
             .tabItem {
                 Label("Explore", systemImage: "sparkles")
             }
@@ -49,7 +53,7 @@ struct ContentView: View {
             }
             .tag(AppTab.library)
 
-            SearchView(library: library, provider: MapKitPlaceSearchProvider())
+            SearchView(library: library, provider: MapKitPlaceSearchProvider(), query: $searchQuery)
             .tabItem {
                 Label("Search", systemImage: "magnifyingglass")
             }
