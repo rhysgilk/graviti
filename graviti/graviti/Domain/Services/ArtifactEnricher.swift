@@ -31,8 +31,19 @@ struct ArtifactEnricher {
         if let place = artifact.place,
            let type = classification?.typeName {
             let location = place.locality ?? place.country
-            summary = location.map { "\(place.name) is a \(type) in \($0)." }
-                ?? "\(place.name) is a \(type)."
+            let base = location.map { "\(place.name) is a \(type) in \($0)" }
+                ?? "\(place.name) is a \(type)"
+            summary = interests.isEmpty
+                ? "\(base)."
+                : "\(base), saved for \(interestPhrase(interests))."
+        } else if let place = artifact.place, !interests.isEmpty {
+            summary = "\(place.name) is saved for \(interestPhrase(interests))."
+        } else if !interests.isEmpty {
+            let subject = artifact.kind == .photo ? "A saved photo" : "A saved idea"
+            summary = "\(subject) about \(interestPhrase(interests))."
+        } else if let category {
+            let subject = artifact.kind == .photo ? "A saved photo" : "A saved idea"
+            summary = "\(subject) about \(category.displayName.lowercased())."
         } else {
             summary = nil
         }
@@ -126,6 +137,16 @@ struct ArtifactEnricher {
             tags.append("Nature")
         }
         return tags
+    }
+
+    private func interestPhrase(_ interests: [String]) -> String {
+        let values = interests.prefix(3).map { $0.lowercased() }
+        switch values.count {
+        case 0: return "this place"
+        case 1: return values[0]
+        case 2: return "\(values[0]) and \(values[1])"
+        default: return "\(values[0]), \(values[1]), and \(values[2])"
+        }
     }
 
     private func positiveWords(_ text: String) -> Set<String> {
