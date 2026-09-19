@@ -48,12 +48,17 @@ enum DestinationFitEngine {
         Candidate(name: "Taipei", country: "Taiwan", region: .asia, interests: ["Matcha", "Tea", "Coffee", "Desserts", "Hiking"]),
         Candidate(name: "Uji", country: "Japan", region: .asia, interests: ["Matcha", "Tea", "Gardens", "Architecture"]),
         Candidate(name: "Madeira", country: "Portugal", region: .europe, interests: ["Scenic views", "Hiking", "Nature", "Gardens"]),
+        Candidate(name: "Norwegian Fjords", country: "Norway", region: .europe, interests: ["Mountains", "Coast & water", "Scenic views", "Hiking"]),
+        Candidate(name: "Scottish Highlands", country: "United Kingdom", region: .europe, interests: ["Mountains", "History", "Coast & water", "Hiking"]),
         Candidate(name: "Copenhagen", country: "Denmark", region: .europe, interests: ["Architecture", "Coffee", "Museums", "Shopping"]),
         Candidate(name: "Mexico City", country: "Mexico", region: .northAmerica, interests: ["Architecture", "Museums", "Coffee", "Desserts", "Shopping"]),
         Candidate(name: "Vancouver", country: "Canada", region: .northAmerica, interests: ["Scenic views", "Hiking", "Nature", "Coffee"]),
+        Candidate(name: "California", country: "United States", region: .northAmerica, interests: ["National parks", "Mountains", "Coast & water", "Forests", "Hiking", "Architecture", "Seafood"]),
+        Candidate(name: "Alaska", country: "United States", region: .northAmerica, interests: ["National parks", "Mountains", "Coast & water", "Wildlife", "Hiking"]),
+        Candidate(name: "Maine", country: "United States", region: .northAmerica, interests: ["National parks", "Coast & water", "Seafood", "Forests", "History"]),
         Candidate(name: "Seoul", country: "South Korea", region: .asia, interests: ["Tea", "Coffee", "Desserts", "Architecture", "Shopping"]),
         Candidate(name: "Lisbon", country: "Portugal", region: .europe, interests: ["Scenic views", "Architecture", "Coffee", "Museums"]),
-        Candidate(name: "Kauai", country: "United States", region: .northAmerica, interests: ["Scenic views", "Hiking", "Nature", "Beaches"])
+        Candidate(name: "Kauai", country: "United States", region: .northAmerica, interests: ["Scenic views", "Hiking", "Nature", "Beaches", "Coast & water", "Mountains"])
     ]
 
     static func recommendations(from profile: InterestProfile, artifacts: [Artifact], preferences: ExplorePreferences = ExplorePreferences(), limit: Int = 3) -> [DestinationRecommendation] {

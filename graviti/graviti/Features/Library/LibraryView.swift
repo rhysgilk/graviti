@@ -6,11 +6,16 @@ struct LibraryView: View {
     @State private var mode: LibraryMode = .saves
     @State private var selectedMapPlace: SavedPlace?
     @State private var query = ""
+    @State private var showsNeedsReviewOnly = false
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 modePicker
+
+                if needsReviewCount > 0 || showsNeedsReviewOnly {
+                    reviewFilter
+                }
 
                 Group {
                     switch mode {
@@ -34,7 +39,41 @@ struct LibraryView: View {
                     self.selectedMapPlace = nil
                 }
             }
+            .onChange(of: needsReviewCount) { _, count in
+                if count == 0 { showsNeedsReviewOnly = false }
+            }
         }
+    }
+
+    private var reviewFilter: some View {
+        Button {
+            showsNeedsReviewOnly.toggle()
+            if showsNeedsReviewOnly { mode = .saves }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "exclamationmark.bubble.fill")
+                Text("Needs your help")
+                    .fontWeight(.semibold)
+                Spacer()
+                Text(needsReviewCount, format: .number)
+                    .font(.caption.weight(.bold))
+                    .frame(minWidth: 28, minHeight: 28)
+                    .background(.white.opacity(0.12), in: Circle())
+                Image(systemName: showsNeedsReviewOnly ? "checkmark.circle.fill" : "chevron.forward")
+            }
+            .font(.subheadline)
+            .foregroundStyle(showsNeedsReviewOnly ? .white : GravitiColors.opportunityCoral)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 48)
+            .background(
+                showsNeedsReviewOnly ? GravitiColors.opportunityCoral.opacity(0.32) : GravitiColors.deepInk,
+                in: RoundedRectangle(cornerRadius: 14)
+            )
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 20)
+        .padding(.bottom, 8)
+        .accessibilityValue(showsNeedsReviewOnly ? "Showing only items that need review" : "")
     }
 
     private var modePicker: some View {
@@ -153,9 +192,16 @@ struct LibraryView: View {
     }
 
     private var filteredArtifacts: [Artifact] {
+        let reviewFiltered = showsNeedsReviewOnly
+            ? library.artifacts.filter(\.needsPlaceReview)
+            : library.artifacts
         let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !term.isEmpty else { return library.artifacts }
-        return library.artifacts.filter { $0.librarySearchText.localizedCaseInsensitiveContains(term) }
+        guard !term.isEmpty else { return reviewFiltered }
+        return reviewFiltered.filter { $0.librarySearchText.localizedCaseInsensitiveContains(term) }
+    }
+
+    private var needsReviewCount: Int {
+        library.artifacts.lazy.filter(\.needsPlaceReview).count
     }
 
     @ViewBuilder
@@ -260,6 +306,10 @@ private struct ArtifactRow: View {
 }
 
 private extension Artifact {
+    var needsPlaceReview: Bool {
+        processingState == .needsReview || processingState == .failed
+    }
+
     var libraryTitle: String {
         switch kind {
         case .url:
