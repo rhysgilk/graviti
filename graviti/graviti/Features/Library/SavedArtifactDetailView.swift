@@ -31,6 +31,10 @@ struct SavedArtifactDetailView: View {
                 }
 
                 if let sourceURL = current.sourceURL {
+                    if let url = openableURL(sourceURL) {
+                        LinkPreviewView(url: url)
+                    }
+
                     Text(sourceURL)
                         .font(.body)
                         .textSelection(.enabled)
