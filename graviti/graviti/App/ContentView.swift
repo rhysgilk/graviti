@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var selectedTab: AppTab = .home
     @State private var libraryNavigationResetID = UUID()
     @State private var searchQuery = ""
+    @AppStorage("onboarding.completed") private var hasCompletedOnboarding = false
 
     init(repository: any ArtifactRepository) {
         _library = StateObject(wrappedValue: ArtifactLibrary(repository: repository))
@@ -61,6 +62,24 @@ struct ContentView: View {
         }
         .tint(GravitiColors.iris)
         .preferredColorScheme(.dark)
+        .fullScreenCover(isPresented: onboardingPresented) {
+            OnboardingView(
+                onFindPlace: {
+                    hasCompletedOnboarding = true
+                    searchQuery = ""
+                    selectedTab = .search
+                },
+                onSaveOrImport: {
+                    hasCompletedOnboarding = true
+                    selectedTab = .save
+                },
+                onExplore: {
+                    hasCompletedOnboarding = true
+                    selectedTab = .home
+                }
+            )
+            .interactiveDismissDisabled()
+        }
         .task {
             await library.load()
             await library.importSharedArtifacts()
@@ -75,6 +94,15 @@ struct ContentView: View {
                 library.processPendingEnrichment()
             }
         }
+    }
+
+    private var onboardingPresented: Binding<Bool> {
+        Binding(
+            get: { !hasCompletedOnboarding },
+            set: { presented in
+                if !presented { hasCompletedOnboarding = true }
+            }
+        )
     }
 }
 
