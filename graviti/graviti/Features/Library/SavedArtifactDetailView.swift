@@ -51,7 +51,12 @@ struct SavedArtifactDetailView: View {
                                     defer { isImportingGuide = false }
                                     do {
                                         let summary = try await library.importAppleGuidePlaces(from: sourceURL)
-                                        guideImportMessage = "\(summary.title): \(summary.imported) places imported, \(summary.skipped) skipped."
+                                        let details = [
+                                            "\(summary.imported) imported",
+                                            summary.duplicates > 0 ? "\(summary.duplicates) duplicates avoided" : nil,
+                                            summary.skipped > 0 ? "\(summary.skipped) couldn’t import" : nil
+                                        ].compactMap { $0 }.joined(separator: " · ")
+                                        guideImportMessage = "\(summary.title): \(details)"
                                     } catch {
                                         guideImportMessage = error.localizedDescription
                                     }

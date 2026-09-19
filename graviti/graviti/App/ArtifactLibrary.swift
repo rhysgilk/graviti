@@ -291,7 +291,8 @@ final class ArtifactLibrary: ObservableObject {
         }
         return CSVImportSummary(
             imported: newArtifacts.count,
-            skipped: parsed.skippedRows + duplicateCount
+            duplicates: duplicateCount,
+            skipped: parsed.skippedRows
         )
     }
 
@@ -324,22 +325,23 @@ final class ArtifactLibrary: ObservableObject {
         let guide = try AppleMapsGuideParser.parse(expanded)
         var existingURLs = Set(artifacts.compactMap(\.sourceURL))
         var additions: [Artifact] = []
-        var skipped = 0
+        var duplicates = 0
+        var failed = 0
 
         for rawIdentifier in guide.placeIdentifiers {
             let placeURL = "https://maps.apple.com/place?place-id=\(rawIdentifier)"
             guard existingURLs.insert(placeURL).inserted else {
-                skipped += 1
+                duplicates += 1
                 continue
             }
             guard let identifier = MKMapItem.Identifier(rawValue: rawIdentifier) else {
-                skipped += 1
+                failed += 1
                 continue
             }
             do {
                 let item = try await MKMapItemRequest(mapItemIdentifier: identifier).mapItem
                 guard let name = item.name, !name.isEmpty else {
-                    skipped += 1
+                    failed += 1
                     continue
                 }
                 let coordinate = item.location.coordinate
@@ -360,7 +362,7 @@ final class ArtifactLibrary: ObservableObject {
                     processingState: .processed
                 ))
             } catch {
-                skipped += 1
+                failed += 1
             }
         }
 
@@ -372,7 +374,10 @@ final class ArtifactLibrary: ObservableObject {
         return AppleGuideImportSummary(
             title: guide.title,
             imported: additions.count,
-            skipped: skipped
+            duplicates: duplicates,
+            skipped: failed,
+            countries: Set(additions.compactMap { $0.place?.country }).count,
+            cities: Set(additions.compactMap { $0.place?.locality }).count
         )
     }
 }
@@ -380,11 +385,15 @@ final class ArtifactLibrary: ObservableObject {
 struct AppleGuideImportSummary {
     let title: String
     let imported: Int
+    let duplicates: Int
     let skipped: Int
+    let countries: Int
+    let cities: Int
 }
 
 struct CSVImportSummary {
     let imported: Int
+    let duplicates: Int
     let skipped: Int
 }
 

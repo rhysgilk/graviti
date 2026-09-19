@@ -19,6 +19,7 @@ struct SaveView: View {
     @State private var showingCSVImporter = false
     @State private var showingMapsLinkImporter = false
     @State private var importMessage: String?
+    @State private var importSummary: SaveImportSummary?
 
     var body: some View {
         NavigationStack {
@@ -167,6 +168,10 @@ struct SaveView: View {
                         }
                         .buttonStyle(.plain)
 
+                        if let importSummary {
+                            ImportSummaryCard(summary: importSummary)
+                        }
+
                         if let importMessage {
                             Text(importMessage)
                                 .font(.subheadline)
@@ -199,12 +204,21 @@ struct SaveView: View {
                 Task {
                     do {
                         let summary = try await library.importGoogleSavedCSV(from: fileURL)
-                        importMessage = "Imported \(summary.imported) saves. \(summary.skipped) skipped."
+                        importMessage = nil
+                        importSummary = SaveImportSummary(
+                            title: String(localized: "Google Maps import complete"),
+                            imported: summary.imported,
+                            duplicates: summary.duplicates,
+                            skipped: summary.skipped,
+                            processingContinues: summary.imported > 0
+                        )
                     } catch {
+                        importSummary = nil
                         importMessage = error.localizedDescription
                     }
                 }
             case .failure(let error):
+                importSummary = nil
                 importMessage = error.localizedDescription
             }
         }
@@ -217,13 +231,16 @@ struct SaveView: View {
                 Task {
                     do {
                         let url = try await library.importMapsLinkFile(from: fileURL)
+                        importSummary = nil
                         importMessage = "Maps link saved to Library."
                         await importAppleGuideIfNeeded(url)
                     } catch {
+                        importSummary = nil
                         importMessage = error.localizedDescription
                     }
                 }
             case .failure(let error):
+                importSummary = nil
                 importMessage = error.localizedDescription
             }
         }
@@ -300,9 +317,18 @@ struct SaveView: View {
         guard MapLinkMetadata.provider(for: url) == .apple,
               MapLinkMetadata.isCollectionLink(url) else { return }
         importMessage = "Importing places from Apple Maps guide…"
+        importSummary = nil
         do {
             let summary = try await library.importAppleGuidePlaces(from: url)
-            importMessage = "\(summary.title): \(summary.imported) places imported, \(summary.skipped) skipped."
+            importMessage = nil
+            importSummary = SaveImportSummary(
+                title: summary.title,
+                imported: summary.imported,
+                duplicates: summary.duplicates,
+                skipped: summary.skipped,
+                countries: summary.countries,
+                cities: summary.cities
+            )
         } catch {
             importMessage = error.localizedDescription
         }
