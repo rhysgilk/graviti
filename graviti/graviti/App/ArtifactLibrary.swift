@@ -12,6 +12,7 @@ final class ArtifactLibrary: ObservableObject {
     private let placeResolver: MapPlaceResolver
     private var processingIDs: Set<UUID> = []
     private var enrichingIDs: Set<UUID> = []
+    private var isImportingSharedArtifacts = false
 
     init(repository: any ArtifactRepository, placeResolver: MapPlaceResolver? = nil) {
         self.repository = repository
@@ -197,7 +198,12 @@ final class ArtifactLibrary: ObservableObject {
         }
     }
 
-    func importSharedArtifacts() async {
+    @discardableResult
+    func importSharedArtifacts() async -> Int {
+        guard !isImportingSharedArtifacts else { return 0 }
+        isImportingSharedArtifacts = true
+        defer { isImportingSharedArtifacts = false }
+        var importedCount = 0
         do {
             for fileURL in try SharedArtifactInbox.pendingFiles() {
                 let envelope = try SharedArtifactInbox.read(fileURL)
@@ -212,6 +218,7 @@ final class ArtifactLibrary: ObservableObject {
                         capturedAt: envelope.capturedAt
                     )
                     try await save(artifact)
+                    importedCount += 1
                 }
                 try SharedArtifactInbox.remove(fileURL)
             }
@@ -219,6 +226,7 @@ final class ArtifactLibrary: ObservableObject {
         } catch {
             loadError = error.localizedDescription
         }
+        return importedCount
     }
 
     func importGoogleSavedCSV(from fileURL: URL) async throws -> CSVImportSummary {

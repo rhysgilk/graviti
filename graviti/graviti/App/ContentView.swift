@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var libraryNavigationResetID = UUID()
     @State private var searchQuery = ""
     @AppStorage("onboarding.completed") private var hasCompletedOnboarding = false
+    @State private var shareImportNotice: String?
 
     init(repository: any ArtifactRepository) {
         _library = StateObject(wrappedValue: ArtifactLibrary(repository: repository))
@@ -62,6 +63,20 @@ struct ContentView: View {
         }
         .tint(GravitiColors.iris)
         .preferredColorScheme(.dark)
+        .overlay(alignment: .top) {
+            if let shareImportNotice {
+                Label(shareImportNotice, systemImage: "checkmark.circle.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 48)
+                    .background(GravitiColors.deepInk.opacity(0.98), in: Capsule())
+                    .overlay(Capsule().strokeBorder(GravitiColors.signalMint.opacity(0.5)))
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .accessibilityAddTraits(.updatesFrequently)
+            }
+        }
         .fullScreenCover(isPresented: onboardingPresented) {
             OnboardingView(
                 onFindPlace: {
@@ -82,14 +97,14 @@ struct ContentView: View {
         }
         .task {
             await library.load()
-            await library.importSharedArtifacts()
+            await importSharedArtifactsWithNotice()
             await library.processPendingMaps()
             library.processPendingEnrichment()
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
             Task {
-                await library.importSharedArtifacts()
+                await importSharedArtifactsWithNotice()
                 await library.processPendingMaps()
                 library.processPendingEnrichment()
             }
@@ -103,6 +118,20 @@ struct ContentView: View {
                 if !presented { hasCompletedOnboarding = true }
             }
         )
+    }
+
+    private func importSharedArtifactsWithNotice() async {
+        let count = await library.importSharedArtifacts()
+        guard count > 0 else { return }
+        let notice = "Added \(count) shared \(count == 1 ? "save" : "saves") to your Library"
+        withAnimation(.easeOut(duration: 0.25)) {
+            shareImportNotice = notice
+        }
+        try? await Task.sleep(for: .seconds(4))
+        guard shareImportNotice == notice else { return }
+        withAnimation(.easeIn(duration: 0.2)) {
+            shareImportNotice = nil
+        }
     }
 }
 
