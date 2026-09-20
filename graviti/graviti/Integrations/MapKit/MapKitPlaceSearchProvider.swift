@@ -15,12 +15,20 @@ struct MapKitPlaceSearchProvider: PlaceSearchProviding {
 
         return response.mapItems.compactMap { item in
             guard let place = MapItemPlaceAdapter.savedPlace(from: item) else { return nil }
-            var url = URLComponents(string: "https://maps.apple.com/")!
-            url.queryItems = [
-                URLQueryItem(name: "ll", value: "\(place.latitude),\(place.longitude)"),
-                URLQueryItem(name: "q", value: place.name)
-            ]
-            return PlaceCandidate(place: place, sourceURL: url.url!.absoluteString)
+            guard let sourceURL = Self.sourceURL(for: place) else { return nil }
+            return PlaceCandidate(place: place, sourceURL: sourceURL)
         }
+    }
+
+    static func sourceURL(for place: SavedPlace) -> String? {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "maps.apple.com"
+        components.path = "/"
+        components.queryItems = [
+            URLQueryItem(name: "ll", value: "\(place.latitude),\(place.longitude)"),
+            URLQueryItem(name: "q", value: place.name)
+        ]
+        return components.url?.absoluteString
     }
 }

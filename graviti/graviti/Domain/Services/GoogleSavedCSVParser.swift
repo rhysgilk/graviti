@@ -23,8 +23,12 @@ enum GoogleSavedCSVParser {
         }
 
         let headers = records[headerIndex].map(normalizedHeader)
-        let titleIndex = headers.firstIndex(of: "title")!
-        let urlIndex = headers.firstIndex(of: "url") ?? headers.firstIndex(of: "item_content_url")!
+        guard
+            let titleIndex = headers.firstIndex(of: "title"),
+            let urlIndex = headers.firstIndex(of: "url") ?? headers.firstIndex(of: "item_content_url")
+        else {
+            throw CSVError.missingHeader
+        }
         let noteIndex = headers.firstIndex(of: "note")
         var imported: [GoogleSavedCSVRow] = []
         var skipped = 0

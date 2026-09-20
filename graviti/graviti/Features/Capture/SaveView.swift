@@ -149,8 +149,10 @@ struct SaveView: View {
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.7))
 
-                        Link("Open Google Takeout", destination: URL(string: "https://takeout.google.com")!)
-                            .font(.subheadline.weight(.semibold))
+                        if let googleTakeoutURL = URL(string: "https://takeout.google.com") {
+                            Link("Open Google Takeout", destination: googleTakeoutURL)
+                                .font(.subheadline.weight(.semibold))
+                        }
 
                         Button {
                             showingCSVImporter = true
