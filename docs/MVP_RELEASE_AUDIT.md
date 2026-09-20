@@ -2,7 +2,9 @@
 
 **Audit date:** September 20, 2026
 
-**Audited app commit:** `cdcc5b4`
+**Simulator-validated app commit:** `2c0a0fd`
+
+**Signed archive validation commit:** `cdcc5b4`
 
 **Release candidate:** 1.0 (1)
 
@@ -10,10 +12,10 @@ This audit maps the local MVP Definition of Done to current evidence. External d
 
 ## Automated release evidence
 
-- 66 of 66 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
-- 66 of 66 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
+- 67 of 67 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
+- 67 of 67 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
 - 62 of 62 tests passed with no failures or skips on a physical iPhone 13 Pro Max running iOS 26.3.1.
-- A signed arm64 Release archive of the audited commit completed Xcode's store validation phase.
+- A signed arm64 Release archive of commit `cdcc5b4` completed Xcode's store validation phase. The later `2c0a0fd` change affects MapKit query scoping and passed both simulator suites.
 - `scripts/verify-release-archive.sh` passed every package check: bundle identifiers, matching app and extension versions, iOS 18 minimum, encryption declaration, both privacy manifests, exactly two Sora fonts, no CSV fixtures, nested signatures, and matching App Group entitlements.
 - The only archive warning is expected: the available seven-day Apple Development profile is suitable for device testing but not TestFlight distribution.
 
@@ -33,7 +35,7 @@ This audit maps the local MVP Definition of Done to current evidence. External d
 | Gravity Field handles sparse and large libraries | Verified | Deterministic layout tests cover empty through ten-destination fields. A 30-save crowded library remained readable within the ten-label budget. |
 | Adaptive geographic resolution works | Verified | Tests cover country collapse, city expansion, state grouping, missing-region fallback, concentration, and label budgets. Automatic and explicit resolution modes were exercised. |
 | Destination Gravity updates correctly | Verified | Live imports changed Home destinations after persistence and relaunch. Orbit builder tests cover stable geographic identity and ranking behavior. |
-| Explore produces useful interest-based recommendations | Verified for local MVP catalog | Diverse fixtures produced varied recommendations and explanations. Each recommendation now builds a live Fit Guide grouped by its matched patterns. A New York guide returned relevant Matcha, Tea, Museums, and Coffee results; saving a result created a retrievable guide in Explore. |
+| Explore produces useful interest-based recommendations | Verified for local MVP catalog | Diverse fixtures produced varied recommendations and explanations. Each recommendation builds a live Fit Guide grouped by its matched patterns. Destination regions are resolved before category searches and enforced as required, preventing city records and results from another region. Live New York, Kyoto, and Mexico City guides returned relevant local venues; saving a result created a retrievable guide in Explore. |
 | Recommendation data does not contaminate explicit interest | Verified | Save Destination and Not for Me are persisted separately. Fit tests cover exclusions and avoided interests while Gravity remains based on explicit saves. |
 | Saved media is preserved and browsable | Verified | Photo storage, thumbnails, detail views, OCR provenance, backup round trips, and restored embedded media are covered. |
 | Accessibility requirements are tested | Verified in Simulator | VoiceOver labels and ordering, Dynamic Type, increased contrast, Reduce Motion, right-to-left layout, and large pseudo-localized strings were inspected. Conventional Library and Search access remains available. |

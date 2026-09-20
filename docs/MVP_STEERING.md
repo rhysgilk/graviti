@@ -88,6 +88,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Keep ambient Home stars decorative, noninteractive, and motion accessible; apply Sora consistently to Library and Search.
 - [x] Turn each Fit recommendation into a retrievable Fit Guide with live destination-scoped suggestions grouped by the interests that produced the recommendation.
 - [x] Save suggested places into their Fit Guide without duplicating an existing Library item, and retain guide membership in exports and restores.
+- [x] Resolve each Fit Guide destination before searching, require results to stay inside that region, and use category-specific fallback terms so international guides return local venues instead of the destination itself.
 
 ### MVP decision gate
 
