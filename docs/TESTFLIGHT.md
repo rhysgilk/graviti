@@ -39,7 +39,7 @@ This beta stores its Library on the device. Graviti does not require an account 
 Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
 - All 59 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing and migration, Fit scoring, persistence, backup restore, offline save preservation and recovery, safe map URL generation, and deterministic ten-destination Gravity Field layout.
-- A clean signed Debug build completed without warnings. The app and Share Extension generated the same App Group entitlement.
+- Clean signed Debug and Release archive builds completed. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
 - Direct bubble switching, bulk place removal confirmation, and bulk save deletion confirmation were exercised without committing destructive test actions.
@@ -57,11 +57,12 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - Spanish coverage was completed for the app and Share Extension. Home, Explore, Library, canonical interest names, singular/plural counts, accessibility labels, and bulk-selection copy were inspected in Spanish without clipping.
 - The iOS 18.6 minimum runtime was validated on an iPhone 16 Pro simulator. MapKit search found and saved Nishiki Market, Home generated its Gravity destination, Library showed the enriched save, and the record persisted after force quit and relaunch.
 - The public privacy policy URL returned HTTP 200 and exposed the current effective date and support route without repository authentication.
-- An unsigned arm64 Release archive was produced with an iOS 18 minimum, both privacy manifests, non-exempt encryption disabled, exactly the two registered Sora fonts, and no dogfood CSVs.
+- A signed arm64 Release archive was produced with an iOS 18 minimum, matching app and extension versions, both privacy manifests, non-exempt encryption disabled, exactly the two registered Sora fonts, no dogfood CSVs, valid nested signatures, and matching App Group entitlements.
+- The current archive uses a seven-day Apple Development provisioning profile. It verifies the packaged release contents but is not eligible for TestFlight upload; the upload archive must use App Store distribution provisioning.
 
 Still required before external TestFlight distribution:
 
-- Run the core flow on a physical signed device.
+- Complete the remaining core-flow checklist on a physical signed device. Initial physical-device testing has passed.
 - Supply the feedback email and App Store Connect review contact.
 - Produce and upload the distribution archive in the owner's App Store Connect account.
 
@@ -81,3 +82,21 @@ Public privacy policy URL: <https://github.com/rhysgilk/graviti/blob/main/docs/P
 - State the local-only data promise and backup instruction in every beta build's notes.
 - Complete the device, accessibility, localization, offline, import, backup, and data-loss checks above before inviting external testers.
 - Run the core flow on both the iOS 18 minimum and the latest iOS release before inviting external testers.
+
+## Archive verification
+
+After archiving in Xcode, run the repository check against the generated archive:
+
+```sh
+./scripts/verify-release-archive.sh /path/to/graviti.xcarchive
+```
+
+The default mode verifies bundle identifiers, versions, minimum OS, encryption metadata, privacy manifests, fonts, absence of CSV fixtures, nested code signatures, and the shared App Group. A development-signed archive passes these package checks with a warning.
+
+Before upload, require a distribution provisioning profile:
+
+```sh
+./scripts/verify-release-archive.sh /path/to/graviti.xcarchive --require-distribution
+```
+
+The upload gate fails for development provisioning so a locally installable archive cannot be mistaken for a TestFlight-ready archive.
