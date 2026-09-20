@@ -127,12 +127,12 @@ enum ArtifactImportCoordinator {
         _ list: GoogleMapsList,
         existingArtifacts: [Artifact]
     ) -> GoogleMapsListImportPlan {
-        var existingURLs = Set(existingArtifacts.compactMap(\.sourceURL))
+        var existingURLs = Set(existingArtifacts.compactMap(\.sourceURL).map(GoogleMapsListPlace.importIdentity(for:)))
         var additions = [Artifact]()
         var duplicates = 0
 
         for place in list.places {
-            guard existingURLs.insert(place.sourceURL).inserted else {
+            guard existingURLs.insert(place.importIdentity).inserted else {
                 duplicates += 1
                 continue
             }

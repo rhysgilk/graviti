@@ -84,6 +84,11 @@ final class ImportParserTests: XCTestCase {
         XCTAssertEqual(result.places[0].note, "Try matcha")
         XCTAssertEqual(result.places[0].latitude, 40.7)
         XCTAssertTrue(result.places[0].sourceURL.contains("0xffffffffffffffff:0x2"))
+        XCTAssertEqual(MapLinkMetadata.searchQuery(from: result.places[0].sourceURL), "Tea House, 1 Main St")
+        XCTAssertEqual(
+            MapLinkMetadata.coordinateHint(from: result.places[0].sourceURL),
+            MapLinkMetadata.Coordinate(latitude: 40.7, longitude: -73.9)
+        )
         XCTAssertNil(result.places[1].note)
     }
 

@@ -21,6 +21,7 @@ struct GoogleMapsListPlace: Equatable {
             components.scheme = "https"
             components.host = "www.google.com"
             components.path = "/maps/place/\(title)/data=!4m2!3m1!1s0x\(first):0x\(second)"
+            components.queryItems = sourceHints
             if let url = components.url?.absoluteString { return url }
         }
 
@@ -36,7 +37,47 @@ struct GoogleMapsListPlace: Equatable {
             URLQueryItem(name: "api", value: "1"),
             URLQueryItem(name: "query", value: query)
         ]
+        if let coordinateHint {
+            components.queryItems?.append(URLQueryItem(name: "ll", value: coordinateHint))
+        }
         return components.url?.absoluteString ?? "https://www.google.com/maps"
+    }
+
+    var importIdentity: String {
+        Self.importIdentity(for: sourceURL)
+    }
+
+    nonisolated static func importIdentity(for rawURL: String) -> String {
+        guard var components = URLComponents(string: rawURL),
+              let host = components.host?.lowercased(),
+              host == "google.com" || host.hasSuffix(".google.com") else { return rawURL }
+        if components.path.contains("/data=") {
+            components.queryItems = nil
+        } else if components.path.hasPrefix("/maps/search") {
+            components.queryItems = components.queryItems?.filter { $0.name.lowercased() != "ll" }
+        }
+        return components.url?.absoluteString ?? rawURL
+    }
+
+    private var sourceHints: [URLQueryItem]? {
+        var items = [URLQueryItem]()
+        let query = [title, address]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: ", ")
+        if !query.isEmpty {
+            items.append(URLQueryItem(name: "q", value: query))
+        }
+        if let coordinateHint {
+            items.append(URLQueryItem(name: "ll", value: coordinateHint))
+        }
+        return items.isEmpty ? nil : items
+    }
+
+    private var coordinateHint: String? {
+        guard let latitude, let longitude,
+              (-90...90).contains(latitude), (-180...180).contains(longitude) else { return nil }
+        return "\(latitude),\(longitude)"
     }
 
     private static func hexIdentifier(_ value: String) -> String? {

@@ -37,7 +37,7 @@ final class ArtifactImportCoordinatorTests: XCTestCase {
         XCTAssertNil(plan.artifact)
     }
 
-    func testGoogleMapsListPlanPreservesNotesAndSkipsExistingPlaces() {
+    func testGoogleMapsListPlanPreservesNotesAndSkipsExistingPlaces() throws {
         let existingPlace = GoogleMapsListPlace(
             title: "Existing",
             address: "1 Main St",
@@ -54,7 +54,13 @@ final class ArtifactImportCoordinatorTests: XCTestCase {
             longitude: 4,
             featureIdentifiers: ["3", "4"]
         )
-        let existing = Artifact(kind: .url, sourceURL: existingPlace.sourceURL, originalText: existingPlace.title)
+        var legacyComponents = try XCTUnwrap(URLComponents(string: existingPlace.sourceURL))
+        legacyComponents.queryItems = nil
+        let existing = Artifact(
+            kind: .url,
+            sourceURL: legacyComponents.url?.absoluteString,
+            originalText: existingPlace.title
+        )
 
         let plan = ArtifactImportCoordinator.googleMapsList(
             GoogleMapsList(title: "Shared list", places: [existingPlace, newPlace]),
@@ -66,5 +72,6 @@ final class ArtifactImportCoordinatorTests: XCTestCase {
         XCTAssertEqual(plan.artifacts.count, 1)
         XCTAssertEqual(plan.artifacts.first?.originalText, "New place")
         XCTAssertEqual(plan.artifacts.first?.userNote, "Scenic roof")
+        XCTAssertEqual(existingPlace.importIdentity, legacyComponents.url?.absoluteString)
     }
 }

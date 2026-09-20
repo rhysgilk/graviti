@@ -1,6 +1,11 @@
 import Foundation
 
 enum MapLinkMetadata {
+    struct Coordinate: Equatable {
+        let latitude: Double
+        let longitude: Double
+    }
+
     enum Provider {
         case apple
         case google
@@ -63,5 +68,28 @@ enum MapLinkMetadata {
                 .removingPercentEncoding?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
         }
+    }
+
+    static func searchQuery(from rawURL: String) -> String? {
+        guard let components = URLComponents(string: rawURL),
+              provider(for: rawURL) != nil else { return nil }
+        return components.queryItems?
+            .first(where: { ["q", "query"].contains($0.name.lowercased()) })?
+            .value?
+            .replacingOccurrences(of: "+", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    static func coordinateHint(from rawURL: String) -> Coordinate? {
+        guard let components = URLComponents(string: rawURL),
+              provider(for: rawURL) != nil,
+              let raw = components.queryItems?.first(where: { $0.name.lowercased() == "ll" })?.value else {
+            return nil
+        }
+        let parts = raw.split(separator: ",", maxSplits: 1).map(String.init)
+        guard parts.count == 2,
+              let latitude = Double(parts[0]), let longitude = Double(parts[1]),
+              (-90...90).contains(latitude), (-180...180).contains(longitude) else { return nil }
+        return Coordinate(latitude: latitude, longitude: longitude)
     }
 }

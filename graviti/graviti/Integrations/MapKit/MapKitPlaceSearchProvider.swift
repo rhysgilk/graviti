@@ -3,15 +3,25 @@ import MapKit
 
 struct MapKitPlaceSearchProvider: PlaceSearchProviding {
     func search(_ query: String) async throws -> [PlaceCandidate] {
+        var attempt = 0
+        while true {
+            do {
+                return try await performSearch(query)
+            } catch let error as MKError where error.code == .placemarkNotFound {
+                return []
+            } catch let error as MKError where
+                [.serverFailure, .loadingThrottled].contains(error.code) && attempt < 2 {
+                attempt += 1
+                try await Task.sleep(for: .milliseconds(350 * attempt))
+            }
+        }
+    }
+
+    private func performSearch(_ query: String) async throws -> [PlaceCandidate] {
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = query
         request.resultTypes = [.pointOfInterest, .address]
-        let response: MKLocalSearch.Response
-        do {
-            response = try await MKLocalSearch(request: request).start()
-        } catch let error as MKError where error.code == .placemarkNotFound {
-            return []
-        }
+        let response = try await MKLocalSearch(request: request).start()
 
         return response.mapItems.compactMap { item in
             guard let place = MapItemPlaceAdapter.savedPlace(from: item) else { return nil }
