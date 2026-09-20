@@ -23,6 +23,16 @@ Graviti is a private iOS travel-interest library. Save a place, link, note, scre
 
 Graviti remains under active MVP development. See [Product Specification](docs/PRODUCT_SPEC.md), [Architecture](docs/ARCHITECTURE.md), [Data Model](docs/DATA_MODEL.md), [MVP Steering](docs/MVP_STEERING.md), [Privacy](docs/PRIVACY.md), and [TestFlight Preparation](docs/TESTFLIGHT.md).
 
+## Screenshots
+
+| Gravity Field | Explore |
+| --- | --- |
+| ![A city-level Gravity Field built from a diverse saved-place library](docs/screenshots/gravity-field.png) | ![Explainable destination Fit recommendations and recurring interests](docs/screenshots/explore-fit.png) |
+
+| Places | Saves |
+| --- | --- |
+| ![The Places Library with review and repeated-place tools](docs/screenshots/library-places.png) | ![The rich Saves Library with generated descriptions and categories](docs/screenshots/library-saves.png) |
+
 ## Project structure
 
 ```text
