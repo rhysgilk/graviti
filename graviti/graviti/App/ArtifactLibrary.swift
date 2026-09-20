@@ -330,10 +330,17 @@ final class ArtifactLibrary: ObservableObject {
         }
     }
 
-    func savePlace(_ candidate: PlaceCandidate) async throws {
+    func savePlace(_ candidate: PlaceCandidate, sourceCollectionTitle: String? = nil) async throws {
+        if let sourceCollectionTitle,
+           let existing = artifacts.first(where: { $0.place?.id == candidate.place.id }) {
+            guard !existing.sourceCollectionTitles.contains(sourceCollectionTitle) else { return }
+            try await update(existing.withSourceCollectionTitle(sourceCollectionTitle))
+            return
+        }
         try await save(Artifact(
             kind: .url,
             sourceURL: candidate.sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: candidate.place.name,
             place: candidate.place,
             processingState: .processed

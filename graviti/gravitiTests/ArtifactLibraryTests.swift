@@ -101,6 +101,40 @@ final class ArtifactLibraryTests: XCTestCase {
         let persistedIDs = try await repository.artifacts().map(\.id)
         XCTAssertEqual(persistedIDs, [retained.id])
     }
+
+    func testSavePlaceAddsExistingPlaceToFitGuideWithoutDuplicatingArtifact() async throws {
+        let repository = PreviewArtifactRepository()
+        let place = SavedPlace(
+            id: "museum",
+            name: "City Museum",
+            latitude: 40.7,
+            longitude: -74,
+            locality: "New York",
+            region: "New York",
+            country: "United States"
+        )
+        let existing = Artifact(
+            kind: .url,
+            sourceURL: "https://maps.apple.com/?q=museum",
+            originalText: place.name,
+            place: place,
+            processingState: .processed
+        )
+        try await repository.save(existing)
+        let library = ArtifactLibrary(repository: repository)
+        await library.load()
+
+        try await library.savePlace(
+            PlaceCandidate(place: place, sourceURL: "https://maps.apple.com/?q=museum"),
+            sourceCollectionTitle: "New York City Fit Guide · Museums"
+        )
+
+        XCTAssertEqual(library.artifacts.count, 1)
+        XCTAssertEqual(library.artifacts[0].sourceCollectionTitles, ["New York City Fit Guide · Museums"])
+        let persisted = try await repository.artifacts()
+        XCTAssertEqual(persisted.count, 1)
+        XCTAssertEqual(persisted[0].sourceCollectionTitles, ["New York City Fit Guide · Museums"])
+    }
 }
 
 private enum TestInboxError: LocalizedError {

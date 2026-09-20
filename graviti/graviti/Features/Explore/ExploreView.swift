@@ -30,14 +30,14 @@ struct ExploreView: View {
     private var savedDestinationIDs: Set<String> { Self.decode(savedDestinationsRaw) }
     private var excludedDestinationIDs: Set<String> { Self.decode(excludedDestinationsRaw) }
 
-    private var savedDestinations: [SavedDestination] {
-        var destinations = [SavedDestination]()
+    private var savedGuides: [FitGuide] {
+        var guides = [FitGuide]()
         for id in savedDestinationIDs {
-            if let destination = DestinationFitEngine.savedDestination(for: id) {
-                destinations.append(destination)
+            if let guide = DestinationFitEngine.fitGuide(for: id, from: profile, preferences: preferences) {
+                guides.append(guide)
             }
         }
-        return destinations.sorted { $0.name < $1.name }
+        return guides.sorted { $0.destination.name < $1.destination.name }
     }
 
     var body: some View {
@@ -64,21 +64,30 @@ struct ExploreView: View {
                         leadingPattern(leading)
                     }
 
-                    if !savedDestinations.isEmpty {
+                    if !savedGuides.isEmpty {
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("Saved destinations")
+                            Text("Your Fit Guides")
                                 .font(.headline)
-                            ForEach(savedDestinations) { destination in
-                                Button { onFindPlace(destination.name) } label: {
+                            ForEach(savedGuides) { guide in
+                                NavigationLink {
+                                    FitGuideView(
+                                        guide: guide,
+                                        library: library,
+                                        provider: MapKitPlaceSearchProvider(),
+                                        onKeepGuide: {}
+                                    )
+                                } label: {
                                     HStack(spacing: 12) {
                                         Image(systemName: "bookmark.fill")
                                             .foregroundStyle(GravitiColors.signalMint)
                                         VStack(alignment: .leading, spacing: 2) {
-                                            Text(destination.name).font(.headline)
-                                            Text(destination.country).font(.caption).foregroundStyle(.white.opacity(0.62))
+                                            Text(guide.destination.name).font(.headline)
+                                            Text("\(guide.destination.country) · \(GravitiCopy.savedItems(library.artifacts.filter(guide.contains).count))")
+                                                .font(.caption)
+                                                .foregroundStyle(.white.opacity(0.62))
                                         }
                                         Spacer()
-                                        Image(systemName: "magnifyingglass")
+                                        Image(systemName: "chevron.right")
                                             .foregroundStyle(.white.opacity(0.55))
                                     }
                                     .padding(14)
@@ -126,7 +135,7 @@ struct ExploreView: View {
                                     DestinationRecommendationView(
                                         recommendation: recommendation,
                                         isSaved: savedDestinationIDs.contains(recommendation.id),
-                                        onSearch: { onFindPlace(recommendation.name) },
+                                        library: library,
                                         onSave: { saveDestination(recommendation) },
                                         onNotForMe: { excludeDestination(recommendation) }
                                     )
@@ -306,7 +315,7 @@ private struct DestinationRecommendationView: View {
     @Environment(\.dismiss) private var dismiss
     let recommendation: DestinationRecommendation
     let isSaved: Bool
-    let onSearch: () -> Void
+    @ObservedObject var library: ArtifactLibrary
     let onSave: () -> Void
     let onNotForMe: () -> Void
 
@@ -352,10 +361,22 @@ private struct DestinationRecommendationView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
 
-                Button("Search places in \(recommendation.name)", action: onSearch)
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity, minHeight: 50)
-                    .background(GravitiColors.iris, in: RoundedRectangle(cornerRadius: 14))
+                NavigationLink {
+                    FitGuideView(
+                        guide: FitGuide(
+                            destination: SavedDestination(name: recommendation.name, country: recommendation.country),
+                            interests: recommendation.matchedInterests
+                        ),
+                        library: library,
+                        provider: MapKitPlaceSearchProvider(),
+                        onKeepGuide: onSave
+                    )
+                } label: {
+                    Label("Build my \(recommendation.name) Fit Guide", systemImage: "map.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .background(GravitiColors.iris, in: RoundedRectangle(cornerRadius: 14))
+                }
 
                 Button {
                     onSave()

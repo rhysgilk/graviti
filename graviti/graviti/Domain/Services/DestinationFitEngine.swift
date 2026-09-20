@@ -162,6 +162,28 @@ enum DestinationFitEngine {
         candidates.first { $0.id == id }.map { SavedDestination(name: $0.name, country: $0.country) }
     }
 
+    static func fitGuide(
+        for id: String,
+        from profile: InterestProfile,
+        preferences: ExplorePreferences = ExplorePreferences()
+    ) -> FitGuide? {
+        guard let candidate = candidates.first(where: { $0.id == id }) else { return nil }
+        let signals = userSignals(from: profile, preferences: preferences)
+        let matched = signals.compactMap { signal -> (String, Double)? in
+            candidate.strengths[signal.name].map { (signal.name, signal.weight * $0) }
+        }
+        .sorted { $0.1 > $1.1 }
+        .map(\.0)
+
+        let interests = Array((matched.isEmpty
+            ? candidate.strengths.sorted { $0.value > $1.value }.map(\.key)
+            : matched).prefix(4))
+        return FitGuide(
+            destination: SavedDestination(name: candidate.name, country: candidate.country),
+            interests: interests
+        )
+    }
+
     private static func userSignals(from profile: InterestProfile, preferences: ExplorePreferences) -> [UserSignal] {
         var signals = Dictionary(uniqueKeysWithValues: profile.interests.map { pattern in
             let spread = 1 + 0.22 * Double(min(pattern.areaCount, 4))

@@ -86,6 +86,8 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Preserve multiple guide/list memberships for the same imported place and expose that source history without overwriting user-edited details.
 - [x] Retry transient failed map lookups when the app next launches or returns to the foreground.
 - [x] Keep ambient Home stars decorative, noninteractive, and motion accessible; apply Sora consistently to Library and Search.
+- [x] Turn each Fit recommendation into a retrievable Fit Guide with live destination-scoped suggestions grouped by the interests that produced the recommendation.
+- [x] Save suggested places into their Fit Guide without duplicating an existing Library item, and retain guide membership in exports and restores.
 
 ### MVP decision gate
 

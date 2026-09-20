@@ -18,6 +18,7 @@ Graviti is a private iOS travel-interest library. Save a place, link, note, scre
 - Gravity visualization with adaptive geographic resolution and an ambient, noninteractive starfield
 - Interest patterns across categories and geographic areas
 - Destination Fit recommendations with evidence confidence
+- Fit Guides with live place suggestions grouped by the patterns behind each recommendation
 - Accessibility, Reduce Motion support, and localization infrastructure
 - Focused dogfood datasets for scenery, culture, food, water, and mixed interests
 

@@ -253,6 +253,8 @@ Recommendation synthesis must look across the full Library. Repeated interests s
 
 The initial offline implementation uses a small versioned destination-interest catalog and deterministic weights. It excludes destinations already represented in the Library, labels every result as Fit, and exposes the matched interests and supporting-save count. Catalog coverage should expand or move to a reviewed service without changing the separation between recommendations and explicit Gravity.
 
+Every Fit recommendation must lead to an actionable **Fit Guide**. The guide searches for specific places within the destination for each pattern that contributed to the recommendation, groups results by that pattern, and lets the user save individual results. Saved results retain their Fit Guide membership in the Library and backup so the user can return to the destination from Explore and continue planning. The local implementation uses live Apple Maps search relevance and sends users to the Maps listing for current ratings, hours, and details; it must not invent or display a review score that MapKit does not provide.
+
 Prefer concise evidence:
 
 > **Taipei · 93% fit**  
@@ -268,6 +270,8 @@ Detailed reasoning may be accessible when useful.
 Explore begins with:
 
 > **What are you looking for?**
+
+Explore also keeps saved Fit Guides visible. A recommendation is useful only when the user can move from the destination level to concrete experiences, save those experiences, and retrieve the resulting guide later.
 
 Users can specify hard constraints, preferences, and things to avoid.
 

@@ -85,6 +85,24 @@ final class DestinationFitEngineTests: XCTestCase {
         XCTAssertFalse(updated.contains { $0.id == excluded })
     }
 
+    func testFitGuideUsesTheUsersStrongestMatchingPatterns() throws {
+        let artifacts = (0..<4).map { index in
+            artifact(
+                interests: ["Museums", "Coffee", "Matcha", "Desserts"],
+                place: place("ny-pattern-\(index)", locality: "Providence", region: "Rhode Island")
+            )
+        }
+        let profile = InterestProfileBuilder.build(from: artifacts)
+
+        let guide = try XCTUnwrap(DestinationFitEngine.fitGuide(
+            for: "New York City, United States",
+            from: profile
+        ))
+
+        XCTAssertEqual(guide.destination.name, "New York City")
+        XCTAssertEqual(Set(guide.interests), Set(["Museums", "Coffee", "Matcha", "Desserts"]))
+    }
+
     private func recommendations(_ artifacts: [Artifact], limit: Int = 3) -> [DestinationRecommendation] {
         DestinationFitEngine.recommendations(from: InterestProfileBuilder.build(from: artifacts), artifacts: artifacts, limit: limit)
     }
