@@ -86,6 +86,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [ ] Add current product screenshots to the README before the public repository or external beta announcement.
 - [x] Extract import, processing, and enrichment coordinators incrementally. Keep `ArtifactLibrary` as the observable facade instead of adding every workflow to it.
 - [x] Add privacy manifests, export-compliance metadata, a local-only privacy policy draft, and TestFlight beta guidance before producing an external build.
+- [x] Exercise rich-artifact round trips, batch updates, and deletion through an in-memory SwiftData container to guard the production persistence adapter.
 
 ## Scope guardrail
 

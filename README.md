@@ -71,7 +71,7 @@ xcodebuild \
 
 The shared `graviti` scheme includes the `gravitiTests` target. Run it from Xcode with **Product → Test**, or provide an installed simulator destination to `xcodebuild test`.
 
-Current Fit regression tests cover sparse evidence, semantic destination specificity, duplicate evidence discounting, independent place confidence, and avoided interests. Additional parser, Orbit, and profile tests are tracked in the steering guide.
+Current regression tests cover sparse Fit evidence, semantic destination specificity, duplicate evidence discounting, independent place confidence, avoided interests, parsers, Orbit behavior, interest profiles, backup round trips, OCR, link metadata, bulk deletion, and rich-artifact persistence through the real SwiftData repository.
 
 ## Test data
 
