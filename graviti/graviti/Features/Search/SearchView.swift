@@ -15,10 +15,60 @@ struct SearchView: View {
     var body: some View {
         NavigationStack {
             List {
+                if !savedArtifactMatches.isEmpty {
+                    Section("Your saves") {
+                        ForEach(savedArtifactMatches) { artifact in
+                            NavigationLink {
+                                SavedArtifactDetailView(artifact: artifact, library: library)
+                            } label: {
+                                savedArtifactRow(artifact)
+                            }
+                        }
+                    }
+                }
+
+                if !destinationMatches.isEmpty {
+                    Section("Your destinations") {
+                        ForEach(destinationMatches) { node in
+                            NavigationLink {
+                                DestinationLibraryDetailView(node: node, library: library)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(node.name).font(.headline)
+                                    Text("\(node.saveCount) saved \(node.saveCount == 1 ? "item" : "items") · \(Int(node.gravity)) Gravity")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if !interestMatches.isEmpty {
+                    Section("Your interests") {
+                        ForEach(interestMatches) { pattern in
+                            NavigationLink {
+                                SearchInterestDetailView(pattern: pattern, library: library)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(pattern.name).font(.headline)
+                                    Text(pattern.evidenceSummary)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if !savedMatches.isEmpty {
                     Section("Your places") {
                         ForEach(savedMatches) { place in
-                            placeRow(place)
+                            NavigationLink {
+                                SavedPlaceDetailView(place: place, library: library)
+                            } label: {
+                                placeRow(place)
+                            }
                         }
                     }
                 }
@@ -71,19 +121,38 @@ struct SearchView: View {
             .scrollContentBackground(.hidden)
             .background(GravitiColors.appBackground)
             .navigationTitle("Search")
-            .searchable(text: $query, prompt: "Places and addresses")
+            .searchable(text: $query, prompt: "Saves, interests, or places")
             .task(id: query) { await search() }
         }
     }
 
     private var savedMatches: [SavedPlace] {
         let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !term.isEmpty { return localResults.places }
         var seen = Set<String>()
         return library.artifacts.compactMap(\.place).filter { place in
-            seen.insert(place.id).inserted &&
-                (term.isEmpty || place.name.localizedCaseInsensitiveContains(term) ||
-                 place.subtitle.localizedCaseInsensitiveContains(term))
+            seen.insert(place.id).inserted
         }
+    }
+
+    private var normalizedTerm: String {
+        query.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var savedArtifactMatches: [Artifact] {
+        localResults.artifacts
+    }
+
+    private var destinationMatches: [OrbitNode] {
+        localResults.destinations
+    }
+
+    private var interestMatches: [InterestPattern] {
+        localResults.interests
+    }
+
+    private var localResults: LibrarySearchResults {
+        LibrarySearchEngine.search(normalizedTerm, in: library.artifacts)
     }
 
     private func placeRow(_ place: SavedPlace) -> some View {
@@ -96,6 +165,17 @@ struct SearchView: View {
             }
         }
         .accessibilityElement(children: .combine)
+    }
+
+    private func savedArtifactRow(_ artifact: Artifact) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(LibrarySearchEngine.title(for: artifact)).font(.headline).lineLimit(2)
+            Text([artifact.effectiveCategory?.displayName, artifact.place?.subtitle]
+                .compactMap { $0 }.joined(separator: " · "))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
     }
 
     private func isSaved(_ candidate: PlaceCandidate) -> Bool {
@@ -138,5 +218,54 @@ struct SearchView: View {
             saveFailed = true
             saveMessage = error.localizedDescription
         }
+    }
+}
+
+private struct SearchInterestDetailView: View {
+    let pattern: InterestPattern
+    @ObservedObject var library: ArtifactLibrary
+
+    var body: some View {
+        List {
+            Section {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(pattern.name)
+                        .font(.custom("Sora-SemiBold", size: 26, relativeTo: .title))
+                    Text(pattern.evidenceSummary)
+                        .foregroundStyle(.secondary)
+                    if !pattern.areaNames.isEmpty {
+                        Text(pattern.areaNames.prefix(4).joined(separator: " · "))
+                            .font(.subheadline)
+                            .foregroundStyle(GravitiColors.signalMint)
+                    }
+                }
+                .padding(.vertical, 8)
+            }
+            Section("Saves") {
+                ForEach(currentArtifacts) { artifact in
+                    NavigationLink {
+                        SavedArtifactDetailView(artifact: artifact, library: library)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(artifact.place?.name ?? artifact.linkMetadata?.title ?? artifact.originalText ?? "Saved item")
+                                .font(.headline)
+                                .lineLimit(2)
+                            if let summary = artifact.effectiveSummary {
+                                Text(summary).font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .scrollContentBackground(.hidden)
+        .background(GravitiColors.appBackground)
+        .navigationTitle("Interest")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var currentArtifacts: [Artifact] {
+        let ids = Set(pattern.artifacts.map(\.id))
+        return library.artifacts.filter { ids.contains($0.id) }
     }
 }
