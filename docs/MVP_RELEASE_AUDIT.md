@@ -2,7 +2,7 @@
 
 **Audit date:** September 20, 2026
 
-**Audited commit:** `b48e3af`
+**Audited commit:** `5918cf1`
 
 **Release candidate:** 1.0 (1)
 
@@ -10,8 +10,8 @@ This audit maps the MVP Definition of Done to current evidence. It distinguishes
 
 ## Automated release evidence
 
-- 61 of 61 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
-- 61 of 61 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
+- 62 of 62 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
+- 62 of 62 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
 - A signed arm64 Release archive of the audited commit completed Xcode's store validation phase.
 - `scripts/verify-release-archive.sh` passed every package check: bundle identifiers, matching app and extension versions, iOS 18 minimum, encryption declaration, both privacy manifests, exactly two Sora fonts, no CSV fixtures, nested signatures, and matching App Group entitlements.
 - The only archive warning is expected: the available seven-day Apple Development profile is suitable for device testing but not TestFlight distribution.
@@ -25,7 +25,7 @@ This audit maps the MVP Definition of Done to current evidence. It distinguishes
 | Capture inside and outside the app | Verified | Link, note, photo, place, CSV, `.webloc`, Apple guide, and Google list capture are implemented. A live Safari Share Extension save was completed and reopened in Library. |
 | Saves appear immediately | Verified | Capture preserves the source before background work. Live link, Share Extension, Apple guide, and Google list checks showed immediate Library records. |
 | Background processing does not block capture | Verified | Processing and metadata state are persisted separately. Interrupted enrichment and transient map lookup retry tests pass. |
-| Places and geographic hierarchy resolve reliably enough for real use | Verified for beta | Live Google and Apple collections resolved through MapKit. The supplied Apple “Matcha” guide resolved 19 of 19 identifiers; the supplied Google list matched 25 automatically and routed three ambiguous names to review. Imported places retain their collection title as enrichment evidence. |
+| Places and geographic hierarchy resolve reliably enough for real use | Verified for beta | Live Google and Apple collections resolved through MapKit. The supplied Apple “Matcha” guide resolved 19 of 19 identifiers; the supplied Google list matched 25 automatically and routed three ambiguous names to review. Imported places retain every distinct collection title as enrichment evidence and expose that history in Saved Item detail. |
 | Low-confidence cases can be corrected | Verified | Needs Your Help and place review flows were exercised; user-selected matches are protected from automated refresh. |
 | Duplicates can be reconciled | Verified | Stable URL and place identity prevent repeated imports. Reimporting the Apple guide avoided all 19 duplicates while backfilling collection context; Google reimport reports duplicates and refreshes eligible older records without replacing user-selected matches. Bulk repeated-place cleanup preserves source saves. |
 | Library supports Destinations, Places, Saves, and Map | Verified | All four modes were exercised with varied and crowded datasets; the last mode persists. |
