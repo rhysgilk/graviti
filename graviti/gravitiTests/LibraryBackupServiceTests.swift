@@ -7,6 +7,7 @@ final class LibraryBackupServiceTests: XCTestCase {
         let artifact = Artifact(
             id: UUID(),
             kind: .photo,
+            sourceCollectionTitle: "Maine coast",
             userNote: "Rocky coast at sunrise",
             mediaKey: "photo.jpg",
             extractedText: "Acadia",
@@ -37,6 +38,30 @@ final class LibraryBackupServiceTests: XCTestCase {
         XCTAssertEqual(decoded.artifacts.first?.artifact, artifact)
         XCTAssertEqual(decoded.artifacts.first?.mediaData, media)
         XCTAssertEqual(decoded.artifacts.first?.mediaFileExtension, "jpg")
+    }
+
+    func testDecodeAcceptsVersionOneBackupWithoutCollectionContext() throws {
+        let artifact = Artifact(
+            id: UUID(),
+            kind: .url,
+            sourceURL: "https://example.com/place",
+            sourceCollectionTitle: "Scenic favorites",
+            originalText: "A place"
+        )
+        let encoded = try LibraryBackupService.encode([artifact])
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        var entries = try XCTUnwrap(root["artifacts"] as? [[String: Any]])
+        var entry = try XCTUnwrap(entries.first)
+        var artifactJSON = try XCTUnwrap(entry["artifact"] as? [String: Any])
+        artifactJSON.removeValue(forKey: "sourceCollectionTitle")
+        entry["artifact"] = artifactJSON
+        entries[0] = entry
+        root["artifacts"] = entries
+
+        let legacyData = try JSONSerialization.data(withJSONObject: root)
+        let decoded = try LibraryBackupService.decode(legacyData)
+
+        XCTAssertNil(decoded.artifacts.first?.artifact.sourceCollectionTitle)
     }
 
     func testDecodeRejectsUnsupportedSchema() throws {

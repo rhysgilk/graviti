@@ -6,6 +6,7 @@ final class StoredArtifact {
     @Attribute(.unique) var id: UUID
     var kindRawValue: String
     var sourceURL: String?
+    var sourceCollectionTitle: String?
     var originalText: String?
     var userNote: String?
     var mediaKey: String?
@@ -25,6 +26,7 @@ final class StoredArtifact {
         id = artifact.id
         kindRawValue = artifact.kind.rawValue
         sourceURL = artifact.sourceURL
+        sourceCollectionTitle = artifact.sourceCollectionTitle
         originalText = artifact.originalText
         userNote = artifact.userNote
         mediaKey = artifact.mediaKey
@@ -50,6 +52,7 @@ final class StoredArtifact {
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
@@ -69,6 +72,7 @@ final class StoredArtifact {
 
     @MainActor func apply(_ artifact: Artifact) throws {
         sourceURL = artifact.sourceURL
+        sourceCollectionTitle = artifact.sourceCollectionTitle
         originalText = artifact.originalText
         placeJSON = try artifact.place.map { try JSONEncoder().encode($0) }
         enrichmentJSON = try artifact.enrichment.map { try JSONEncoder().encode($0) }

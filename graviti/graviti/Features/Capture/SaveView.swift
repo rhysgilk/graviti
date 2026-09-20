@@ -369,6 +369,7 @@ struct SaveView: View {
                 importSummary = SaveImportSummary(
                     title: summary.title,
                     imported: summary.imported,
+                    refreshed: summary.refreshed,
                     duplicates: summary.duplicates,
                     skipped: summary.skipped,
                     countries: summary.countries,

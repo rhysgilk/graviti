@@ -432,18 +432,27 @@ final class ArtifactLibrary: ObservableObject {
         let plan = try await ArtifactImportCoordinator.appleGuide(rawURL, existingArtifacts: artifacts)
         try await applyCollectionTitle(plan.title, sourceURL: rawURL)
 
+        if !plan.updatedArtifacts.isEmpty {
+            try await repository.updateMany(plan.updatedArtifacts)
+            let replacements = Dictionary(uniqueKeysWithValues: plan.updatedArtifacts.map { ($0.id, $0) })
+            artifacts = artifacts.map { replacements[$0.id] ?? $0 }
+        }
         if !plan.artifacts.isEmpty {
             try await repository.saveMany(plan.artifacts)
             artifacts.insert(contentsOf: plan.artifacts, at: 0)
+        }
+        if !plan.artifacts.isEmpty || !plan.updatedArtifacts.isEmpty {
             await processPendingEnrichment()
         }
+        let affectedArtifacts = plan.artifacts + plan.updatedArtifacts
         return AppleGuideImportSummary(
             title: plan.title,
             imported: plan.artifacts.count,
+            refreshed: plan.updatedArtifacts.count,
             duplicates: plan.duplicates,
             skipped: plan.skipped,
-            countries: Set(plan.artifacts.compactMap { $0.place?.country }).count,
-            cities: Set(plan.artifacts.compactMap { $0.place?.locality }).count
+            countries: Set(affectedArtifacts.compactMap { $0.place?.country }).count,
+            cities: Set(affectedArtifacts.compactMap { $0.place?.locality }).count
         )
     }
 
@@ -490,6 +499,7 @@ final class ArtifactLibrary: ObservableObject {
 struct AppleGuideImportSummary {
     let title: String
     let imported: Int
+    let refreshed: Int
     let duplicates: Int
     let skipped: Int
     let countries: Int

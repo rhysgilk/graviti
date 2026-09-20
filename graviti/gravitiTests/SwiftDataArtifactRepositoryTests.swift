@@ -98,6 +98,7 @@ final class SwiftDataArtifactRepositoryTests: XCTestCase {
             id: UUID(uuidString: "11111111-2222-3333-4444-555555555555")!,
             kind: .photo,
             sourceURL: "https://example.com/coastal-trail",
+            sourceCollectionTitle: "Coastal scenery",
             originalText: "Coastal trail",
             userNote: "Rocky water views and seafood nearby",
             mediaKey: "photo.jpg",

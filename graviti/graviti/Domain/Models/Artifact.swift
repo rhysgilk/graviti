@@ -44,6 +44,7 @@ struct Artifact: Identifiable, Hashable, Codable {
     let id: UUID
     let kind: ArtifactKind
     let sourceURL: String?
+    let sourceCollectionTitle: String?
     let originalText: String?
     let userNote: String?
     let mediaKey: String?
@@ -63,6 +64,7 @@ struct Artifact: Identifiable, Hashable, Codable {
         id: UUID = UUID(),
         kind: ArtifactKind,
         sourceURL: String? = nil,
+        sourceCollectionTitle: String? = nil,
         originalText: String? = nil,
         userNote: String? = nil,
         mediaKey: String? = nil,
@@ -81,6 +83,7 @@ struct Artifact: Identifiable, Hashable, Codable {
         self.id = id
         self.kind = kind
         self.sourceURL = sourceURL
+        self.sourceCollectionTitle = sourceCollectionTitle
         self.originalText = originalText
         self.userNote = userNote
         self.mediaKey = mediaKey
@@ -102,6 +105,7 @@ struct Artifact: Identifiable, Hashable, Codable {
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
@@ -124,6 +128,7 @@ struct Artifact: Identifiable, Hashable, Codable {
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
@@ -146,6 +151,7 @@ struct Artifact: Identifiable, Hashable, Codable {
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: originalText,
             userNote: note,
             mediaKey: mediaKey,
@@ -168,6 +174,7 @@ struct Artifact: Identifiable, Hashable, Codable {
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
@@ -194,6 +201,7 @@ struct Artifact: Identifiable, Hashable, Codable {
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
@@ -216,6 +224,7 @@ struct Artifact: Identifiable, Hashable, Codable {
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
@@ -233,11 +242,16 @@ struct Artifact: Identifiable, Hashable, Codable {
         )
     }
 
-    func withSourceURL(_ sourceURL: String, processingState: ArtifactProcessingState) -> Artifact {
+    func withSourceURL(
+        _ sourceURL: String,
+        sourceCollectionTitle: String? = nil,
+        processingState: ArtifactProcessingState
+    ) -> Artifact {
         Artifact(
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle ?? self.sourceCollectionTitle,
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
@@ -260,6 +274,7 @@ struct Artifact: Identifiable, Hashable, Codable {
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
@@ -277,11 +292,36 @@ struct Artifact: Identifiable, Hashable, Codable {
         )
     }
 
+    func withSourceCollectionTitle(_ title: String) -> Artifact {
+        let changed = sourceCollectionTitle != title
+        return Artifact(
+            id: id,
+            kind: kind,
+            sourceURL: sourceURL,
+            sourceCollectionTitle: title,
+            originalText: originalText,
+            userNote: userNote,
+            mediaKey: mediaKey,
+            extractedText: extractedText,
+            extractedTextSource: extractedTextSource,
+            textExtractionState: textExtractionState,
+            linkMetadata: linkMetadata,
+            linkMetadataState: linkMetadataState,
+            place: place,
+            enrichment: changed ? nil : enrichment,
+            enrichmentState: changed ? .pending : enrichmentState,
+            userDetails: userDetails,
+            processingState: processingState,
+            capturedAt: capturedAt
+        )
+    }
+
     func withMediaKey(_ mediaKey: String?) -> Artifact {
         Artifact(
             id: id,
             kind: kind,
             sourceURL: sourceURL,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,

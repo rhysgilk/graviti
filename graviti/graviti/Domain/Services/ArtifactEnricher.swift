@@ -4,7 +4,7 @@ import MapKit
 @MainActor
 struct ArtifactEnricher {
     func enrich(_ artifact: Artifact) async throws -> ArtifactEnrichment? {
-        let savedText = [artifact.originalText, artifact.userNote, artifact.linkMetadata?.title, artifact.linkMetadata?.summary]
+        let savedText = [artifact.originalText, artifact.userNote, artifact.sourceCollectionTitle, artifact.linkMetadata?.title, artifact.linkMetadata?.summary]
             .compactMap { $0 }
             .joined(separator: " ")
         let text = [savedText, artifact.extractedText]

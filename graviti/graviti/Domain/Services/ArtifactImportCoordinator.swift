@@ -15,6 +15,7 @@ struct MapsLinkImportPlan {
 struct AppleGuideImportPlan {
     let title: String
     let artifacts: [Artifact]
+    let updatedArtifacts: [Artifact]
     let duplicates: Int
     let skipped: Int
 }
@@ -76,8 +77,13 @@ enum ArtifactImportCoordinator {
     static func appleGuide(_ rawURL: String, existingArtifacts: [Artifact]) async throws -> AppleGuideImportPlan {
         let expanded = await URLSessionMapLinkExpander().expandedURL(for: rawURL)
         let guide = try AppleMapsGuideParser.parse(expanded)
-        var existingURLs = Set(existingArtifacts.compactMap(\.sourceURL))
+        let existingByURL = Dictionary(
+            existingArtifacts.compactMap { artifact in artifact.sourceURL.map { ($0, artifact) } },
+            uniquingKeysWith: { first, _ in first }
+        )
+        var existingURLs = Set(existingByURL.keys)
         var additions = [Artifact]()
+        var updates = [Artifact]()
         var duplicates = 0
         var failed = 0
 
@@ -85,6 +91,10 @@ enum ArtifactImportCoordinator {
             let placeURL = "https://maps.apple.com/place?place-id=\(rawIdentifier)"
             guard existingURLs.insert(placeURL).inserted else {
                 duplicates += 1
+                if let existing = existingByURL[placeURL],
+                   existing.sourceCollectionTitle != guide.title {
+                    updates.append(existing.withSourceCollectionTitle(guide.title))
+                }
                 continue
             }
             guard let identifier = MKMapItem.Identifier(rawValue: rawIdentifier) else {
@@ -100,6 +110,7 @@ enum ArtifactImportCoordinator {
                 additions.append(Artifact(
                     kind: .url,
                     sourceURL: placeURL,
+                    sourceCollectionTitle: guide.title,
                     originalText: place.name,
                     place: place,
                     processingState: .processed
@@ -111,6 +122,7 @@ enum ArtifactImportCoordinator {
         return AppleGuideImportPlan(
             title: guide.title,
             artifacts: additions,
+            updatedArtifacts: updates,
             duplicates: duplicates,
             skipped: failed
         )
@@ -141,17 +153,26 @@ enum ArtifactImportCoordinator {
         for place in list.places {
             guard seenURLs.insert(place.importIdentity).inserted else {
                 duplicates += 1
-                if let existing = existingByIdentity[place.importIdentity],
-                   existing.sourceURL != place.sourceURL,
-                   existing.place == nil,
-                   [.saved, .needsReview, .failed].contains(existing.processingState) {
-                    updates.append(existing.withSourceURL(place.sourceURL, processingState: .saved))
+                if let existing = existingByIdentity[place.importIdentity] {
+                    var updated = existing
+                    if existing.sourceURL != place.sourceURL,
+                       existing.place == nil,
+                       [.saved, .needsReview, .failed].contains(existing.processingState) {
+                        updated = updated.withSourceURL(place.sourceURL, processingState: .saved)
+                    }
+                    if updated.sourceCollectionTitle != list.title {
+                        updated = updated.withSourceCollectionTitle(list.title)
+                    }
+                    if updated != existing {
+                        updates.append(updated)
+                    }
                 }
                 continue
             }
             additions.append(Artifact(
                 kind: .url,
                 sourceURL: place.sourceURL,
+                sourceCollectionTitle: list.title,
                 originalText: place.title,
                 userNote: place.note
             ))

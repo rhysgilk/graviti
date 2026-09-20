@@ -85,6 +85,7 @@ Artifact
 - user_id: UUID
 - artifact_type: enum
 - source_url: string?
+- source_collection_title: string?
 - source_app: string?
 - original_text: string?
 - user_note: string?
@@ -139,6 +140,8 @@ This lets a save remain safely captured while richer descriptions, categories, a
 Image text extraction has the same resumable state vocabulary. The MVP runs Apple Vision locally after the media asset is secure, stores detected text separately from user-authored text, and records `apple_vision` as its source. Detected text can seed category and interest enrichment, while the saved-item detail keeps the extracted text and its provenance visible to the user.
 
 Link metadata also uses this resumable lifecycle. Metadata fetches run after capture with an ephemeral, cookie-free session; reject loopback and private-network targets; enforce response type and size limits; and cache title, description, site name, resolved URL, and a bounded preview image. Cached title and description become enrichment evidence without replacing the original URL or the user's note.
+
+Places imported from a shared collection retain `source_collection_title`. This source context contributes to enrichment because a guide title such as “Matcha” or “Coastal hikes” can explain why otherwise generic place names were saved. Reimporting an older collection backfills the title and reruns generated enrichment without overwriting user corrections.
 
 The Artifact is never deleted merely because extraction fails.
 

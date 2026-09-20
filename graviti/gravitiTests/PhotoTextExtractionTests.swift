@@ -55,6 +55,21 @@ final class PhotoTextExtractionTests: XCTestCase {
         XCTAssertEqual(enrichment?.source, .detectedText)
     }
 
+    func testEnrichmentUsesImportedCollectionTitleAsSemanticEvidence() async throws {
+        let artifact = Artifact(
+            kind: .url,
+            sourceURL: "https://maps.apple.com/place?place-id=example",
+            sourceCollectionTitle: "Matcha favorites",
+            originalText: "Junbi"
+        )
+
+        let enrichment = try await ArtifactEnricher().enrich(artifact)
+
+        XCTAssertEqual(enrichment?.category, .foodAndDrink)
+        XCTAssertTrue(enrichment?.interests.contains("Matcha") == true)
+        XCTAssertEqual(enrichment?.source, .savedText)
+    }
+
     func testVisionRecognizerReadsClearImageText() async throws {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1200, height: 320))
         let image = renderer.image { context in
