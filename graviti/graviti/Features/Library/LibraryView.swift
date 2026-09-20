@@ -13,6 +13,11 @@ struct LibraryView: View {
     @State private var showingBulkRemoveConfirmation = false
     @State private var isRemovingPlaces = false
     @State private var placeActionError: String?
+    @State private var isSelectingSaves = false
+    @State private var selectedArtifactIDs: Set<UUID> = []
+    @State private var showingBulkDeleteConfirmation = false
+    @State private var isDeletingSaves = false
+    @State private var saveActionError: String?
     @State private var backupDocument = LibraryBackupDocument()
     @State private var isExportingBackup = false
     @State private var isImportingBackup = false
@@ -60,6 +65,13 @@ struct LibraryView: View {
                             if !isSelectingPlaces { selectedPlaceIDs.removeAll() }
                         }
                     }
+                } else if mode == .saves, !filteredArtifacts.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(isSelectingSaves ? "Done" : "Select") {
+                            isSelectingSaves.toggle()
+                            if !isSelectingSaves { selectedArtifactIDs.removeAll() }
+                        }
+                    }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
@@ -93,10 +105,16 @@ struct LibraryView: View {
                     isSelectingPlaces = false
                     selectedPlaceIDs.removeAll()
                 }
+                if newMode != .saves {
+                    isSelectingSaves = false
+                    selectedArtifactIDs.removeAll()
+                }
             }
             .safeAreaInset(edge: .bottom) {
                 if mode == .places, isSelectingPlaces {
                     bulkPlaceActions
+                } else if mode == .saves, isSelectingSaves {
+                    bulkSaveActions
                 }
             }
             .confirmationDialog(
@@ -107,6 +125,15 @@ struct LibraryView: View {
                 Button("Remove places", role: .destructive) { removeSelectedPlaces() }
             } message: {
                 Text("The associated saves stay in your Library and can be matched to places again later.")
+            }
+            .confirmationDialog(
+                "Delete \(selectedArtifactIDs.count) selected \(selectedArtifactIDs.count == 1 ? "save" : "saves")?",
+                isPresented: $showingBulkDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete saved items", role: .destructive) { deleteSelectedSaves() }
+            } message: {
+                Text("This permanently removes the selected items and updates their places, Gravity, and interest signals.")
             }
             .fileExporter(
                 isPresented: $isExportingBackup,
@@ -369,6 +396,50 @@ struct LibraryView: View {
         }
     }
 
+    private var bulkSaveActions: some View {
+        VStack(spacing: 8) {
+            if let saveActionError {
+                Text(saveActionError)
+                    .font(.caption)
+                    .foregroundStyle(GravitiColors.opportunityCoral)
+            }
+            Button(role: .destructive) {
+                showingBulkDeleteConfirmation = true
+            } label: {
+                Label(
+                    selectedArtifactIDs.isEmpty ? "Select saves to delete" : "Delete \(selectedArtifactIDs.count) selected",
+                    systemImage: "trash"
+                )
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 48)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(GravitiColors.opportunityCoral)
+            .disabled(selectedArtifactIDs.isEmpty || isDeletingSaves)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial)
+    }
+
+    private func deleteSelectedSaves() {
+        let ids = selectedArtifactIDs
+        guard !ids.isEmpty else { return }
+        isDeletingSaves = true
+        saveActionError = nil
+        Task {
+            do {
+                try await library.deleteArtifacts(ids)
+                selectedArtifactIDs.removeAll()
+                isSelectingSaves = false
+            } catch {
+                saveActionError = error.localizedDescription
+                selectedArtifactIDs.formIntersection(Set(library.artifacts.map(\.id)))
+            }
+            isDeletingSaves = false
+        }
+    }
+
     @ViewBuilder
     private var mapContent: some View {
         if savedPlaces.isEmpty {
@@ -452,10 +523,31 @@ struct LibraryView: View {
             }
         } else {
             List(filteredArtifacts) { artifact in
-                NavigationLink {
-                    SavedArtifactDetailView(artifact: artifact, library: library)
-                } label: {
-                    ArtifactRow(artifact: artifact)
+                Group {
+                    if isSelectingSaves {
+                        Button {
+                            if selectedArtifactIDs.contains(artifact.id) {
+                                selectedArtifactIDs.remove(artifact.id)
+                            } else {
+                                selectedArtifactIDs.insert(artifact.id)
+                            }
+                        } label: {
+                            HStack(spacing: 14) {
+                                Image(systemName: selectedArtifactIDs.contains(artifact.id) ? "checkmark.circle.fill" : "circle")
+                                    .font(.title3)
+                                    .foregroundStyle(selectedArtifactIDs.contains(artifact.id) ? GravitiColors.signalMint : .secondary)
+                                ArtifactRow(artifact: artifact)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityValue(selectedArtifactIDs.contains(artifact.id) ? "Selected" : "Not selected")
+                    } else {
+                        NavigationLink {
+                            SavedArtifactDetailView(artifact: artifact, library: library)
+                        } label: {
+                            ArtifactRow(artifact: artifact)
+                        }
+                    }
                 }
                 .listRowBackground(GravitiColors.deepInk)
             }
