@@ -47,8 +47,8 @@ private enum MediaStoreError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .unsupportedImage: "This image format or size isn't supported yet."
-        case .unavailable: "Graviti's local media storage is unavailable."
+        case .unsupportedImage: String(localized: "This image format or size isn't supported yet.")
+        case .unavailable: String(localized: "Graviti's local media storage is unavailable.")
         }
     }
 }
@@ -109,6 +109,6 @@ private enum InboxError: LocalizedError {
     case unavailable
 
     var errorDescription: String? {
-        "Graviti's shared save storage is unavailable."
+        String(localized: "Graviti's shared save storage is unavailable.")
     }
 }

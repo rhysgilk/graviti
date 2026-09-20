@@ -91,9 +91,9 @@ enum LibraryBackupError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidFile: "This isn't a valid Graviti backup."
-        case .unsupportedVersion: "This backup was created by an unsupported version of Graviti."
-        case .invalidMedia: "A saved photo is missing or invalid, so the backup can't be completed safely."
+        case .invalidFile: String(localized: "This isn't a valid Graviti backup.")
+        case .unsupportedVersion: String(localized: "This backup was created by an unsupported version of Graviti.")
+        case .invalidMedia: String(localized: "A saved photo is missing or invalid, so the backup can't be completed safely.")
         }
     }
 }

@@ -7,9 +7,9 @@ enum FitConfidence: String {
 
     var displayName: String {
         switch self {
-        case .early: "Early signal"
-        case .developing: "Developing signal"
-        case .strong: "Strong signal"
+        case .early: String(localized: "Early signal")
+        case .developing: String(localized: "Developing signal")
+        case .strong: String(localized: "Strong signal")
         }
     }
 }
@@ -38,10 +38,10 @@ enum RecommendationRegion: String, CaseIterable, Identifiable {
     var id: Self { self }
     var displayName: String {
         switch self {
-        case .anywhere: "Anywhere"
-        case .asia: "Asia"
-        case .europe: "Europe"
-        case .northAmerica: "North America"
+        case .anywhere: String(localized: "Anywhere")
+        case .asia: String(localized: "Asia")
+        case .europe: String(localized: "Europe")
+        case .northAmerica: String(localized: "North America")
         }
     }
 }

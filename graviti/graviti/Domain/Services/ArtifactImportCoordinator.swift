@@ -112,11 +112,11 @@ enum ArtifactImportCoordinator {
 enum CSVImportError: LocalizedError {
     case invalidEncoding
 
-    var errorDescription: String? { "This CSV isn't UTF-8 text." }
+    var errorDescription: String? { String(localized: "This CSV isn't UTF-8 text.") }
 }
 
 enum MapsLinkFileError: LocalizedError {
     case invalidFile
 
-    var errorDescription: String? { "This file doesn't contain an Apple Maps or Google Maps link." }
+    var errorDescription: String? { String(localized: "This file doesn't contain an Apple Maps or Google Maps link.") }
 }

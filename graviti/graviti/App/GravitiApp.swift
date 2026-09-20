@@ -32,7 +32,7 @@ struct GravitiApp: App {
                 ContentUnavailableView(
                     "Library unavailable",
                     systemImage: "externaldrive.badge.exclamationmark",
-                    description: Text(startupError ?? "The local library could not open.")
+                    description: Text(startupError ?? String(localized: "The local library could not open."))
                 )
             }
         }

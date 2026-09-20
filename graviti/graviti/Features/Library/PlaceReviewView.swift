@@ -91,9 +91,9 @@ struct PlaceReviewView: View {
         results = []
         do {
             results = Array(try await MapKitPlaceSearchProvider().search(term).prefix(20))
-            if results.isEmpty { errorMessage = "No matches. Try the place name with its city." }
+            if results.isEmpty { errorMessage = String(localized: "No matches. Try the place name with its city.") }
         } catch {
-            errorMessage = "Place search is unavailable. Try again when you're online."
+            errorMessage = String(localized: "Place search is unavailable. Try again when you're online.")
         }
         isSearching = false
     }

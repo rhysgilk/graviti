@@ -33,11 +33,11 @@ final class ShareViewController: SLComposeServiceViewController {
                 extensionContext?.completeRequest(returningItems: nil)
             } catch {
                 let alert = UIAlertController(
-                    title: "Couldn't save to Graviti",
+                    title: String(localized: "Couldn't save to Graviti"),
                     message: error.localizedDescription,
                     preferredStyle: .alert
                 )
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                alert.addAction(UIAlertAction(title: String(localized: "OK"), style: .default))
                 present(alert, animated: true)
             }
         }
@@ -142,8 +142,8 @@ private enum ShareError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .empty: "There's no link or text to save."
-        case .unsupported: "This app shared content Graviti can't read yet."
+        case .empty: String(localized: "There's no link or text to save.")
+        case .unsupported: String(localized: "This app shared content Graviti can't read yet.")
         }
     }
 }

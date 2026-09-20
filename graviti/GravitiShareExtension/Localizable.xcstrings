@@ -1,0 +1,76 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Couldn't save to Graviti" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar en Graviti"
+          }
+        }
+      }
+    },
+    "Graviti's local media storage is unavailable." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El almacenamiento multimedia local de Graviti no está disponible."
+          }
+        }
+      }
+    },
+    "Graviti's shared save storage is unavailable." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El almacenamiento compartido de Graviti no está disponible."
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
+          }
+        }
+      }
+    },
+    "There's no link or text to save." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ningún enlace ni texto para guardar."
+          }
+        }
+      }
+    },
+    "This app shared content Graviti can't read yet." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta app compartió contenido que Graviti todavía no puede leer."
+          }
+        }
+      }
+    },
+    "This image format or size isn't supported yet." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este formato o tamaño de imagen todavía no es compatible."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

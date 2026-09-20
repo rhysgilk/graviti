@@ -150,7 +150,7 @@ struct ExploreView: View {
                                             .foregroundStyle(GravitiColors.signalMint)
                                             .frame(width: 32)
                                         VStack(alignment: .leading, spacing: 4) {
-                                            Text(pattern.name)
+                                            Text(InterestDisplayName.localized(pattern.name))
                                                 .font(.headline)
                                             Text(pattern.evidenceSummary)
                                                 .font(.subheadline)
@@ -176,7 +176,7 @@ struct ExploreView: View {
                                 HStack {
                                     Text(pattern.category.displayName)
                                     Spacer()
-                                    Text("\(pattern.saveCount) \(pattern.saveCount == 1 ? "save" : "saves")")
+                                    Text(GravitiCopy.saves(pattern.saveCount))
                                         .foregroundStyle(.white.opacity(0.65))
                                 }
                                 .font(.subheadline)
@@ -208,8 +208,8 @@ struct ExploreView: View {
         let region = preferences.region.displayName
         let selected = preferences.preferredInterests.count + preferences.avoidedInterests.count
         return selected == 0 && preferences.region == .anywhere
-            ? "Anywhere · Based on your saves"
-            : "\(region) · \(selected) preference\(selected == 1 ? "" : "s")"
+            ? String(localized: "Anywhere · Based on your saves")
+            : "\(region) · \(GravitiCopy.preferences(selected))"
     }
 
     private var hasActivePreferences: Bool {
@@ -228,7 +228,7 @@ struct ExploreView: View {
                 Text(recommendation.country)
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.65))
-                Text(recommendation.matchedInterests.joined(separator: " · "))
+                Text(InterestDisplayName.joined(recommendation.matchedInterests))
                     .font(.caption)
                     .foregroundStyle(GravitiColors.signalMint)
                     .lineLimit(2)
@@ -241,7 +241,9 @@ struct ExploreView: View {
                 }
                 Text(recommendation.scoreLabel)
                     .font(recommendation.confidence == .early ? .caption.weight(.bold) : .title3.weight(.bold))
-                Text(recommendation.confidence == .early ? "MORE SAVES NEEDED" : recommendation.confidence.displayName.uppercased())
+                Text(recommendation.confidence == .early
+                     ? String(localized: "MORE SAVES NEEDED")
+                     : recommendation.confidence.displayName.uppercased())
                     .font(.caption2.weight(.semibold))
                     .tracking(1)
                     .foregroundStyle(.white.opacity(0.55))
@@ -253,7 +255,7 @@ struct ExploreView: View {
         .padding(16)
         .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(recommendation.name), \(recommendation.country), \(recommendation.scoreLabel), \(recommendation.confidence.displayName), based on \(recommendation.matchedInterests.joined(separator: ", "))")
+        .accessibilityLabel("\(recommendation.name), \(recommendation.country), \(recommendation.scoreLabel), \(recommendation.confidence.displayName), based on \(InterestDisplayName.joined(recommendation.matchedInterests, separator: ", "))")
     }
 
     private func leadingPattern(_ pattern: InterestPattern) -> some View {
@@ -261,9 +263,9 @@ struct ExploreView: View {
             Label("Pattern", systemImage: "circle.grid.cross")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(GravitiColors.signalMint)
-            Text("\(pattern.name) keeps showing up")
+            Text("\(InterestDisplayName.localized(pattern.name)) keeps showing up")
                 .font(.custom("Sora-SemiBold", size: 22, relativeTo: .title2))
-            Text("You saved \(pattern.saveCount) items across \(pattern.areaCount) areas, including \(pattern.areaNames.prefix(2).joined(separator: " and ")).")
+            Text("You saved \(pattern.saveCount) items across \(pattern.areaCount) areas, including \(ListFormatter.localizedString(byJoining: Array(pattern.areaNames.prefix(2)))).")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.8))
             NavigationLink("See the saves behind this") {
@@ -329,7 +331,7 @@ private struct DestinationRecommendationView: View {
                     Text("Patterns")
                         .font(.headline)
                     ForEach(recommendation.matchedInterests, id: \.self) { interest in
-                        Label(interest, systemImage: "sparkles")
+                        Label(InterestDisplayName.localized(interest), systemImage: "sparkles")
                             .foregroundStyle(GravitiColors.signalMint)
                     }
                     Text("Based on \(recommendation.supportingArtifacts.count) of your saved items across the Library.")
@@ -439,7 +441,7 @@ private struct ExplorePreferencesView: View {
     private func selectionRow(_ interest: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack {
-                Text(interest)
+                Text(InterestDisplayName.localized(interest))
                     .foregroundStyle(.primary)
                 Spacer()
                 if selected {
@@ -500,7 +502,7 @@ private struct InterestEvidenceView: View {
                 SavedArtifactDetailView(artifact: artifact, library: library)
             } label: {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(artifact.place?.name ?? artifact.originalText ?? artifact.userNote ?? "Saved item")
+                    Text(artifact.place?.name ?? artifact.originalText ?? artifact.userNote ?? String(localized: "Saved item"))
                         .font(.headline)
                         .lineLimit(2)
                     if let place = artifact.place {
@@ -516,6 +518,6 @@ private struct InterestEvidenceView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(GravitiColors.appBackground)
-        .navigationTitle(interest)
+        .navigationTitle(InterestDisplayName.localized(interest))
     }
 }

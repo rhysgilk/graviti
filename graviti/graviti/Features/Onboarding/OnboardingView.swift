@@ -71,7 +71,7 @@ struct OnboardingView: View {
         .foregroundStyle(.white)
     }
 
-    private func feature(icon: String, title: String, detail: String) -> some View {
+    private func feature(icon: String, title: LocalizedStringKey, detail: LocalizedStringKey) -> some View {
         HStack(spacing: 15) {
             Image(systemName: icon)
                 .font(.title3)

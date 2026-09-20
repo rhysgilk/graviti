@@ -62,6 +62,6 @@ struct RepeatedPlacesView: View {
         artifact.originalText
             ?? artifact.userNote
             ?? artifact.sourceURL.flatMap { URLComponents(string: $0)?.host }
-            ?? "Saved item"
+            ?? String(localized: "Saved item")
     }
 }

@@ -10,7 +10,7 @@ struct DestinationLibraryDetailView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(node.name)
                         .font(.custom("Sora-SemiBold", size: 26, relativeTo: .title))
-                    Text("\(node.saveCount) saved \(node.saveCount == 1 ? "item" : "items") · \(Int(node.gravity)) Gravity")
+                    Text("\(GravitiCopy.savedItems(node.saveCount)) · \(Int(node.gravity)) Gravity")
                         .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 8)
@@ -20,7 +20,7 @@ struct DestinationLibraryDetailView: View {
                 Section("Interests") {
                     VStack(alignment: .leading, spacing: 12) {
                         if !profile.interests.isEmpty {
-                            Text(profile.interests.prefix(6).map(\.name).joined(separator: " · "))
+                            Text(InterestDisplayName.joined(profile.interests.prefix(6).map(\.name)))
                                 .font(.subheadline.weight(.medium))
                                 .foregroundStyle(.white)
                         }
@@ -144,7 +144,7 @@ private struct DestinationArtifactRow: View {
                         .font(.caption.weight(.medium))
                         .foregroundStyle(GravitiColors.signalMint)
                 } else if !artifact.effectiveInterests.isEmpty {
-                    Text(artifact.effectiveInterests.prefix(3).joined(separator: " · "))
+                    Text(InterestDisplayName.joined(artifact.effectiveInterests.prefix(3)))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)

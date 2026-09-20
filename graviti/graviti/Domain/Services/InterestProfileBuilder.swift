@@ -12,12 +12,12 @@ struct InterestPattern: Identifiable {
 
     var evidenceSummary: String {
         if areaCount > 1 {
-            return "\(saveCount) saves across \(areaCount) areas"
+            return GravitiCopy.savesAcrossAreas(saveCount, areaCount: areaCount)
         }
         if placeCount > 1 {
-            return "\(saveCount) saves at \(placeCount) places"
+            return GravitiCopy.savesAtPlaces(saveCount, placeCount: placeCount)
         }
-        return "\(saveCount) saved \(saveCount == 1 ? "item" : "items")"
+        return GravitiCopy.savedItems(saveCount)
     }
 }
 

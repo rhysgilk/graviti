@@ -240,7 +240,7 @@ struct SaveView: View {
                     do {
                         let url = try await library.importMapsLinkFile(from: fileURL)
                         importSummary = nil
-                        importMessage = "Maps link saved to Library."
+                        importMessage = String(localized: "Maps link saved to Library.")
                         await importAppleGuideIfNeeded(url)
                     } catch {
                         importSummary = nil
@@ -324,7 +324,7 @@ struct SaveView: View {
     private func importAppleGuideIfNeeded(_ url: String) async {
         guard MapLinkMetadata.provider(for: url) == .apple,
               MapLinkMetadata.isCollectionLink(url) else { return }
-        importMessage = "Importing places from Apple Maps guide…"
+        importMessage = String(localized: "Importing places from Apple Maps guide…")
         importSummary = nil
         do {
             let summary = try await library.importAppleGuidePlaces(from: url)
@@ -412,7 +412,7 @@ struct SaveView: View {
         do {
             try await removeTrackedDogfood()
             importSummary = nil
-            importMessage = "Test data removed."
+            importMessage = String(localized: "Test data removed.")
         } catch {
             importSummary = nil
             importMessage = error.localizedDescription
@@ -469,7 +469,7 @@ private enum DogfoodDatasetError: LocalizedError {
 private enum PhotoCaptureError: LocalizedError {
     case unsupported
 
-    var errorDescription: String? { "This photo couldn't be read. Try another image." }
+    var errorDescription: String? { String(localized: "This photo couldn't be read. Try another image.") }
 }
 
 private extension String {

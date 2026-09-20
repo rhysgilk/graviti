@@ -95,6 +95,6 @@ struct DestinationSelectionCard: View {
     @ViewBuilder
     private var statistics: some View {
         Label("\(Int(node.gravity)) Gravity", systemImage: "circle.dotted")
-        Label("\(node.saveCount) saved \(node.saveCount == 1 ? "item" : "items")", systemImage: "square.stack")
+        Label(GravitiCopy.savedItems(node.saveCount), systemImage: "square.stack")
     }
 }

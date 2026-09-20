@@ -43,6 +43,8 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
 - Direct bubble switching, bulk place removal confirmation, and bulk save deletion confirmation were exercised without committing destructive test actions.
 - Maximum Dynamic Type, increased contrast, right-to-left layout, expanded pseudo-localized strings, and Reduce Motion were inspected in Simulator.
+- Spanish coverage was completed for the app and Share Extension. Home, Explore, Library, canonical interest names, singular/plural counts, accessibility labels, and bulk-selection copy were inspected in Spanish without clipping.
+- An unsigned arm64 Release archive was produced with an iOS 18 minimum, both privacy manifests, non-exempt encryption disabled, exactly the two registered Sora fonts, and no dogfood CSVs.
 
 Still required before external TestFlight distribution:
 

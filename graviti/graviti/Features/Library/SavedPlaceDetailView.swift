@@ -53,7 +53,7 @@ struct SavedPlaceDetailView: View {
                         SavedArtifactDetailView(artifact: artifact, library: library)
                     } label: {
                         HStack {
-                            Text(artifact.originalText ?? "Saved link")
+                            Text(artifact.originalText ?? String(localized: "Saved link"))
                             Spacer()
                             Image(systemName: "chevron.right")
                         }

@@ -78,5 +78,5 @@ final class SwiftDataArtifactRepository: ArtifactRepository {
 private enum ArtifactRepositoryError: LocalizedError {
     case notFound
 
-    var errorDescription: String? { "This save is no longer in the Library." }
+    var errorDescription: String? { String(localized: "This save is no longer in the Library.") }
 }

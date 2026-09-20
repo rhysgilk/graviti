@@ -127,7 +127,7 @@ struct ContentView: View {
     private func importSharedArtifactsWithNotice() async {
         let count = await library.importSharedArtifacts()
         guard count > 0 else { return }
-        let notice = "Added \(count) shared \(count == 1 ? "save" : "saves") to your Library"
+        let notice = GravitiCopy.sharedImportNotice(count)
         withAnimation(.easeOut(duration: 0.25)) {
             shareImportNotice = notice
         }

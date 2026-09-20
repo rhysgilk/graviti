@@ -58,7 +58,7 @@ enum AppleMapsGuideError: LocalizedError {
     case unreadable
 
     var errorDescription: String? {
-        "This Apple Maps guide could not be read. Its link is still saved in your Library."
+        String(localized: "This Apple Maps guide could not be read. Its link is still saved in your Library.")
     }
 }
 

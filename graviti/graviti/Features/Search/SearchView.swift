@@ -35,7 +35,7 @@ struct SearchView: View {
                             } label: {
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(node.name).font(.headline)
-                                    Text("\(node.saveCount) saved \(node.saveCount == 1 ? "item" : "items") · \(Int(node.gravity)) Gravity")
+                                    Text("\(GravitiCopy.savedItems(node.saveCount)) · \(Int(node.gravity)) Gravity")
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
@@ -51,7 +51,7 @@ struct SearchView: View {
                                 SearchInterestDetailView(pattern: pattern, library: library)
                             } label: {
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text(pattern.name).font(.headline)
+                                    Text(InterestDisplayName.localized(pattern.name)).font(.headline)
                                     Text(pattern.evidenceSummary)
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
@@ -201,7 +201,7 @@ struct SearchView: View {
             return
         } catch {
             guard !Task.isCancelled else { return }
-            errorMessage = "Place search is unavailable. Your saved places are still here."
+            errorMessage = String(localized: "Place search is unavailable. Your saved places are still here.")
             isSearching = false
         }
     }
@@ -213,7 +213,7 @@ struct SearchView: View {
         do {
             try await library.savePlace(candidate)
             saveFailed = false
-            saveMessage = "Saved \(candidate.place.name) to Graviti."
+            saveMessage = String(localized: "Saved \(candidate.place.name) to Graviti.")
         } catch {
             saveFailed = true
             saveMessage = error.localizedDescription
@@ -229,7 +229,7 @@ private struct SearchInterestDetailView: View {
         List {
             Section {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(pattern.name)
+                    Text(InterestDisplayName.localized(pattern.name))
                         .font(.custom("Sora-SemiBold", size: 26, relativeTo: .title))
                     Text(pattern.evidenceSummary)
                         .foregroundStyle(.secondary)
@@ -247,7 +247,7 @@ private struct SearchInterestDetailView: View {
                         SavedArtifactDetailView(artifact: artifact, library: library)
                     } label: {
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(artifact.place?.name ?? artifact.linkMetadata?.title ?? artifact.originalText ?? "Saved item")
+                            Text(artifact.place?.name ?? artifact.linkMetadata?.title ?? artifact.originalText ?? String(localized: "Saved item"))
                                 .font(.headline)
                                 .lineLimit(2)
                             if let summary = artifact.effectiveSummary {

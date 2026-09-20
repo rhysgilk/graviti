@@ -42,8 +42,8 @@ struct SavedArtifactDetailView: View {
 
                     if MapLinkMetadata.isCollectionLink(sourceURL) {
                         Text(MapLinkMetadata.provider(for: sourceURL) == .google
-                             ? "This saves the list link. To add each place, import its Google Saved CSV from the Save tab."
-                             : "Import the places in this Apple Maps guide into your Library.")
+                             ? String(localized: "This saves the list link. To add each place, import its Google Saved CSV from the Save tab.")
+                             : String(localized: "Import the places in this Apple Maps guide into your Library."))
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.68))
 
@@ -56,9 +56,9 @@ struct SavedArtifactDetailView: View {
                                     do {
                                         let summary = try await library.importAppleGuidePlaces(from: sourceURL)
                                         let details = [
-                                            "\(summary.imported) imported",
-                                            summary.duplicates > 0 ? "\(summary.duplicates) duplicates avoided" : nil,
-                                            summary.skipped > 0 ? "\(summary.skipped) couldn’t import" : nil
+                                            GravitiCopy.imported(summary.imported),
+                                            summary.duplicates > 0 ? GravitiCopy.duplicatesAvoided(summary.duplicates) : nil,
+                                            summary.skipped > 0 ? GravitiCopy.couldNotImport(summary.skipped) : nil
                                         ].compactMap { $0 }.joined(separator: " · ")
                                         guideImportMessage = "\(summary.title): \(details)"
                                     } catch {
@@ -127,13 +127,11 @@ struct SavedArtifactDetailView: View {
                                 .foregroundStyle(GravitiColors.signalMint)
                         }
                         if !current.effectiveInterests.isEmpty {
-                            Text(current.effectiveInterests.joined(separator: " · "))
+                            Text(InterestDisplayName.joined(current.effectiveInterests))
                                 .font(.subheadline)
                                 .foregroundStyle(.white.opacity(0.8))
                         }
-                        Text(current.userDetails == nil
-                             ? "Suggested from \(current.enrichment?.source.displayName ?? "saved details")"
-                             : "Details edited by you")
+                        Text(detailsProvenance)
                             .font(.caption)
                             .foregroundStyle(.white.opacity(0.55))
                         if current.enrichment != nil {
@@ -306,20 +304,26 @@ struct SavedArtifactDetailView: View {
     }
 
     private var sourceLabel: String {
-        if current.kind == .photo { return "Photo" }
-        guard current.kind == .url else { return "Note" }
+        if current.kind == .photo { return String(localized: "Photo") }
+        guard current.kind == .url else { return String(localized: "Note") }
         if let sourceURL = current.sourceURL,
            let provider = MapLinkMetadata.provider(for: sourceURL) {
             return provider.displayName
         }
-        return "Link"
+        return String(localized: "Link")
+    }
+
+    private var detailsProvenance: String {
+        guard current.userDetails == nil else { return String(localized: "Details edited by you") }
+        let source = current.enrichment?.source.displayName ?? String(localized: "saved details")
+        return String(localized: "Suggested from \(source)")
     }
 
     private var deletionMessage: String {
         if isCollectionSave {
-            return "This removes the guide or list link. Places already imported from it remain saved."
+            return String(localized: "This removes the guide or list link. Places already imported from it remain saved.")
         }
-        return "This removes the save from your Library and updates its place and Gravity."
+        return String(localized: "This removes the save from your Library and updates its place and Gravity.")
     }
 
     private var isCollectionSave: Bool {
@@ -330,11 +334,11 @@ struct SavedArtifactDetailView: View {
     private var enrichmentStatus: (text: String, symbol: String)? {
         switch current.enrichmentState {
         case .pending, .processing:
-            return ("Learning about this save…", "sparkles")
+            return (String(localized: "Learning about this save…"), "sparkles")
         case .failed:
-            return ("Details will be tried again later.", "arrow.clockwise")
+            return (String(localized: "Details will be tried again later."), "arrow.clockwise")
         case .unavailable:
-            return ("Add a description or place to help Graviti understand this save.", "text.badge.plus")
+            return (String(localized: "Add a description or place to help Graviti understand this save."), "text.badge.plus")
         case .processed:
             return nil
         }

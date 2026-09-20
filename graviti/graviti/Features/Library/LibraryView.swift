@@ -129,7 +129,7 @@ struct LibraryView: View {
                 }
             }
             .confirmationDialog(
-                "Remove \(selectedPlaceIDs.count) selected \(selectedPlaceIDs.count == 1 ? "place" : "places")?",
+                GravitiCopy.removeSelectedPlacesQuestion(selectedPlaceIDs.count),
                 isPresented: $showingBulkRemoveConfirmation,
                 titleVisibility: .visible
             ) {
@@ -138,7 +138,7 @@ struct LibraryView: View {
                 Text("The associated saves stay in your Library and can be matched to places again later.")
             }
             .confirmationDialog(
-                "Delete \(selectedArtifactIDs.count) selected \(selectedArtifactIDs.count == 1 ? "save" : "saves")?",
+                GravitiCopy.deleteSelectedSavesQuestion(selectedArtifactIDs.count),
                 isPresented: $showingBulkDeleteConfirmation,
                 titleVisibility: .visible
             ) {
@@ -189,9 +189,11 @@ struct LibraryView: View {
             Task {
                 do {
                     let summary = try await library.restoreBackup(data)
-                    let duplicateText = summary.duplicates > 0 ? " · \(summary.duplicates) already present" : ""
                     backupStatus = LibraryBackupStatus(
-                        message: "\(summary.imported) \(summary.imported == 1 ? "save" : "saves") restored\(duplicateText)."
+                        message: GravitiCopy.restoreSummary(
+                            imported: summary.imported,
+                            duplicates: summary.duplicates
+                        )
                     )
                 } catch {
                     backupStatus = LibraryBackupStatus(message: error.localizedDescription)
@@ -242,7 +244,7 @@ struct LibraryView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Repeated places")
                         .fontWeight(.semibold)
-                    Text("\(repeatedPlaceGroups.count) \(repeatedPlaceGroups.count == 1 ? "place combines" : "places combine") multiple saves")
+                    Text(GravitiCopy.repeatedPlaces(repeatedPlaceGroups.count))
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.62))
                 }
@@ -302,7 +304,7 @@ struct LibraryView: View {
                 } label: {
                     VStack(alignment: .leading, spacing: 5) {
                         Text(node.name).font(.headline)
-                        Text("\(node.level.displayName) · \(node.saveCount) saved \(node.saveCount == 1 ? "item" : "items")")
+                        Text("\(node.level.displayName) · \(GravitiCopy.savedItems(node.saveCount))")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -378,7 +380,9 @@ struct LibraryView: View {
                 showingBulkRemoveConfirmation = true
             } label: {
                 Label(
-                    selectedPlaceIDs.isEmpty ? "Select places to remove" : "Remove \(selectedPlaceIDs.count) selected",
+                    selectedPlaceIDs.isEmpty
+                        ? String(localized: "Select places to remove")
+                        : GravitiCopy.removeSelectedPlacesLabel(selectedPlaceIDs.count),
                     systemImage: "trash"
                 )
                 .font(.subheadline.weight(.semibold))
@@ -421,7 +425,9 @@ struct LibraryView: View {
                 showingBulkDeleteConfirmation = true
             } label: {
                 Label(
-                    selectedArtifactIDs.isEmpty ? "Select saves to delete" : "Delete \(selectedArtifactIDs.count) selected",
+                    selectedArtifactIDs.isEmpty
+                        ? String(localized: "Select saves to delete")
+                        : GravitiCopy.deleteSelectedSavesLabel(selectedArtifactIDs.count),
                     systemImage: "trash"
                 )
                 .font(.subheadline.weight(.semibold))
@@ -686,16 +692,18 @@ private extension Artifact {
         case .url:
             if let title = originalText, !title.isEmpty { return title }
             if let title = linkMetadata?.title, !title.isEmpty { return title }
-            guard let source = sourceURL else { return "Saved link" }
+            guard let source = sourceURL else { return String(localized: "Saved link") }
             if MapLinkMetadata.isCollectionLink(source),
                let provider = MapLinkMetadata.provider(for: source) {
-                return provider == .apple ? "Apple Maps guide" : "Google Maps list"
+                return provider == .apple
+                    ? String(localized: "Apple Maps guide")
+                    : String(localized: "Google Maps list")
             }
             return URLComponents(string: source)?.host ?? source
         case .manual:
-            return originalText?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Saved note"
+            return originalText?.split(whereSeparator: \.isNewline).first.map(String.init) ?? String(localized: "Saved note")
         case .photo:
-            return userNote?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Saved photo"
+            return userNote?.split(whereSeparator: \.isNewline).first.map(String.init) ?? String(localized: "Saved photo")
         }
     }
 

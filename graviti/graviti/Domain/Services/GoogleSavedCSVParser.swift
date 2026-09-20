@@ -110,8 +110,8 @@ private enum CSVError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .missingHeader: "This CSV needs Title and URL columns from Google Saved."
-        case .unclosedQuote: "This CSV has an unfinished quoted field."
+        case .missingHeader: String(localized: "This CSV needs Title and URL columns from Google Saved.")
+        case .unclosedQuote: String(localized: "This CSV has an unfinished quoted field.")
         }
     }
 }

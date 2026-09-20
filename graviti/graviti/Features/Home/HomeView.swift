@@ -115,7 +115,7 @@ struct HomeView: View {
                     )
                     .transition(.opacity.combined(with: .scale(scale: 0.94)))
                     .zIndex(isFocusedPlanet ? 1 : 0)
-                    .accessibilityLabel("\(item.node.name), \(item.node.level.displayName), Gravity \(Int(item.node.gravity)), \(item.node.saveCount) saved \(item.node.saveCount == 1 ? "item" : "items")")
+                    .accessibilityLabel("\(item.node.name), \(item.node.level.displayName), Gravity \(Int(item.node.gravity)), \(GravitiCopy.savedItems(item.node.saveCount))")
                     .accessibilityHint(isSelected ? "Closes destination" : "Opens destination")
                     .accessibilityValue(isSelected ? "Selected" : (isInsightLeader ? "Leading destination" : ""))
                     .accessibilitySortPriority(item.node.gravity)

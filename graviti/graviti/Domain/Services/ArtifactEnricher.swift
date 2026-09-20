@@ -35,19 +35,26 @@ struct ArtifactEnricher {
         if let place = artifact.place,
            let type = classification?.typeName {
             let location = place.locality ?? place.country
-            let base = location.map { "\(place.name) is a \(type) in \($0)" }
-                ?? "\(place.name) is a \(type)"
-            summary = interests.isEmpty
-                ? "\(base)."
-                : "\(base), saved for \(interestPhrase(interests))."
+            let interestText = interestPhrase(interests)
+            if let location {
+                summary = interests.isEmpty
+                    ? String(localized: "\(place.name) is a \(type) in \(location).")
+                    : String(localized: "\(place.name) is a \(type) in \(location), saved for \(interestText).")
+            } else {
+                summary = interests.isEmpty
+                    ? String(localized: "\(place.name) is a \(type).")
+                    : String(localized: "\(place.name) is a \(type), saved for \(interestText).")
+            }
         } else if let place = artifact.place, !interests.isEmpty {
-            summary = "\(place.name) is saved for \(interestPhrase(interests))."
+            summary = String(localized: "\(place.name) is saved for \(interestPhrase(interests)).")
         } else if !interests.isEmpty {
-            let subject = artifact.kind == .photo ? "A saved photo" : "A saved idea"
-            summary = "\(subject) about \(interestPhrase(interests))."
+            summary = artifact.kind == .photo
+                ? String(localized: "A saved photo about \(interestPhrase(interests)).")
+                : String(localized: "A saved idea about \(interestPhrase(interests)).")
         } else if let category {
-            let subject = artifact.kind == .photo ? "A saved photo" : "A saved idea"
-            summary = "\(subject) about \(category.displayName.lowercased())."
+            summary = artifact.kind == .photo
+                ? String(localized: "A saved photo about \(category.displayName.lowercased()).")
+                : String(localized: "A saved idea about \(category.displayName.lowercased()).")
         } else {
             summary = nil
         }
@@ -78,28 +85,28 @@ struct ArtifactEnricher {
 
     private func classification(for poi: MKPointOfInterestCategory) -> (category: ExperienceCategory, typeName: String)? {
         switch poi {
-        case .restaurant: (.foodAndDrink, "restaurant")
-        case .cafe: (.foodAndDrink, "café")
-        case .bakery: (.foodAndDrink, "bakery")
-        case .foodMarket: (.foodAndDrink, "food market")
-        case .brewery: (.foodAndDrink, "brewery")
-        case .winery: (.foodAndDrink, "winery")
-        case .museum: (.artsAndCulture, "museum")
-        case .theater: (.artsAndCulture, "theater")
-        case .musicVenue: (.artsAndCulture, "music venue")
-        case .park: (.sceneryAndNature, "park")
-        case .nationalPark: (.sceneryAndNature, "national park")
-        case .beach: (.sceneryAndNature, "beach")
-        case .hiking: (.sceneryAndNature, "hiking area")
-        case .campground: (.sceneryAndNature, "campground")
-        case .landmark: (.landmarks, "landmark")
-        case .nationalMonument: (.landmarks, "monument")
-        case .castle: (.landmarks, "castle")
-        case .store: (.shopping, "shop")
-        case .hotel: (.stay, "hotel")
-        case .aquarium: (.activities, "aquarium")
-        case .zoo: (.activities, "zoo")
-        case .amusementPark: (.activities, "amusement park")
+        case .restaurant: (.foodAndDrink, String(localized: "restaurant"))
+        case .cafe: (.foodAndDrink, String(localized: "café"))
+        case .bakery: (.foodAndDrink, String(localized: "bakery"))
+        case .foodMarket: (.foodAndDrink, String(localized: "food market"))
+        case .brewery: (.foodAndDrink, String(localized: "brewery"))
+        case .winery: (.foodAndDrink, String(localized: "winery"))
+        case .museum: (.artsAndCulture, String(localized: "museum"))
+        case .theater: (.artsAndCulture, String(localized: "theater"))
+        case .musicVenue: (.artsAndCulture, String(localized: "music venue"))
+        case .park: (.sceneryAndNature, String(localized: "park"))
+        case .nationalPark: (.sceneryAndNature, String(localized: "national park"))
+        case .beach: (.sceneryAndNature, String(localized: "beach"))
+        case .hiking: (.sceneryAndNature, String(localized: "hiking area"))
+        case .campground: (.sceneryAndNature, String(localized: "campground"))
+        case .landmark: (.landmarks, String(localized: "landmark"))
+        case .nationalMonument: (.landmarks, String(localized: "monument"))
+        case .castle: (.landmarks, String(localized: "castle"))
+        case .store: (.shopping, String(localized: "shop"))
+        case .hotel: (.stay, String(localized: "hotel"))
+        case .aquarium: (.activities, String(localized: "aquarium"))
+        case .zoo: (.activities, String(localized: "zoo"))
+        case .amusementPark: (.activities, String(localized: "amusement park"))
         default: nil
         }
     }
@@ -152,13 +159,12 @@ struct ArtifactEnricher {
     }
 
     private func interestPhrase(_ interests: [String]) -> String {
-        let values = interests.prefix(3).map { $0.lowercased() }
-        switch values.count {
-        case 0: return "this place"
-        case 1: return values[0]
-        case 2: return "\(values[0]) and \(values[1])"
-        default: return "\(values[0]), \(values[1]), and \(values[2])"
+        var values: [String] = []
+        for interest in interests.prefix(3) {
+            values.append(InterestDisplayName.localized(interest).lowercased())
         }
+        guard !values.isEmpty else { return String(localized: "this place") }
+        return ListFormatter.localizedString(byJoining: values)
     }
 
     private func positiveWords(_ text: String) -> Set<String> {
