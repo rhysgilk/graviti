@@ -59,6 +59,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 ### Now
 
 - [x] Add multi-select to Library > Places with a bulk remove action. Preserve source saves and return them to place review.
+- [x] Add multi-select to Library > Saves with an atomic bulk delete action and a destructive confirmation.
 - [x] Replace the saturating Fit equation with weighted destination traits, evidence diversity, duplicate discounting, confidence bands, and conservative score shrinkage.
 - [x] Add an XCTest target and deterministic `DestinationFitEngine` fixtures for sparse evidence, semantic specificity, duplicate discounting, and avoid rules.
 - [x] Extend deterministic XCTest coverage to `InterestProfileBuilder`, `DestinationOrbitBuilder`, `OrbitLayoutEngine`, and import parsers.
@@ -76,6 +77,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Make the local-only data promise visible during onboarding and from Library Actions, including network and backup behavior.
 - [x] Lower the minimum deployment target to iOS 18 and isolate iOS 26 MapKit address APIs behind a compatibility adapter.
 - [x] Keep dogfood datasets and unused font weights out of Release archives while preserving the dataset switcher in Debug builds.
+- [x] Add a production app icon with standard, dark, and tinted appearances, plus the branded system accent color.
 
 ### MVP decision gate
 

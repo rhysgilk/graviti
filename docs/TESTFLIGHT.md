@@ -40,6 +40,7 @@ This beta stores its Library on the device. Graviti does not require an account 
 - Confirm both bundles contain `PrivacyInfo.xcprivacy`.
 - Confirm `ITSAppUsesNonExemptEncryption` is `false` in the app bundle.
 - Confirm the archive contains no dogfood CSVs and only the registered Sora font weights.
+- Confirm the production app icon appears correctly in standard, dark, and tinted Home Screen appearances.
 - Supply the beta description, feedback email, review contact, and What to Test text.
 - Publish `docs/PRIVACY.md` at a stable URL and enter it as the privacy policy URL.
 - Answer App Privacy with **No, we do not collect data from this app** while the implementation remains local-only and contains no telemetry SDK.
