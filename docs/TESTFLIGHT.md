@@ -38,7 +38,7 @@ This beta stores its Library on the device. Graviti does not require an account 
 
 Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 62 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing and migration, Fit scoring, persistence, backup restore, offline save preservation and recovery, safe map URL generation, and deterministic ten-destination Gravity Field layout.
+- All 66 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing and migration, Fit scoring, Fit Guide grouping and persistence, backup restore, offline save preservation and recovery, safe map URL generation, and deterministic ten-destination Gravity Field layout.
 - Clean signed Debug and Release archive builds completed. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
@@ -53,6 +53,7 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - A saved Apple Maps guide or Google Maps list can retry or refresh its places directly from Saved Item detail. The real collection title replaces the generic Maps label. Upgraded Google lookup hints survived force quit and relaunch; the next import reported only duplicates and no redundant refreshes.
 - Transient map lookup failures retry automatically when processing resumes, while the original save remains visible throughout.
 - Home's white and yellow stars remain behind the Gravity Field, ignore input, and pulse gently; Reduce Motion keeps them static. The small Graviti wordmark animates both colored i dots.
+- A New York Fit recommendation produced live Apple Maps suggestions grouped under Matcha, Tea, Museums, and Coffee. Saving Matcha 108 added it to a persistent New York City Fit Guide, which reopened from Explore with the saved place intact.
 - Library and Search use Sora for navigation, tabs, segmented controls, search fields, and screen content.
 - Saturated Gravity ties now prefer destinations with more saved items before falling back to a stable name order, so a smaller destination cannot displace stronger evidence merely because both scores reached 100.
 - Maximum Dynamic Type, increased contrast, right-to-left layout, expanded pseudo-localized strings, and Reduce Motion were inspected in Simulator.
