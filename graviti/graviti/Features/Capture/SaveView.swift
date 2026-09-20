@@ -301,12 +301,18 @@ struct SaveView: View {
             case .url:
                 let url = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
                 savedURL = url
-                try await library.save(Artifact(
-                    kind: .url,
-                    sourceURL: url,
-                    originalText: MapLinkMetadata.placeName(from: url),
-                    userNote: optionalNote.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
-                ))
+                let note = optionalNote.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+                let collectionAlreadySaved = note == nil && library.artifacts.contains {
+                    $0.sourceURL == url && ArtifactProcessingCoordinator.isResolvedMapCollection($0)
+                }
+                if !collectionAlreadySaved {
+                    try await library.save(Artifact(
+                        kind: .url,
+                        sourceURL: url,
+                        originalText: MapLinkMetadata.placeName(from: url),
+                        userNote: note
+                    ))
+                }
             case .manual:
                 try await library.save(Artifact(
                     kind: .manual,
@@ -369,9 +375,10 @@ struct SaveView: View {
                 importSummary = SaveImportSummary(
                     title: summary.title,
                     imported: summary.imported,
+                    refreshed: summary.refreshed,
                     duplicates: summary.duplicates,
                     skipped: summary.skipped,
-                    processingContinues: summary.imported > 0
+                    processingContinues: summary.imported + summary.refreshed > 0
                 )
             } catch GoogleMapsListError.notAList {
                 importMessage = nil

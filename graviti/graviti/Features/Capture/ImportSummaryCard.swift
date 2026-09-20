@@ -30,6 +30,7 @@ struct ImportSummaryCard: View {
     @ViewBuilder
     private var metrics: some View {
         metric(summary.imported, label: "imported")
+        if summary.refreshed > 0 { metric(summary.refreshed, label: "place details refreshed") }
         if summary.countries > 0 { metric(summary.countries, label: "countries") }
         if summary.cities > 0 { metric(summary.cities, label: "cities") }
         if summary.duplicates > 0 { metric(summary.duplicates, label: "duplicates avoided") }
@@ -47,6 +48,7 @@ struct ImportSummaryCard: View {
 struct SaveImportSummary {
     let title: String
     let imported: Int
+    var refreshed = 0
     var duplicates = 0
     var skipped = 0
     var countries = 0

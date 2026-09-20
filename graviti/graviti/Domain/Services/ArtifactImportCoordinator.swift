@@ -22,6 +22,7 @@ struct AppleGuideImportPlan {
 struct GoogleMapsListImportPlan {
     let title: String
     let artifacts: [Artifact]
+    let updatedArtifacts: [Artifact]
     let duplicates: Int
     let skipped: Int
 }
@@ -127,13 +128,25 @@ enum ArtifactImportCoordinator {
         _ list: GoogleMapsList,
         existingArtifacts: [Artifact]
     ) -> GoogleMapsListImportPlan {
-        var existingURLs = Set(existingArtifacts.compactMap(\.sourceURL).map(GoogleMapsListPlace.importIdentity(for:)))
+        var existingByIdentity = [String: Artifact]()
+        for artifact in existingArtifacts {
+            guard let sourceURL = artifact.sourceURL else { continue }
+            existingByIdentity[GoogleMapsListPlace.importIdentity(for: sourceURL)] = artifact
+        }
+        var seenURLs = Set(existingByIdentity.keys)
         var additions = [Artifact]()
+        var updates = [Artifact]()
         var duplicates = 0
 
         for place in list.places {
-            guard existingURLs.insert(place.importIdentity).inserted else {
+            guard seenURLs.insert(place.importIdentity).inserted else {
                 duplicates += 1
+                if let existing = existingByIdentity[place.importIdentity],
+                   existing.sourceURL != place.sourceURL,
+                   existing.place == nil,
+                   [.saved, .needsReview, .failed].contains(existing.processingState) {
+                    updates.append(existing.withSourceURL(place.sourceURL, processingState: .saved))
+                }
                 continue
             }
             additions.append(Artifact(
@@ -147,6 +160,7 @@ enum ArtifactImportCoordinator {
         return GoogleMapsListImportPlan(
             title: list.title,
             artifacts: additions,
+            updatedArtifacts: updates,
             duplicates: duplicates,
             skipped: 0
         )

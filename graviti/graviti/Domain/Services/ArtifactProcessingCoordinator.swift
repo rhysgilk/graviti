@@ -17,6 +17,11 @@ final class ArtifactProcessingCoordinator {
             artifact.sourceURL.map { MapLinkMetadata.provider(for: $0) != nil } == true
     }
 
+    static func isResolvedMapCollection(_ artifact: Artifact) -> Bool {
+        artifact.processingState == .processed && artifact.place == nil &&
+            artifact.sourceURL.map { MapLinkMetadata.provider(for: $0) != nil } == true
+    }
+
     static func shouldEnrich(_ artifact: Artifact) -> Bool {
         artifact.enrichment == nil &&
             [.pending, .processing, .failed].contains(artifact.enrichmentState) &&

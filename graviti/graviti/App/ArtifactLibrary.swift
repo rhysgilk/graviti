@@ -449,9 +449,16 @@ final class ArtifactLibrary: ObservableObject {
     func importGoogleMapsListPlaces(from rawURL: String) async throws -> GoogleMapsListImportSummary {
         let plan = try await ArtifactImportCoordinator.googleMapsList(rawURL, existingArtifacts: artifacts)
 
+        if !plan.updatedArtifacts.isEmpty {
+            try await repository.updateMany(plan.updatedArtifacts)
+            let replacements = Dictionary(uniqueKeysWithValues: plan.updatedArtifacts.map { ($0.id, $0) })
+            artifacts = artifacts.map { replacements[$0.id] ?? $0 }
+        }
         if !plan.artifacts.isEmpty {
             try await repository.saveMany(plan.artifacts)
             artifacts.insert(contentsOf: plan.artifacts, at: 0)
+        }
+        if !plan.artifacts.isEmpty || !plan.updatedArtifacts.isEmpty {
             Task {
                 await processPendingMaps()
                 await processPendingEnrichment()
@@ -460,6 +467,7 @@ final class ArtifactLibrary: ObservableObject {
         return GoogleMapsListImportSummary(
             title: plan.title,
             imported: plan.artifacts.count,
+            refreshed: plan.updatedArtifacts.count,
             duplicates: plan.duplicates,
             skipped: plan.skipped
         )
@@ -485,6 +493,7 @@ struct CSVImportSummary {
 struct GoogleMapsListImportSummary {
     let title: String
     let imported: Int
+    let refreshed: Int
     let duplicates: Int
     let skipped: Int
 }

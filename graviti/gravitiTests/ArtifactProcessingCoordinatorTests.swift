@@ -50,5 +50,9 @@ final class ArtifactProcessingCoordinatorTests: XCTestCase {
         )
 
         XCTAssertFalse(ArtifactProcessingCoordinator.shouldEnrich(artifact))
+        XCTAssertFalse(ArtifactProcessingCoordinator.isResolvedMapCollection(artifact))
+        XCTAssertTrue(ArtifactProcessingCoordinator.isResolvedMapCollection(
+            artifact.withResolution(place: nil, state: .processed)
+        ))
     }
 }

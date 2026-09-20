@@ -72,6 +72,48 @@ final class ArtifactImportCoordinatorTests: XCTestCase {
         XCTAssertEqual(plan.artifacts.count, 1)
         XCTAssertEqual(plan.artifacts.first?.originalText, "New place")
         XCTAssertEqual(plan.artifacts.first?.userNote, "Scenic roof")
+        XCTAssertEqual(plan.updatedArtifacts.count, 1)
+        XCTAssertEqual(plan.updatedArtifacts.first?.id, existing.id)
+        XCTAssertEqual(plan.updatedArtifacts.first?.sourceURL, existingPlace.sourceURL)
+        XCTAssertEqual(plan.updatedArtifacts.first?.processingState, .saved)
         XCTAssertEqual(existingPlace.importIdentity, legacyComponents.url?.absoluteString)
+    }
+
+    func testGoogleMapsListDoesNotRefreshAUserMatchedPlace() throws {
+        let place = GoogleMapsListPlace(
+            title: "Tea House",
+            address: "1 Main St",
+            note: nil,
+            latitude: 1,
+            longitude: 2,
+            featureIdentifiers: ["1", "2"]
+        )
+        var legacyComponents = try XCTUnwrap(URLComponents(string: place.sourceURL))
+        legacyComponents.queryItems = nil
+        let matchedPlace = SavedPlace(
+            id: "user-match",
+            name: "Tea House",
+            latitude: 1,
+            longitude: 2,
+            locality: "Boston",
+            region: "Massachusetts",
+            country: "United States"
+        )
+        let existing = Artifact(
+            kind: .url,
+            sourceURL: legacyComponents.url?.absoluteString,
+            originalText: place.title,
+            place: matchedPlace,
+            processingState: .processed
+        )
+
+        let plan = ArtifactImportCoordinator.googleMapsList(
+            GoogleMapsList(title: "Shared list", places: [place]),
+            existingArtifacts: [existing]
+        )
+
+        XCTAssertEqual(plan.duplicates, 1)
+        XCTAssertTrue(plan.artifacts.isEmpty)
+        XCTAssertTrue(plan.updatedArtifacts.isEmpty)
     }
 }
