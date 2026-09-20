@@ -1668,6 +1668,16 @@
         }
       }
     },
+    "GitHub support requests are public. Do not include private or sensitive information." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las solicitudes de ayuda en GitHub son públicas. No incluyas información privada ni sensible."
+          }
+        }
+      }
+    },
     "Google Maps import complete" : {
       "localizations" : {
         "es" : {
@@ -3757,6 +3767,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usar detalles sugeridos"
+          }
+        }
+      }
+    },
+    "Version %@ (%@)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión %1$@ (%2$@)"
           }
         }
       }

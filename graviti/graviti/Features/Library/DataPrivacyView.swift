@@ -52,6 +52,15 @@ struct DataPrivacyView: View {
                             }
                         }
                     }
+
+                    Text("GitHub support requests are public. Do not include private or sensitive information.")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.62))
+
+                    Text("Version \(appVersion) (\(buildNumber))")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.5))
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(20)
@@ -99,6 +108,14 @@ struct DataPrivacyView: View {
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity, minHeight: 50, alignment: .leading)
         .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+    }
+
+    private var buildNumber: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
     }
 }
 
