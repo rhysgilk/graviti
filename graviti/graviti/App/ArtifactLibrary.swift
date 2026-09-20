@@ -1,7 +1,6 @@
 import Foundation
 import SwiftUI
 import Combine
-import MapKit
 
 @MainActor
 final class ArtifactLibrary: ObservableObject {
@@ -420,45 +419,19 @@ final class ArtifactLibrary: ObservableObject {
     }
 
     func importGoogleSavedCSV(_ text: String) async throws -> CSVImportSummary {
-        let parsed = try GoogleSavedCSVParser.parse(text)
+        let plan = try ArtifactImportCoordinator.googleCSV(text, existingArtifacts: artifacts)
 
-        struct ImportKey: Hashable {
-            let url: String
-            let title: String
-            let note: String?
-        }
-        var seen = Set(artifacts.compactMap { artifact -> ImportKey? in
-            guard let url = artifact.sourceURL,
-                  let title = artifact.originalText else { return nil }
-            return ImportKey(url: url, title: title, note: artifact.userNote)
-        })
-        var newArtifacts: [Artifact] = []
-        var duplicateCount = 0
-        for row in parsed.rows {
-            let key = ImportKey(url: row.url, title: row.title, note: row.note)
-            guard seen.insert(key).inserted else {
-                duplicateCount += 1
-                continue
-            }
-            newArtifacts.append(Artifact(
-                kind: .url,
-                sourceURL: row.url,
-                originalText: row.title,
-                userNote: row.note
-            ))
-        }
-
-        if !newArtifacts.isEmpty {
-            try await repository.saveMany(newArtifacts)
-            artifacts.insert(contentsOf: newArtifacts, at: 0)
+        if !plan.artifacts.isEmpty {
+            try await repository.saveMany(plan.artifacts)
+            artifacts.insert(contentsOf: plan.artifacts, at: 0)
             Task { await processPendingMaps() }
             await processPendingEnrichment()
         }
         return CSVImportSummary(
-            imported: newArtifacts.count,
-            duplicates: duplicateCount,
-            skipped: parsed.skippedRows,
-            importedIDs: newArtifacts.map(\.id)
+            imported: plan.artifacts.count,
+            duplicates: plan.duplicates,
+            skipped: plan.skipped,
+            importedIDs: plan.artifacts.map(\.id)
         )
     }
 
@@ -466,84 +439,30 @@ final class ArtifactLibrary: ObservableObject {
         let hasAccess = fileURL.startAccessingSecurityScopedResource()
         defer { if hasAccess { fileURL.stopAccessingSecurityScopedResource() } }
 
-        let data = try Data(contentsOf: fileURL)
-        guard let plist = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
-              let rawURL = plist["URL"] as? String,
-              let url = URLComponents(string: rawURL),
-              ["http", "https"].contains(url.scheme?.lowercased() ?? ""),
-              MapLinkMetadata.provider(for: rawURL) != nil else {
-            throw MapsLinkFileError.invalidFile
+        let plan = try ArtifactImportCoordinator.mapsLinkFile(
+            Data(contentsOf: fileURL), existingArtifacts: artifacts
+        )
+        if let artifact = plan.artifact {
+            try await save(artifact)
         }
-
-        if artifacts.contains(where: { $0.sourceURL == rawURL }) {
-            return rawURL
-        }
-        try await save(Artifact(
-            kind: .url,
-            sourceURL: rawURL,
-            originalText: MapLinkMetadata.placeName(from: rawURL)
-        ))
-        return rawURL
+        return plan.rawURL
     }
 
     func importAppleGuidePlaces(from rawURL: String) async throws -> AppleGuideImportSummary {
-        let expanded = await URLSessionMapLinkExpander().expandedURL(for: rawURL)
-        let guide = try AppleMapsGuideParser.parse(expanded)
-        var existingURLs = Set(artifacts.compactMap(\.sourceURL))
-        var additions: [Artifact] = []
-        var duplicates = 0
-        var failed = 0
+        let plan = try await ArtifactImportCoordinator.appleGuide(rawURL, existingArtifacts: artifacts)
 
-        for rawIdentifier in guide.placeIdentifiers {
-            let placeURL = "https://maps.apple.com/place?place-id=\(rawIdentifier)"
-            guard existingURLs.insert(placeURL).inserted else {
-                duplicates += 1
-                continue
-            }
-            guard let identifier = MKMapItem.Identifier(rawValue: rawIdentifier) else {
-                failed += 1
-                continue
-            }
-            do {
-                let item = try await MKMapItemRequest(mapItemIdentifier: identifier).mapItem
-                guard let name = item.name, !name.isEmpty else {
-                    failed += 1
-                    continue
-                }
-                let coordinate = item.location.coordinate
-                let place = SavedPlace(
-                    id: item.identifier?.rawValue ?? rawIdentifier,
-                    name: name,
-                    latitude: coordinate.latitude,
-                    longitude: coordinate.longitude,
-                    locality: item.addressRepresentations?.cityName,
-                    region: nil,
-                    country: item.addressRepresentations?.regionName
-                )
-                additions.append(Artifact(
-                    kind: .url,
-                    sourceURL: placeURL,
-                    originalText: name,
-                    place: place,
-                    processingState: .processed
-                ))
-            } catch {
-                failed += 1
-            }
-        }
-
-        if !additions.isEmpty {
-            try await repository.saveMany(additions)
-            artifacts.insert(contentsOf: additions, at: 0)
+        if !plan.artifacts.isEmpty {
+            try await repository.saveMany(plan.artifacts)
+            artifacts.insert(contentsOf: plan.artifacts, at: 0)
             await processPendingEnrichment()
         }
         return AppleGuideImportSummary(
-            title: guide.title,
-            imported: additions.count,
-            duplicates: duplicates,
-            skipped: failed,
-            countries: Set(additions.compactMap { $0.place?.country }).count,
-            cities: Set(additions.compactMap { $0.place?.locality }).count
+            title: plan.title,
+            imported: plan.artifacts.count,
+            duplicates: plan.duplicates,
+            skipped: plan.skipped,
+            countries: Set(plan.artifacts.compactMap { $0.place?.country }).count,
+            cities: Set(plan.artifacts.compactMap { $0.place?.locality }).count
         )
     }
 }
@@ -562,20 +481,4 @@ struct CSVImportSummary {
     let duplicates: Int
     let skipped: Int
     let importedIDs: [UUID]
-}
-
-private enum CSVImportError: LocalizedError {
-    case invalidEncoding
-
-    var errorDescription: String? { "This CSV isn't UTF-8 text." }
-}
-
-private enum MapsLinkFileError: LocalizedError {
-    case invalidFile
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidFile: "This file doesn't contain an Apple Maps or Google Maps link."
-        }
-    }
 }
