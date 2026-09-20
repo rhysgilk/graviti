@@ -54,6 +54,12 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Resources/Fonts/Sora-Bold.ttf,
+				Resources/Fonts/Sora-ExtraBold.ttf,
+				Resources/Fonts/Sora-ExtraLight.ttf,
+				Resources/Fonts/Sora-Light.ttf,
+				Resources/Fonts/Sora-Medium.ttf,
+				Resources/Fonts/Sora-Thin.ttf,
 			);
 			target = 4076AAA3305CBC1700E032E4 /* graviti */;
 		};
@@ -480,6 +486,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V9W8HRDJQT;
 				ENABLE_PREVIEWS = YES;
+				EXCLUDED_SOURCE_FILE_NAMES = "Resources/Dogfood/*";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = graviti/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
