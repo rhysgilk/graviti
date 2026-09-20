@@ -8,12 +8,17 @@ struct LibrarySearchResults {
 }
 
 enum LibrarySearchEngine {
-    static func search(_ query: String, in artifacts: [Artifact], limit: Int = 20) -> LibrarySearchResults {
+    static func search(
+        _ query: String,
+        in artifacts: [Artifact],
+        limit: Int = 20,
+        locale: Locale? = nil
+    ) -> LibrarySearchResults {
         let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !term.isEmpty else { return LibrarySearchResults(artifacts: [], destinations: [], interests: [], places: []) }
 
         let artifactMatches = Array(artifacts.filter {
-            searchText(for: $0).localizedCaseInsensitiveContains(term)
+            searchText(for: $0, locale: locale).localizedCaseInsensitiveContains(term)
         }.prefix(limit))
         let destinations = Array(DestinationOrbitBuilder.nodes(from: artifacts, mode: .automatic, limit: nil)
             .filter { $0.name.localizedCaseInsensitiveContains(term) }
@@ -21,6 +26,7 @@ enum LibrarySearchEngine {
         let interests = Array(InterestProfileBuilder.build(from: artifacts).interests
             .filter { pattern in
                 pattern.name.localizedCaseInsensitiveContains(term) ||
+                    InterestDisplayName.localized(pattern.name, locale: locale).localizedCaseInsensitiveContains(term) ||
                     pattern.areaNames.contains { $0.localizedCaseInsensitiveContains(term) }
             }
             .prefix(limit))
@@ -37,10 +43,12 @@ enum LibrarySearchEngine {
         if let metadataTitle = artifact.linkMetadata?.title { return metadataTitle }
         if let note = firstLine(of: artifact.userNote) { return note }
         if let placeName = artifact.place?.name { return placeName }
-        return artifact.kind == .photo ? "Saved photo" : "Saved item"
+        return artifact.kind == .photo
+            ? String(localized: "Saved photo")
+            : String(localized: "Saved item")
     }
 
-    private static func searchText(for artifact: Artifact) -> String {
+    private static func searchText(for artifact: Artifact, locale: Locale?) -> String {
         var parts = [String]()
         parts.append(title(for: artifact))
         append(artifact.sourceURL, to: &parts)
@@ -51,6 +59,7 @@ enum LibrarySearchEngine {
         append(artifact.effectiveSummary, to: &parts)
         append(artifact.effectiveCategory?.displayName, to: &parts)
         parts.append(artifact.effectiveInterests.joined(separator: " "))
+        parts.append(InterestDisplayName.joined(artifact.effectiveInterests, separator: " ", locale: locale))
         append(artifact.place?.name, to: &parts)
         append(artifact.place?.subtitle, to: &parts)
         return parts.joined(separator: " ")

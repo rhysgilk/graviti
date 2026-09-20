@@ -32,6 +32,14 @@ final class LibrarySearchEngineTests: XCTestCase {
         XCTAssertEqual(forest.artifacts.map(\.id), [artifact.id])
         XCTAssertEqual(forest.interests.map(\.name), ["Forests"])
 
+        let spanishForest = LibrarySearchEngine.search(
+            "bosques",
+            in: [artifact],
+            locale: Locale(identifier: "es")
+        )
+        XCTAssertEqual(spanishForest.artifacts.map(\.id), [artifact.id])
+        XCTAssertEqual(spanishForest.interests.map(\.name), ["Forests"])
+
         let burlington = LibrarySearchEngine.search("Burlington", in: [artifact])
         XCTAssertEqual(burlington.destinations.map(\.name), ["Burlington"])
         XCTAssertEqual(burlington.places.map(\.id), [place.id])

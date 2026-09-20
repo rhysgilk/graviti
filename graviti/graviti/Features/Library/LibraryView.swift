@@ -719,6 +719,7 @@ private extension Artifact {
             effectiveSummary,
             effectiveCategory?.displayName,
             effectiveInterests.joined(separator: " "),
+            InterestDisplayName.joined(effectiveInterests, separator: " "),
             place?.name,
             place?.locality,
             place?.region,
