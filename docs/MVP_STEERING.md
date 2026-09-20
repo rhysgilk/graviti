@@ -85,6 +85,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Remove stray document title lines and expand the README with setup, architecture, testing, and current MVP status.
 - [ ] Add current product screenshots to the README before the public repository or external beta announcement.
 - [x] Extract import, processing, and enrichment coordinators incrementally. Keep `ArtifactLibrary` as the observable facade instead of adding every workflow to it.
+- [x] Add privacy manifests, export-compliance metadata, a local-only privacy policy draft, and TestFlight beta guidance before producing an external build.
 
 ## Scope guardrail
 

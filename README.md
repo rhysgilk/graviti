@@ -21,7 +21,7 @@ Graviti is a private iOS travel-interest library. Save a place, link, note, scre
 - Accessibility, Reduce Motion support, and localization infrastructure
 - Focused dogfood datasets for scenery, culture, food, water, and mixed interests
 
-Graviti remains under active MVP development. See [Product Specification](docs/PRODUCT_SPEC.md), [Architecture](docs/ARCHITECTURE.md), [Data Model](docs/DATA_MODEL.md), and [MVP Steering](docs/MVP_STEERING.md).
+Graviti remains under active MVP development. See [Product Specification](docs/PRODUCT_SPEC.md), [Architecture](docs/ARCHITECTURE.md), [Data Model](docs/DATA_MODEL.md), [MVP Steering](docs/MVP_STEERING.md), [Privacy](docs/PRIVACY.md), and [TestFlight Preparation](docs/TESTFLIGHT.md).
 
 ## Project structure
 
