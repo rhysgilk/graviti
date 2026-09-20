@@ -88,8 +88,14 @@ final class ArtifactLibrary: ObservableObject {
     }
 
     func removePlaceFromLibrary(_ placeID: String) async throws {
+        try await removePlacesFromLibrary([placeID])
+    }
+
+    func removePlacesFromLibrary(_ placeIDs: Set<String>) async throws {
         let changed = artifacts
-            .filter { $0.place?.id == placeID }
+            .filter { artifact in
+                artifact.place.map { placeIDs.contains($0.id) } ?? false
+            }
             .map { $0.withResolution(place: nil, state: .needsReview) }
         guard !changed.isEmpty else { return }
         try await repository.updateMany(changed)

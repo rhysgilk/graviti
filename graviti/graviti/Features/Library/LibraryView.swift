@@ -7,6 +7,11 @@ struct LibraryView: View {
     @State private var selectedMapPlace: SavedPlace?
     @State private var query = ""
     @State private var showsNeedsReviewOnly = false
+    @State private var isSelectingPlaces = false
+    @State private var selectedPlaceIDs: Set<String> = []
+    @State private var showingBulkRemoveConfirmation = false
+    @State private var isRemovingPlaces = false
+    @State private var placeActionError: String?
 
     var body: some View {
         NavigationStack {
@@ -15,6 +20,10 @@ struct LibraryView: View {
 
                 if needsReviewCount > 0 || showsNeedsReviewOnly {
                     reviewFilter
+                }
+
+                if !repeatedPlaceGroups.isEmpty {
+                    repeatedPlacesLink
                 }
 
                 Group {
@@ -33,6 +42,16 @@ struct LibraryView: View {
             }
             .background(GravitiColors.appBackground)
             .navigationTitle("Library")
+            .toolbar {
+                if mode == .places, !savedPlaces.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(isSelectingPlaces ? "Done" : "Select") {
+                            isSelectingPlaces.toggle()
+                            if !isSelectingPlaces { selectedPlaceIDs.removeAll() }
+                        }
+                    }
+                }
+            }
             .searchable(text: $query, prompt: "Places, interests, and saves")
             .onChange(of: query) { _, _ in
                 if let selectedMapPlace, !savedPlaces.contains(where: { $0.id == selectedMapPlace.id }) {
@@ -41,6 +60,26 @@ struct LibraryView: View {
             }
             .onChange(of: needsReviewCount) { _, count in
                 if count == 0 { showsNeedsReviewOnly = false }
+            }
+            .onChange(of: mode) { _, newMode in
+                if newMode != .places {
+                    isSelectingPlaces = false
+                    selectedPlaceIDs.removeAll()
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                if mode == .places, isSelectingPlaces {
+                    bulkPlaceActions
+                }
+            }
+            .confirmationDialog(
+                "Remove \(selectedPlaceIDs.count) selected \(selectedPlaceIDs.count == 1 ? "place" : "places")?",
+                isPresented: $showingBulkRemoveConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Remove places", role: .destructive) { removeSelectedPlaces() }
+            } message: {
+                Text("The associated saves stay in your Library and can be matched to places again later.")
             }
         }
     }
@@ -74,6 +113,33 @@ struct LibraryView: View {
         .padding(.horizontal, 20)
         .padding(.bottom, 8)
         .accessibilityValue(showsNeedsReviewOnly ? "Showing only items that need review" : "")
+    }
+
+    private var repeatedPlacesLink: some View {
+        NavigationLink {
+            RepeatedPlacesView(groups: repeatedPlaceGroups, library: library)
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "square.on.square")
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Repeated places")
+                        .fontWeight(.semibold)
+                    Text("\(repeatedPlaceGroups.count) \(repeatedPlaceGroups.count == 1 ? "place combines" : "places combine") multiple saves")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.62))
+                }
+                Spacer()
+                Image(systemName: "chevron.forward")
+            }
+            .font(.subheadline)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 58)
+            .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 20)
+        .padding(.bottom, 8)
     }
 
     private var modePicker: some View {
@@ -141,19 +207,88 @@ struct LibraryView: View {
             }
         } else {
             List(savedPlaces) { place in
-                NavigationLink {
-                    SavedPlaceDetailView(place: place, library: library)
-                } label: {
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(place.name).font(.headline)
-                        Text(place.subtitle).font(.subheadline).foregroundStyle(.secondary)
+                Group {
+                    if isSelectingPlaces {
+                        Button {
+                            if selectedPlaceIDs.contains(place.id) {
+                                selectedPlaceIDs.remove(place.id)
+                            } else {
+                                selectedPlaceIDs.insert(place.id)
+                            }
+                        } label: {
+                            HStack(spacing: 14) {
+                                Image(systemName: selectedPlaceIDs.contains(place.id) ? "checkmark.circle.fill" : "circle")
+                                    .font(.title3)
+                                    .foregroundStyle(selectedPlaceIDs.contains(place.id) ? GravitiColors.signalMint : .secondary)
+                                placeLabel(place)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityValue(selectedPlaceIDs.contains(place.id) ? "Selected" : "Not selected")
+                    } else {
+                        NavigationLink {
+                            SavedPlaceDetailView(place: place, library: library)
+                        } label: {
+                            placeLabel(place)
+                        }
                     }
-                    .padding(.vertical, 6)
                 }
                 .listRowBackground(GravitiColors.deepInk)
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
+        }
+    }
+
+    private func placeLabel(_ place: SavedPlace) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(place.name).font(.headline)
+            Text(place.subtitle).font(.subheadline).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 6)
+    }
+
+    private var bulkPlaceActions: some View {
+        VStack(spacing: 8) {
+            if let placeActionError {
+                Text(placeActionError)
+                    .font(.caption)
+                    .foregroundStyle(GravitiColors.opportunityCoral)
+            }
+            Button(role: .destructive) {
+                showingBulkRemoveConfirmation = true
+            } label: {
+                Label(
+                    selectedPlaceIDs.isEmpty ? "Select places to remove" : "Remove \(selectedPlaceIDs.count) selected",
+                    systemImage: "trash"
+                )
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 48)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(GravitiColors.opportunityCoral)
+            .disabled(selectedPlaceIDs.isEmpty || isRemovingPlaces)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial)
+    }
+
+    private func removeSelectedPlaces() {
+        let ids = selectedPlaceIDs
+        guard !ids.isEmpty else { return }
+        isRemovingPlaces = true
+        placeActionError = nil
+        Task {
+            do {
+                try await library.removePlacesFromLibrary(ids)
+                selectedPlaceIDs.removeAll()
+                isSelectingPlaces = false
+            } catch {
+                placeActionError = error.localizedDescription
+            }
+            isRemovingPlaces = false
         }
     }
 
@@ -202,6 +337,24 @@ struct LibraryView: View {
 
     private var needsReviewCount: Int {
         library.artifacts.lazy.filter(\.needsPlaceReview).count
+    }
+
+    private var repeatedPlaceGroups: [RepeatedPlaceGroup] {
+        Dictionary(grouping: library.artifacts.compactMap { artifact -> (SavedPlace, Artifact)? in
+            artifact.place.map { ($0, artifact) }
+        }, by: { $0.0.id })
+        .values
+        .compactMap { values in
+            guard let place = values.first?.0, values.count > 1 else { return nil }
+            return RepeatedPlaceGroup(
+                place: place,
+                artifacts: values.map(\.1).sorted { $0.capturedAt > $1.capturedAt }
+            )
+        }
+        .sorted {
+            if $0.artifacts.count != $1.artifacts.count { return $0.artifacts.count > $1.artifacts.count }
+            return $0.place.name.localizedCaseInsensitiveCompare($1.place.name) == .orderedAscending
+        }
     }
 
     @ViewBuilder

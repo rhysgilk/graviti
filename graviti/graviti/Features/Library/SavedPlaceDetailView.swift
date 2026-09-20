@@ -33,6 +33,19 @@ struct SavedPlaceDetailView: View {
                         .foregroundStyle(.secondary)
                 }
 
+                if artifacts.count > 1 {
+                    Label {
+                        Text("\(artifacts.count) separate saves connect to this one place. Each original remains available and contributes to its Gravity and interest signals.")
+                    } icon: {
+                        Image(systemName: "square.on.square")
+                            .foregroundStyle(GravitiColors.signalMint)
+                    }
+                    .font(.subheadline)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                }
+
                 Text("Saved items")
                     .font(.headline)
                 ForEach(artifacts) { artifact in
