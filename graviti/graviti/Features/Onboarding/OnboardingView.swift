@@ -40,6 +40,11 @@ struct OnboardingView: View {
                             title: "Discover deeper patterns",
                             detail: "Repeated interests across places shape future recommendations."
                         )
+                        feature(
+                            icon: "lock.shield",
+                            title: "Private by default",
+                            detail: "Your Library stays on this device. Export a backup whenever you want."
+                        )
                     }
 
                     VStack(spacing: 12) {

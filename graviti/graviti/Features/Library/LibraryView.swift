@@ -22,6 +22,7 @@ struct LibraryView: View {
     @State private var isExportingBackup = false
     @State private var isImportingBackup = false
     @State private var backupStatus: LibraryBackupStatus?
+    @State private var showingDataPrivacy = false
 
     private var mode: LibraryMode {
         get { LibraryMode(rawValue: modeRawValue) ?? .destinations }
@@ -84,6 +85,12 @@ struct LibraryView: View {
                             isImportingBackup = true
                         } label: {
                             Label("Restore backup", systemImage: "square.and.arrow.down")
+                        }
+                        Divider()
+                        Button {
+                            showingDataPrivacy = true
+                        } label: {
+                            Label("Data & privacy", systemImage: "lock.shield")
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
@@ -150,6 +157,9 @@ struct LibraryView: View {
             }
             .fileImporter(isPresented: $isImportingBackup, allowedContentTypes: [.json]) { result in
                 restoreBackup(result)
+            }
+            .sheet(isPresented: $showingDataPrivacy) {
+                DataPrivacyView()
             }
             .alert(item: $backupStatus) { status in
                 Alert(title: Text("Library backup"), message: Text(status.message), dismissButton: .default(Text("OK")))

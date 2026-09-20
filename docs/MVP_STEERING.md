@@ -73,6 +73,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Add persisted recommendation actions: **Save destination** and **Not for me**.
 - [x] Persist the last Library mode; use Destinations as the initial mode for a new user.
 - [x] Replace repeated explanatory copy with concise headers such as Interests, Patterns, and Your saves.
+- [x] Make the local-only data promise visible during onboarding and from Library Actions, including network and backup behavior.
 
 ### MVP decision gate
 
