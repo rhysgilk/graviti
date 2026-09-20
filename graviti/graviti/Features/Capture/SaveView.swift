@@ -20,6 +20,7 @@ struct SaveView: View {
     @State private var showingMapsLinkImporter = false
     @State private var importMessage: String?
     @State private var importSummary: SaveImportSummary?
+    @FocusState private var focusedField: SaveField?
 #if DEBUG
     @AppStorage("debug.dogfoodArtifactIDs") private var dogfoodArtifactIDs = ""
     @State private var isChangingDogfood = false
@@ -45,10 +46,13 @@ struct SaveView: View {
                             Text("Link")
                                 .font(.headline)
                             TextField("Paste a link", text: $urlText)
+                                .focused($focusedField, equals: .url)
                                 .textInputAutocapitalization(.never)
                                 .autocorrectionDisabled()
                                 .keyboardType(.URL)
                                 .textContentType(.URL)
+                                .submitLabel(.done)
+                                .onSubmit { focusedField = nil }
                                 .padding(14)
                                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 12))
                         }
@@ -57,6 +61,7 @@ struct SaveView: View {
                             Text("A note, if you like")
                                 .font(.headline)
                             TextField("What caught your eye?", text: $optionalNote, axis: .vertical)
+                                .focused($focusedField, equals: .optionalNote)
                                 .lineLimit(2...4)
                                 .padding(14)
                                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 12))
@@ -66,6 +71,7 @@ struct SaveView: View {
                             Text("Your note")
                                 .font(.headline)
                             TextEditor(text: $noteText)
+                                .focused($focusedField, equals: .note)
                                 .scrollContentBackground(.hidden)
                                 .frame(minHeight: 140)
                                 .padding(10)
@@ -89,6 +95,7 @@ struct SaveView: View {
                             }
 
                             TextField("What caught your eye? (optional)", text: $optionalNote, axis: .vertical)
+                                .focused($focusedField, equals: .optionalNote)
                                 .lineLimit(2...4)
                                 .padding(14)
                                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 12))
@@ -96,6 +103,7 @@ struct SaveView: View {
                     }
 
                     Button {
+                        focusedField = nil
                         Task { await save() }
                     } label: {
                         HStack {
@@ -133,6 +141,16 @@ struct SaveView: View {
                             .foregroundStyle(GravitiColors.opportunityCoral)
                     }
 
+                    if let importSummary {
+                        ImportSummaryCard(summary: importSummary)
+                    }
+
+                    if let importMessage {
+                        Text(importMessage)
+                            .font(.subheadline)
+                            .foregroundStyle(GravitiColors.signalMint)
+                    }
+
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Bring in saved places")
                             .font(.headline)
@@ -155,6 +173,7 @@ struct SaveView: View {
                             Spacer()
                             PasteButton(payloadType: URL.self) { urls in
                                 guard let url = urls.first else { return }
+                                focusedField = nil
                                 kind = .url
                                 urlText = url.absoluteString
                                 Task { await save() }
@@ -189,16 +208,6 @@ struct SaveView: View {
                                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
                         }
                         .buttonStyle(.plain)
-
-                        if let importSummary {
-                            ImportSummaryCard(summary: importSummary)
-                        }
-
-                        if let importMessage {
-                            Text(importMessage)
-                                .font(.subheadline)
-                                .foregroundStyle(GravitiColors.signalMint)
-                        }
 
 #if DEBUG
                         dogfoodControls
@@ -291,6 +300,7 @@ struct SaveView: View {
 
     private func save() async {
         guard canSave, !isSaving else { return }
+        focusedField = nil
         isSaving = true
         didSave = false
         saveError = nil
@@ -473,6 +483,12 @@ struct SaveView: View {
         dogfoodArtifactIDs = ""
     }
 #endif
+}
+
+private enum SaveField: Hashable {
+    case url
+    case note
+    case optionalNote
 }
 
 #if DEBUG

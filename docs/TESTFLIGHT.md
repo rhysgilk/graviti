@@ -45,6 +45,7 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - Direct bubble switching, bulk place removal confirmation, and bulk save deletion confirmation were exercised without committing destructive test actions.
 - A 30-save crowded-library fixture was exercised across Home, Explore, and Library. Home stayed within its ten-label budget with readable long names, Library exposed bulk selection, Explore synthesized varied interests with 66 FIT recommendations, and the imported library persisted after termination and relaunch.
 - A live shared Google Maps list link imported all 28 places from the supplied “Vanessa and Rhys” guide, preserved the guide title, and continued place enrichment in the background.
+- The supplied live Apple Maps “Matcha” guide decoded 19 unique identifiers, resolved all 19 through MapKit, imported all 19 through the Save screen across 7 cities in 1 country, and persisted after force quit. Reimporting reported 19 duplicates and created no additional places.
 - Google list imports retain address and coordinate hints for place resolution. A live 28-place check matched 25 automatically, left 3 ambiguous names for review, and had no lookup failures.
 - Re-importing the same Google list upgrades unresolved items created by older builds in place and reports how many place details were refreshed without overwriting user-matched places.
 - Re-importing a known map collection does not add another generic guide wrapper to Library.
