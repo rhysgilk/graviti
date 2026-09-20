@@ -71,7 +71,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Make Search global across artifacts, interests, destinations, saved places, and MapKit results.
 - [x] Add richer thumbnails and media cards to the Saves library with graceful note/link fallbacks.
 - [x] Add persisted recommendation actions: **Save destination** and **Not for me**.
-- [ ] Persist the last Library mode; consider Destinations as the initial mode for a new user.
+- [x] Persist the last Library mode; use Destinations as the initial mode for a new user.
 - [ ] Replace repeated explanatory copy with concise headers such as Interests, Patterns, and Your saves.
 
 ### MVP decision gate

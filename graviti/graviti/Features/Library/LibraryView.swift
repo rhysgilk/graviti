@@ -3,7 +3,7 @@ import MapKit
 
 struct LibraryView: View {
     @ObservedObject var library: ArtifactLibrary
-    @State private var mode: LibraryMode = .saves
+    @AppStorage("library.mode") private var modeRawValue = LibraryMode.destinations.rawValue
     @State private var selectedMapPlace: SavedPlace?
     @State private var query = ""
     @State private var showsNeedsReviewOnly = false
@@ -12,6 +12,11 @@ struct LibraryView: View {
     @State private var showingBulkRemoveConfirmation = false
     @State private var isRemovingPlaces = false
     @State private var placeActionError: String?
+
+    private var mode: LibraryMode {
+        get { LibraryMode(rawValue: modeRawValue) ?? .destinations }
+        nonmutating set { modeRawValue = newValue.rawValue }
+    }
 
     var body: some View {
         NavigationStack {
