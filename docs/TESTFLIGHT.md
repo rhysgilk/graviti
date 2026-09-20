@@ -58,13 +58,14 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - Maximum Dynamic Type, increased contrast, right-to-left layout, expanded pseudo-localized strings, and Reduce Motion were inspected in Simulator.
 - Spanish coverage was completed for the app and Share Extension. Home, Explore, Library, canonical interest names, singular/plural counts, accessibility labels, and bulk-selection copy were inspected in Spanish without clipping.
 - The iOS 18.6 minimum runtime was validated on an iPhone 16 Pro simulator. MapKit search found and saved Nishiki Market, Home generated its Gravity destination, Library showed the enriched save, and the record persisted after force quit and relaunch.
+- A device-specific Debug build from the current source, including the Share Extension, was provisioned for and installed on an iPhone 13 Pro Max running iOS 26.3.1. Device services confirmed installation, successful launch, and a live Graviti process after launch.
 - The public privacy policy URL returned HTTP 200 and exposed the current effective date and support route without repository authentication.
 - A signed arm64 Release archive was produced with an iOS 18 minimum, matching app and extension versions, both privacy manifests, non-exempt encryption disabled, exactly the two registered Sora fonts, no dogfood CSVs, valid nested signatures, and matching App Group entitlements.
 - The current archive uses a seven-day Apple Development provisioning profile. It verifies the packaged release contents but is not eligible for TestFlight upload; the upload archive must use App Store distribution provisioning.
 
 Still required before external TestFlight distribution:
 
-- Complete the remaining core-flow checklist on a physical signed device. Initial physical-device testing has passed.
+- Complete the remaining hands-on core-flow checklist on the provisioned physical device. Initial manual testing and automated install/launch verification have passed.
 - Supply the feedback email and App Store Connect review contact.
 - Enroll or associate team `V9W8HRDJQT` with an App Store Connect provider that can create App Store provisioning profiles. The September 20 export attempt reached Apple's signing service but reported no provider for the account and no permission to create profiles for either bundle.
 - Produce and upload the distribution archive in the owner's App Store Connect account after that account gate is resolved.
