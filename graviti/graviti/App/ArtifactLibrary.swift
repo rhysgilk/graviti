@@ -8,19 +8,16 @@ final class ArtifactLibrary: ObservableObject {
     @Published private(set) var loadError: String?
 
     private let repository: any ArtifactRepository
-    private let placeResolver: MapPlaceResolver
-    private var processingIDs: Set<UUID> = []
-    private var enrichingIDs: Set<UUID> = []
-    private var extractingTextIDs: Set<UUID> = []
-    private var fetchingLinkMetadataIDs: Set<UUID> = []
+    private let processor: ArtifactProcessingCoordinator
     private var isImportingSharedArtifacts = false
 
     init(repository: any ArtifactRepository, placeResolver: MapPlaceResolver? = nil) {
         self.repository = repository
-        self.placeResolver = placeResolver ?? MapPlaceResolver(
+        let resolver = placeResolver ?? MapPlaceResolver(
             searchProvider: MapKitPlaceSearchProvider(),
             linkExpander: URLSessionMapLinkExpander()
         )
+        self.processor = ArtifactProcessingCoordinator(placeResolver: resolver)
     }
 
     func load() async {
@@ -35,34 +32,34 @@ final class ArtifactLibrary: ObservableObject {
     func save(_ artifact: Artifact) async throws {
         try await repository.save(artifact)
         artifacts.insert(artifact, at: 0)
-        if shouldProcess(artifact) {
+        if ArtifactProcessingCoordinator.shouldResolvePlace(artifact) {
             Task { await process(artifact.id) }
         }
-        if shouldEnrich(artifact) {
+        if ArtifactProcessingCoordinator.shouldEnrich(artifact) {
             Task { await enrich(artifact.id) }
         }
-        if shouldExtractText(artifact) {
+        if ArtifactProcessingCoordinator.shouldExtractText(artifact) {
             Task { await extractText(artifact.id) }
         }
-        if shouldFetchLinkMetadata(artifact) {
+        if ArtifactProcessingCoordinator.shouldFetchLinkMetadata(artifact) {
             Task { await fetchLinkMetadata(artifact.id) }
         }
     }
 
     func processPendingEnrichment() async {
-        for artifact in artifacts where shouldEnrich(artifact) {
+        for artifact in artifacts where ArtifactProcessingCoordinator.shouldEnrich(artifact) {
             await enrich(artifact.id)
         }
     }
 
     func processPendingTextExtraction() {
-        for artifact in artifacts where shouldExtractText(artifact) || artifact.textExtractionState == .processing {
+        for artifact in artifacts where ArtifactProcessingCoordinator.shouldExtractText(artifact) || artifact.textExtractionState == .processing {
             Task { await extractText(artifact.id) }
         }
     }
 
     func processPendingLinkMetadata() {
-        for artifact in artifacts where shouldFetchLinkMetadata(artifact) || artifact.linkMetadataState == .processing {
+        for artifact in artifacts where ArtifactProcessingCoordinator.shouldFetchLinkMetadata(artifact) || artifact.linkMetadataState == .processing {
             Task { await fetchLinkMetadata(artifact.id) }
         }
     }
@@ -93,7 +90,7 @@ final class ArtifactLibrary: ObservableObject {
     }
 
     func processPendingMaps() async {
-        for artifact in artifacts where shouldProcess(artifact) ||
+        for artifact in artifacts where ArtifactProcessingCoordinator.shouldResolvePlace(artifact) ||
             (artifact.processingState == .processing && artifact.place == nil && artifact.sourceURL.map { MapLinkMetadata.provider(for: $0) != nil } == true) {
             await process(artifact.id)
         }
@@ -101,7 +98,7 @@ final class ArtifactLibrary: ObservableObject {
 
     func retryProcessing(_ id: UUID) async {
         guard let artifact = artifacts.first(where: { $0.id == id }),
-              !processingIDs.contains(id),
+              !processor.isResolving(id),
               artifact.place == nil,
               artifact.sourceURL.map({ MapLinkMetadata.provider(for: $0) != nil }) == true else { return }
         do {
@@ -194,13 +191,13 @@ final class ArtifactLibrary: ObservableObject {
 
     private func process(_ id: UUID) async {
         guard let artifact = artifacts.first(where: { $0.id == id }),
-              shouldProcess(artifact) || artifact.processingState == .processing else { return }
-        guard processingIDs.insert(id).inserted else { return }
-        defer { processingIDs.remove(id) }
+              ArtifactProcessingCoordinator.shouldResolvePlace(artifact) || artifact.processingState == .processing else { return }
+        guard processor.beginResolving(id) else { return }
+        defer { processor.finishResolving(id) }
 
         do {
             try await update(artifact.withResolution(place: nil, state: .processing))
-            let result = try await placeResolver.resolve(artifact)
+            let result = try await processor.resolvePlace(for: artifact)
             guard let current = artifacts.first(where: { $0.id == id }),
                   current.processingState == .processing else { return }
             switch result {
@@ -219,37 +216,15 @@ final class ArtifactLibrary: ObservableObject {
         }
     }
 
-    private func shouldProcess(_ artifact: Artifact) -> Bool {
-        artifact.processingState == .saved && artifact.place == nil &&
-            artifact.sourceURL.map { MapLinkMetadata.provider(for: $0) != nil } == true
-    }
-
-    private func shouldEnrich(_ artifact: Artifact) -> Bool {
-        artifact.enrichment == nil &&
-            [.pending, .processing, .failed].contains(artifact.enrichmentState) &&
-            (artifact.place != nil || artifact.originalText != nil || artifact.userNote != nil || artifact.extractedText != nil || artifact.linkMetadata != nil) &&
-            artifact.sourceURL.map(MapLinkMetadata.isCollectionLink) != true
-    }
-
-    private func shouldExtractText(_ artifact: Artifact) -> Bool {
-        artifact.kind == .photo && artifact.mediaKey != nil &&
-            [.pending, .failed].contains(artifact.textExtractionState)
-    }
-
-    private func shouldFetchLinkMetadata(_ artifact: Artifact) -> Bool {
-        artifact.kind == .url && artifact.sourceURL != nil &&
-            [.pending, .failed].contains(artifact.linkMetadataState)
-    }
-
     private func fetchLinkMetadata(_ id: UUID) async {
         guard let artifact = artifacts.first(where: { $0.id == id }),
-              (shouldFetchLinkMetadata(artifact) || artifact.linkMetadataState == .processing),
+              (ArtifactProcessingCoordinator.shouldFetchLinkMetadata(artifact) || artifact.linkMetadataState == .processing),
               let sourceURL = artifact.sourceURL,
-              fetchingLinkMetadataIDs.insert(id).inserted else { return }
-        defer { fetchingLinkMetadataIDs.remove(id) }
+              processor.beginFetchingLinkMetadata(id) else { return }
+        defer { processor.finishFetchingLinkMetadata(id) }
         do {
             try await update(artifact.withLinkMetadata(artifact.linkMetadata, state: .processing))
-            let metadata = try await LinkMetadataFetcher().fetch(sourceURL)
+            let metadata = try await processor.fetchLinkMetadata(for: sourceURL)
             guard let current = artifacts.first(where: { $0.id == id }), current.sourceURL == sourceURL else { return }
             try await update(current.withLinkMetadata(metadata, state: metadata == nil ? .unavailable : .processed))
         } catch is CancellationError {
@@ -265,10 +240,10 @@ final class ArtifactLibrary: ObservableObject {
 
     private func extractText(_ id: UUID) async {
         guard let artifact = artifacts.first(where: { $0.id == id }),
-              (shouldExtractText(artifact) || artifact.textExtractionState == .processing),
+              (ArtifactProcessingCoordinator.shouldExtractText(artifact) || artifact.textExtractionState == .processing),
               let mediaKey = artifact.mediaKey,
-              extractingTextIDs.insert(id).inserted else { return }
-        defer { extractingTextIDs.remove(id) }
+              processor.beginExtractingText(id) else { return }
+        defer { processor.finishExtractingText(id) }
 
         do {
             try await update(artifact.withExtractedText(
@@ -276,8 +251,7 @@ final class ArtifactLibrary: ObservableObject {
                 source: artifact.extractedTextSource,
                 state: .processing
             ))
-            let imageURL = try SharedMediaStore.url(for: mediaKey)
-            let text = try await VisionTextRecognizer().recognizeText(at: imageURL)
+            let text = try await processor.extractText(for: mediaKey)
             guard let current = artifacts.first(where: { $0.id == id }),
                   current.mediaKey == mediaKey else { return }
             try await update(current.withExtractedText(
@@ -306,15 +280,15 @@ final class ArtifactLibrary: ObservableObject {
 
     private func enrich(_ id: UUID, force: Bool = false) async {
         guard let artifact = artifacts.first(where: { $0.id == id }),
-              force || shouldEnrich(artifact),
-              enrichingIDs.insert(id).inserted else { return }
-        defer { enrichingIDs.remove(id) }
+              force || ArtifactProcessingCoordinator.shouldEnrich(artifact),
+              processor.beginEnriching(id) else { return }
+        defer { processor.finishEnriching(id) }
 
         do {
             if artifact.enrichment == nil {
                 try await update(artifact.withEnrichmentState(.processing))
             }
-            let enrichment = try await ArtifactEnricher().enrich(artifact)
+            let enrichment = try await processor.enrich(artifact)
             guard let current = artifacts.first(where: { $0.id == id }),
                   current.place?.id == artifact.place?.id,
                   current.originalText == artifact.originalText,
@@ -345,7 +319,7 @@ final class ArtifactLibrary: ObservableObject {
         try await repository.update(artifact)
         guard let index = artifacts.firstIndex(where: { $0.id == artifact.id }) else { return }
         artifacts[index] = artifact
-        if shouldEnrich(artifact) {
+        if ArtifactProcessingCoordinator.shouldEnrich(artifact) {
             Task { await enrich(artifact.id) }
         }
     }
