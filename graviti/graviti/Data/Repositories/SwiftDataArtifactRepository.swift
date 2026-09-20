@@ -54,12 +54,19 @@ final class SwiftDataArtifactRepository: ArtifactRepository {
     }
 
     func delete(_ id: UUID) async throws {
-        let descriptor = FetchDescriptor<StoredArtifact>(predicate: #Predicate { $0.id == id })
-        guard let stored = try context.fetch(descriptor).first else {
-            throw ArtifactRepositoryError.notFound
-        }
-        context.delete(stored)
+        try await deleteMany([id])
+    }
+
+    func deleteMany(_ ids: Set<UUID>) async throws {
+        guard !ids.isEmpty else { return }
         do {
+            for id in ids {
+                let descriptor = FetchDescriptor<StoredArtifact>(predicate: #Predicate { $0.id == id })
+                guard let stored = try context.fetch(descriptor).first else {
+                    throw ArtifactRepositoryError.notFound
+                }
+                context.delete(stored)
+            }
             try context.save()
         } catch {
             context.rollback()

@@ -26,6 +26,10 @@ final class PreviewArtifactRepository: ArtifactRepository {
     }
 
     func delete(_ id: UUID) async throws {
-        stored.removeAll { $0.id == id }
+        try await deleteMany([id])
+    }
+
+    func deleteMany(_ ids: Set<UUID>) async throws {
+        stored.removeAll { ids.contains($0.id) }
     }
 }

@@ -137,17 +137,16 @@ final class ArtifactLibrary: ObservableObject {
     }
 
     func deleteArtifact(_ id: UUID) async throws {
-        guard let artifact = artifacts.first(where: { $0.id == id }) else { return }
-        try await repository.delete(id)
-        artifacts.removeAll { $0.id == id }
-        if let mediaKey = artifact.mediaKey {
-            try? SharedMediaStore.remove(mediaKey)
-        }
+        try await deleteArtifacts([id])
     }
 
     func deleteArtifacts(_ ids: Set<UUID>) async throws {
-        for id in ids where artifacts.contains(where: { $0.id == id }) {
-            try await deleteArtifact(id)
+        let removed = artifacts.filter { ids.contains($0.id) }
+        guard !removed.isEmpty else { return }
+        try await repository.deleteMany(Set(removed.map(\.id)))
+        artifacts.removeAll { ids.contains($0.id) }
+        for mediaKey in removed.compactMap(\.mediaKey) {
+            try? SharedMediaStore.remove(mediaKey)
         }
     }
 

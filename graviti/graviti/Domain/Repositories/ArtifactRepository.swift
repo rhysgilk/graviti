@@ -7,5 +7,6 @@ protocol ArtifactRepository {
     func update(_ artifact: Artifact) async throws
     func updateMany(_ artifacts: [Artifact]) async throws
     func delete(_ id: UUID) async throws
+    func deleteMany(_ ids: Set<UUID>) async throws
     func artifacts() async throws -> [Artifact]
 }

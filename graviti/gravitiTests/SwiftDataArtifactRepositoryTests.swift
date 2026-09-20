@@ -42,9 +42,26 @@ final class SwiftDataArtifactRepositoryTests: XCTestCase {
         var stored = try await repository.artifacts()
         XCTAssertEqual(Set(stored), Set([updatedFirst, updatedSecond]))
 
-        try await repository.delete(updatedFirst.id)
+        try await repository.deleteMany([updatedFirst.id])
         stored = try await repository.artifacts()
         XCTAssertEqual(stored, [updatedSecond])
+    }
+
+    func testBatchDeleteRollsBackWhenAnyArtifactIsMissing() async throws {
+        let repository = try makeRepository()
+        let first = Artifact(kind: .manual, originalText: "Keep both on failure")
+        let second = Artifact(kind: .manual, originalText: "Also retained")
+        try await repository.saveMany([first, second])
+
+        do {
+            try await repository.deleteMany([first.id, UUID()])
+            XCTFail("Expected a missing artifact error")
+        } catch {
+            XCTAssertNotNil(error)
+        }
+
+        let stored = try await repository.artifacts()
+        XCTAssertEqual(Set(stored), Set([first, second]))
     }
 
     private func makeRepository() throws -> SwiftDataArtifactRepository {
