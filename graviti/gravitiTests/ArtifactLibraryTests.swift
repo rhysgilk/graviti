@@ -3,6 +3,29 @@ import XCTest
 
 @MainActor
 final class ArtifactLibraryTests: XCTestCase {
+    func testOfflineMapFailureKeepsOriginalSaveVisible() async throws {
+        let saved = Artifact(
+            kind: .url,
+            sourceURL: "https://maps.apple.com/?q=Acadia%20National%20Park",
+            originalText: "Acadia National Park"
+        )
+        let repository = PreviewArtifactRepository()
+        try await repository.save(saved)
+        let resolver = MapPlaceResolver(
+            searchProvider: OfflinePlaceSearchProvider(),
+            linkExpander: IdentityMapLinkExpander()
+        )
+        let library = ArtifactLibrary(repository: repository, placeResolver: resolver)
+
+        await library.load()
+        await library.processPendingMaps()
+
+        let retained = try XCTUnwrap(library.artifacts.first { $0.id == saved.id })
+        XCTAssertEqual(retained.sourceURL, saved.sourceURL)
+        XCTAssertEqual(retained.processingState, .failed)
+        XCTAssertNil(library.loadError)
+    }
+
     func testUnavailableSharedInboxDoesNotHideLoadedLibrary() async throws {
         let saved = Artifact(kind: .manual, originalText: "Quiet forest trail")
         let repository = PreviewArtifactRepository()
@@ -49,4 +72,14 @@ private enum TestInboxError: LocalizedError {
     case unavailable
 
     var errorDescription: String? { "Shared inbox unavailable for this test." }
+}
+
+private struct OfflinePlaceSearchProvider: PlaceSearchProviding {
+    func search(_ query: String) async throws -> [PlaceCandidate] {
+        throw URLError(.notConnectedToInternet)
+    }
+}
+
+private struct IdentityMapLinkExpander: MapLinkExpanding {
+    func expandedURL(for rawURL: String) async -> String { rawURL }
 }
