@@ -1,6 +1,6 @@
 # Graviti dogfood datasets
 
-These Google Saved compatible CSV files isolate different interest patterns so recommendation behavior can be checked without keeping one permanent sample library.
+These Google Saved compatible CSV files isolate different interest patterns so Gravity, enrichment, Fit, Fit Guides, Search, and dense Library behavior can be checked without keeping one permanent sample library.
 
 ## Datasets
 
@@ -12,4 +12,17 @@ These Google Saved compatible CSV files isolate different interest patterns so r
 
 ## Use
 
-In Graviti, open Save, choose the Google Maps CSV import option, and select one CSV. Delete its imported saves from Library before loading the next focused dataset when you want an isolated signal. The files use public Google Maps place URLs and notes written specifically to exercise Graviti's enrichment vocabulary.
+In a Debug build, open Save and use **Load test dataset**. Graviti tracks the fixture Artifact IDs, removes the previously loaded fixture before switching, and can remove the active fixture without affecting unrelated saves.
+
+The same files can be exercised through **Import Google Saved CSV**. If that path is used, delete the imported saves from Library before loading another focused dataset when an isolated signal is needed.
+
+The files use public Google Maps place URLs and notes written specifically to exercise Graviti's enrichment vocabulary. They are mirrored in `graviti/graviti/Resources/Dogfood` for Debug builds and excluded from Release archives.
+
+## Expected checks
+
+- Home stays within the ten-destination label budget and allows direct switching between visible bubbles.
+- Explore ranks specific semantic matches instead of simply recommending the geography with the most source saves.
+- Sparse libraries show Early signal instead of an intense Fit percentage.
+- Independent places and areas raise confidence more than repeated records for one place.
+- Fit Guides return real venues inside the recommended destination and group them by matched pattern.
+- Library bulk removal and deletion update Gravity and interest evidence without leaving stale groups.

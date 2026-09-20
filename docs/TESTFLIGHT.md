@@ -19,20 +19,25 @@ Graviti is a private travel-interest library. Save places, links, notes, screens
 - Select and delete several saved items; confirm Gravity and interest patterns update.
 - Compare Home and Explore with sparse and diverse libraries.
 - Mark a recommendation Not for me and save another recommendation.
+- Build Fit Guides for New York City and then at least one international destination such as Kyoto or Mexico City. Confirm every result is a real place within the selected destination, sections follow the matched patterns, and the destination itself is not returned as a venue.
+- Save a place from two different Fit Guides or imported collections and confirm one canonical place retains both source memberships.
 - Export a backup, add another item, restore the backup, and confirm existing records are not duplicated.
 - Test Dynamic Type, VoiceOver, Reduce Motion, airplane mode, and relaunch after force quitting.
 
 ## Data promise shown to testers
 
-This beta stores its Library on the device. Graviti does not require an account and does not sync to a Graviti server. Network requests occur when the tester uses Apple MapKit search or place resolution, when Graviti fetches a preview from a saved public link, or when the tester opens an external link. A backup leaves Graviti only when the tester explicitly exports it. Testers should export a backup before deleting the app because uninstalling removes the local Library.
+This beta stores its Library on the device. Graviti does not require an account and does not sync to a Graviti server. Network requests occur for Apple MapKit search and place resolution, public Apple Maps guide and Google Maps list imports, public-link previews, short-link expansion, and links the tester chooses to open. On-device Vision OCR does not upload images. A backup leaves Graviti only when the tester explicitly exports it. Testers should export a backup before deleting the app because uninstalling removes the local Library.
 
 ## Current limitations
 
 - Library data does not sync between devices.
 - Place search, place resolution, Apple Maps and Google Maps list imports, and link previews require a network connection.
 - Shared Google Maps list import depends on Google's public list response format and may need maintenance if Google changes it.
+- Apple and Google collection links must be publicly accessible.
 - Destination recommendations use a small reviewed offline catalog during the MVP beta.
+- Fit Guide ordering follows Apple Maps relevance; MapKit does not provide Graviti with a review score to display or sort directly.
 - Some imported or shared items may require manual place matching.
+- Explore preferences, Save Destination, and Not for Me are stored locally in app settings and are not included in backup schema version 1. Places saved inside Fit Guides keep their guide membership in the backup.
 
 ## Latest simulator validation
 

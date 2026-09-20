@@ -1,28 +1,35 @@
 # Graviti
 
-Graviti is a private iOS travel-interest library. Save a place, link, note, screenshot, photo, Apple Maps guide, shared Google Maps list, or Google Maps export; Graviti preserves the source, organizes it by place and interest, and reveals the destinations and experiences that repeatedly draw you.
+Graviti is a private, local-first iOS travel-interest library. Save places, links, notes, photos, screenshots, Apple Maps guides, shared Google Maps lists, or Google Maps exports. Graviti preserves the source, organizes it by geography and interest, shows where your saves have the most Gravity, and turns recurring patterns into destination Fit recommendations and actionable Fit Guides.
 
-## Current MVP
+> **Save what pulls you.**
 
-- Fast in-app capture and an iOS Share Extension
-- SwiftData persistence with original source preservation
-- Apple Maps and Google Maps place links
-- Apple Maps guide, shared Google Maps list link, and Google Takeout CSV imports
-- Photo and screenshot storage with optional descriptions and on-device Vision text recognition
-- Asynchronous place resolution and editable enrichment
-- Cached link titles, descriptions, site names, and preview images
-- Library views for destinations, places, saves, and a map
-- Global search across saved items, destinations, interests, places, and MapKit results
-- Versioned local library backup and restore, including saved photos
-- Bulk saved-item deletion and bulk place cleanup
-- Gravity visualization with adaptive geographic resolution and an ambient, noninteractive starfield
-- Interest patterns across categories and geographic areas
-- Destination Fit recommendations with evidence confidence
-- Fit Guides with live place suggestions grouped by the patterns behind each recommendation
-- Accessibility, Reduce Motion support, and localization infrastructure
-- Focused dogfood datasets for scenery, culture, food, water, and mixed interests
+## Local MVP status
 
-Graviti's local MVP is complete and verified. External distribution is optional future work. See [Product Specification](docs/PRODUCT_SPEC.md), [Architecture](docs/ARCHITECTURE.md), [Data Model](docs/DATA_MODEL.md), [MVP Steering](docs/MVP_STEERING.md), [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md), [Privacy](docs/PRIVACY.md), and [Optional TestFlight Preparation](docs/TESTFLIGHT.md).
+The local MVP is complete and verified. It requires no account or Graviti server. The Library is stored on the device and can be exported as a versioned backup. External distribution through TestFlight or the App Store is optional future work and is outside the local MVP completion goal.
+
+### Implemented capabilities
+
+- In-app capture for web links, manual notes, photos, screenshots, and Map links
+- iOS Share Extension for URLs, text, and one image with an optional note
+- Direct import from public Apple Maps guide links and shared Google Maps list links
+- Google Takeout Saved CSV and Apple/Google `.webloc` import
+- Immediate local persistence followed by resumable place resolution, OCR, link preview fetching, and enrichment
+- Editable descriptions, categories, interests, notes, place matches, and source collection history
+- Library browsing by Destinations, Places, Saves, and Map
+- Individual deletion, atomic bulk save deletion, and bulk place-association removal
+- Global local search plus live Apple MapKit place search
+- Versioned JSON backup and restore, including saved image bytes
+- Adaptive Gravity Field with country, state/province, and city resolution
+- Direct switching between visible Gravity bubbles and semantic geographic drill-down
+- Decorative white and yellow pulsing stars that respect Reduce Motion
+- Explainable interest patterns, conservative Fit scoring, evidence confidence, preferences, and “Not for me”
+- Fit Guides with region-bound live suggestions grouped by the patterns behind a recommendation
+- Persistent Fit Guide membership without duplicating an existing saved place
+- Sora typography, Spanish localization, Dynamic Type, VoiceOver, increased contrast, RTL inspection, and conventional alternatives to the spatial UI
+- Debug-only focused and crowded dogfood datasets
+
+See [Complete Capability Reference](docs/CAPABILITIES.md) for workflows, data behavior, network use, limitations, and verification details.
 
 ## Screenshots
 
@@ -34,37 +41,48 @@ Graviti's local MVP is complete and verified. External distribution is optional 
 | --- | --- |
 | ![The Places Library with review and repeated-place tools](docs/screenshots/library-places.png) | ![The rich Saves Library with generated descriptions and categories](docs/screenshots/library-saves.png) |
 
+## Documentation
+
+- [Complete Capability Reference](docs/CAPABILITIES.md)
+- [Product Specification](docs/PRODUCT_SPEC.md)
+- [Implemented Architecture](docs/ARCHITECTURE.md)
+- [Implemented Data Model](docs/DATA_MODEL.md)
+- [MVP Steering and Roadmap](docs/MVP_STEERING.md)
+- [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md)
+- [Privacy Policy](docs/PRIVACY.md)
+- [Optional TestFlight Preparation](docs/TESTFLIGHT.md)
+- [Dogfood Datasets](test-data/dogfood/README.md)
+
 ## Project structure
 
 ```text
 graviti/
 ├── graviti/                  iOS application
-│   ├── App/                  app composition and observable library
-│   ├── Data/                 SwiftData storage and repositories
-│   ├── DesignSystem/         colors, typography, and reusable visuals
-│   ├── Domain/               models, parsers, scoring, and enrichment
-│   ├── Features/             Home, Capture, Library, Explore, and Search
-│   └── Integrations/         MapKit and Share Extension support
-├── GravitiShareExtension/    iOS share target
-├── gravitiTests/             deterministic XCTest coverage
+│   ├── App/                  composition and ArtifactLibrary facade
+│   ├── Data/                 SwiftData persistence and repositories
+│   ├── DesignSystem/         color, typography, copy, and wordmark
+│   ├── Domain/               models, importers, scoring, search, and enrichment
+│   ├── Features/             Home, Explore, Save, Library, Search, Onboarding
+│   ├── Integrations/         MapKit and Share Extension support
+│   └── Resources/            Sora fonts and Debug dogfood fixtures
+├── GravitiShareExtension/    iOS Share Extension target
+├── gravitiTests/             deterministic unit and integration coverage
 └── graviti.xcodeproj/
-docs/                         product and engineering contracts
-test-data/                    import and recommendation dogfood fixtures
+docs/                         product, capability, architecture, and release docs
+scripts/                      archive verification and optional export tools
+test-data/dogfood/            source CSV fixtures for focused testing
 ```
-
-Views depend on domain models and repository interfaces. SwiftData and provider-specific behavior remain behind adapters. Capture completes before place lookup or enrichment, so source material is never held hostage by background processing.
 
 ## Requirements
 
 - macOS with Xcode 26.2 or newer
 - iOS 18.0 or newer simulator or device
-- An Apple development team for device signing and Share Extension testing
+- Apple development signing for physical-device and Share Extension testing
+- Network access for MapKit, public Maps collection imports, and web link previews
 
 ## Build
 
 Open `graviti/graviti.xcodeproj`, select the `graviti` scheme, and run on an iPhone simulator.
-
-Command-line build:
 
 ```sh
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
@@ -80,14 +98,16 @@ xcodebuild \
 
 ## Tests
 
-The shared `graviti` scheme includes the `gravitiTests` target. Run it from Xcode with **Product → Test**, or provide an installed simulator destination to `xcodebuild test`.
+The shared `graviti` scheme includes `gravitiTests`. Run **Product → Test** in Xcode or use an installed simulator destination with `xcodebuild test`.
 
-Current regression tests cover sparse Fit evidence, semantic destination specificity, duplicate evidence discounting, independent place confidence, avoided interests, parsers, deterministic crowded Orbit layout, interest profiles, backup round trips, OCR, link metadata, bulk deletion, and rich-artifact persistence through the real SwiftData repository.
+The current suite contains 67 tests. It covers import parsing and migration, Fit relevance and confidence, region-scoped Fit Guide search behavior, interest profiles, adaptive geographic resolution, deterministic crowded layouts, backup validation and media round trips, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
+
+The latest verified runs passed 67 of 67 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
 
 ## Test data
 
-Debug builds expose a dataset switcher at the bottom of the Save tab. Each dataset can be loaded, inspected across Home, Explore, and Library, and removed without affecting other saved items. Source CSV fixtures live in `test-data/dogfood` and are mirrored in the app resources.
+Debug builds expose a dataset switcher at the bottom of Save. Loading a fixture replaces only the previously tracked test fixture, so real Library items remain intact. Release archives exclude the CSV fixtures and unused Sora weights. The source datasets are documented in [test-data/dogfood/README.md](test-data/dogfood/README.md).
 
-## Data status
+## Data ownership
 
-The MVP beta is local only. Data remains on the device unless the user exports a versioned JSON backup from Library > Actions. Backups include saved records, derived details, place matches, and saved photo bytes, and can be restored without duplicating existing records. Sign in and cloud sync are post-MVP options.
+Graviti stores its Library locally and has no account, analytics SDK, advertising SDK, or Graviti-operated backend in the MVP. Library → Actions can export and restore a versioned JSON backup containing saved records, generated details, place matches, source collection membership, cached link details, and image bytes. Uninstalling the app removes the local Library unless the user exports a backup first.

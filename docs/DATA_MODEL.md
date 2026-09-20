@@ -1,682 +1,369 @@
-# Graviti — Data Model
+# Graviti Implemented Data Model
 
-**Version:** 0.1  
-**Status:** Implemented local MVP model with future sync references
-**Storage direction:** SwiftData local authority + versioned backup; optional backend after MVP
+**Version:** 1.0
 
----
+**Status:** Local MVP
 
-## 1. Design Goals
+**Storage:** SwiftData domain record plus App Group image files
 
-The data model must support:
+**Backup schema:** Version 1 JSON
 
-1. original source preservation
-2. multiple Experiences extracted from one Artifact
-3. multiple Artifacts referring to one Place
-4. automatic geographic hierarchy
-5. many-to-many Interest relationships
-6. separation of explicit user signals from system recommendations
-7. confidence and provenance for machine-generated metadata
-8. duplicate detection without destructive merging
-9. adaptive geographic resolution
-10. offline-first local caching
-11. future social/Guide expansion without requiring a V1 rewrite
+This document describes persisted and derived values in the current app. Future normalized server entities are listed separately.
 
-## 2. Identity Rules
-
-Every canonical Graviti entity owns its own UUID.
-
-External provider IDs are aliases, never primary keys.
+## 1. Current entity graph
 
 ```text
-Place.id = Graviti UUID
+Artifact (UUID)
+├── original source
+├── optional local image key
+├── optional SavedPlace (MapKit identity)
+├── optional ArtifactLinkMetadata
+├── optional ArtifactEnrichment
+├── optional ArtifactUserDetails
+├── collection membership titles
+└── independent processing states
 
-PlaceAlias:
-  provider = apple_maps
-  provider_id = ...
+Derived at runtime
+├── canonical Place groups
+├── geographic destination nodes
+├── InterestProfile
+├── DestinationRecommendation
+└── FitGuide sections
+
+App preferences
+├── onboarding and selected modes
+├── Explore filters
+├── saved destination IDs
+└── excluded destination IDs
 ```
 
-## 3. Core Entity Graph
+Only `StoredArtifact` is a SwiftData `@Model`. Places, enrichment, link metadata, and corrections are Codable values embedded in that record.
+
+## 2. Artifact
+
+`Artifact` is the original unit of ownership and backup. It is never replaced by a derived Experience or Place.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | UUID | Stable local and backup identity |
+| `kind` | `url`, `manual`, `photo` | Current source kind; screenshots use `photo` |
+| `sourceURL` | String? | Original or synthesized stable source link |
+| `sourceCollectionTitle` | String? | First Apple, Google, or Fit Guide membership |
+| `additionalSourceCollectionTitles` | [String]? | Later distinct memberships |
+| `originalText` | String? | Shared title, imported place name, or manual note body |
+| `userNote` | String? | User-authored reason or photo description |
+| `mediaKey` | String? | Validated filename in App Group media storage |
+| `extractedText` | String? | On-device OCR output |
+| `extractedTextSource` | `appleVision`? | OCR provenance |
+| `textExtractionState` | state | Independent OCR lifecycle |
+| `linkMetadata` | value? | Cached public page metadata |
+| `linkMetadataState` | state | Independent web metadata lifecycle |
+| `place` | `SavedPlace`? | Accepted canonical place |
+| `enrichment` | value? | Generated description/category/interests |
+| `enrichmentState` | state | Independent enrichment lifecycle |
+| `userDetails` | value? | Explicit correction overriding enrichment |
+| `processingState` | state | Place-resolution lifecycle |
+| `capturedAt` | Date | Original capture time |
+
+Collection titles are trimmed, compared case and diacritic insensitively for deduplication, and returned in stable primary-then-additional order.
+
+## 3. Artifact kinds and capture mapping
+
+| Input | Stored kind |
+| --- | --- |
+| ordinary URL | `url` |
+| Apple or Google Maps link | `url` |
+| imported CSV/list place | `url` |
+| Fit Guide place | `url` |
+| manual note or shared plain text | `manual` |
+| photo or screenshot | `photo` |
+
+There are no separate persisted `video`, `socialPost`, `mapsLink`, or `importRecord` enum cases in the MVP. Those concepts are represented through URL/source fields.
+
+## 4. Processing states
+
+### Place resolution
+
+`ArtifactProcessingState`:
+
+- `saved`
+- `processing`
+- `processed`
+- `needsReview`
+- `failed`
+
+A processed collection wrapper may have no place. A needs-review Artifact stays visible.
+
+### OCR, link metadata, and enrichment
+
+Each subsystem has:
+
+- `pending`
+- `processing`
+- `processed`
+- `unavailable`
+- `failed`
+
+The states are independent. A photo can be safely saved while OCR is processing and enrichment is pending. A URL can have processed link metadata and no place.
+
+Older SwiftData records infer missing state fields from available data for migration compatibility.
+
+## 5. SavedPlace
+
+`SavedPlace` is a Codable value:
+
+| Field | Type |
+| --- | --- |
+| `id` | String |
+| `name` | String |
+| `latitude` | Double |
+| `longitude` | Double |
+| `locality` | String? |
+| `region` | String? |
+| `country` | String? |
+
+For MapKit results, `id` is the stable MapKit identifier. Place groups are derived by this ID. The subtitle removes repeated geography labels and joins locality, region, and country.
+
+Multiple Artifacts can reference the same SavedPlace. Removing a Place from the Library clears the place on every connected Artifact and marks each one for review; it does not delete those Artifacts.
+
+## 6. Link metadata
+
+`ArtifactLinkMetadata` contains:
+
+- title
+- summary
+- site name
+- optional bounded preview image bytes
+- resolved URL
+- fetched date
+
+This is cached evidence. It never replaces `sourceURL` or user-authored text.
+
+## 7. Generated enrichment
+
+`ArtifactEnrichment` contains:
+
+- optional summary
+- optional `ExperienceCategory`
+- interest strings
+- provenance source
+- confidence from 0 through 1
+- generation date
+
+Provenance values distinguish:
+
+- MapKit
+- saved text
+- MapKit plus saved text
+- detected image text
+- MapKit plus detected text
+- link metadata
+- MapKit plus link metadata
+
+`ExperienceCategory` currently supports:
+
+- `foodAndDrink`
+- `sceneryAndNature`
+- `artsAndCulture`
+- `activities`
+- `shopping`
+- `landmarks`
+- `stay`
+- `other`
+
+## 8. User corrections and effective values
+
+`ArtifactUserDetails` contains an optional summary, optional category, and interest array.
+
+Effective fields follow one rule:
 
 ```text
-User
- ├── Artifact
- │    └── Experience
- │         ├── Place
- │         │    └── GeoArea
- │         └── Interest
- │
- ├── UserPlaceSignal
- ├── UserExperienceSignal
- ├── UserInterestProfile
- ├── RecommendationFeedback
- └── DestinationAggregate
+if userDetails exists:
+    use every userDetails value
+else:
+    use generated enrichment
 ```
 
-## 4. User
+An intentionally empty user interest array therefore overrides generated interests. User notes remain independent and are preserved during enrichment refresh.
 
-```text
-User
-- id: UUID
-- created_at
-- updated_at
-- locale
-- preferred_language
-- home_geo_area_id: UUID?
-- orbit_resolution_mode: enum
-```
+Changing a place clears generated enrichment when the place identity changes, then schedules regeneration. User details remain intact.
 
-`orbit_resolution_mode`:
+## 9. Source collection membership
 
-```text
-automatic
-countries
-states_provinces
-cities
-```
-
-## 5. Artifact
-
-An Artifact is the original thing the user supplied.
-
-```text
-Artifact
-- id: UUID
-- user_id: UUID
-- artifact_type: enum
-- source_url: string?
-- source_collection_title: string?
-- additional_source_collection_titles: string[]?
-- source_app: string?
-- original_text: string?
-- user_note: string?
-- media_asset_id: UUID?
-- extracted_text: string?
-- extracted_text_source: enum?
-- text_extraction_state: enum
-- link_metadata: JSON? (title, summary, site name, resolved URL, optional preview image, fetched time)
-- link_metadata_state: enum
-- processing_state: enum
-- processing_error_code: string?
-- captured_at
-- created_at
-- updated_at
-```
-
-`artifact_type`:
-
-```text
-url
-photo
-screenshot
-video
-social_post
-maps_link
-manual
-import_record
-```
-
-`processing_state`:
-
-```text
-saved
-processing
-processed
-needs_review
-failed
-```
-
-Place resolution and descriptive enrichment are tracked separately. Enrichment uses:
-
-```text
-pending
-processing
-processed
-unavailable
-failed
-```
-
-This lets a save remain safely captured while richer descriptions, categories, and interests are generated locally or by a future background service. `unavailable` means the current inputs were insufficient; it is distinct from a processing failure and can return to `pending` when the user adds a place or description.
-
-Image text extraction has the same resumable state vocabulary. The MVP runs Apple Vision locally after the media asset is secure, stores detected text separately from user-authored text, and records `apple_vision` as its source. Detected text can seed category and interest enrichment, while the saved-item detail keeps the extracted text and its provenance visible to the user.
-
-Link metadata also uses this resumable lifecycle. Metadata fetches run after capture with an ephemeral, cookie-free session; reject loopback and private-network targets; enforce response type and size limits; and cache title, description, site name, resolved URL, and a bounded preview image. Cached title and description become enrichment evidence without replacing the original URL or the user's note.
-
-Places imported from shared collections retain every distinct collection title. `source_collection_title` preserves the first title for backward compatibility, while `additional_source_collection_titles` records later memberships. This source context contributes to enrichment because guide titles such as “Matcha,” “Date night,” or “Coastal hikes” can explain why otherwise generic place names were saved. Reimporting an older collection backfills context and reruns generated enrichment without overwriting user corrections. Saved Item detail exposes the retained collection history.
-
-The Artifact is never deleted merely because extraction fails.
-
-`user_note` may contain the optional description a user supplied with a photo. Keep user-authored text separate from generated descriptions and preserve it when enrichment is rerun.
-
-User corrections to a save's description, category, and interests are stored separately from generated enrichment. Explore uses the corrected values when present. Refreshing enrichment must not overwrite corrections; users can explicitly return to the suggested values.
-
-## 6. MediaAsset
-
-```text
-MediaAsset
-- id: UUID
-- user_id: UUID
-- media_type: enum
-- storage_key: string
-- thumbnail_storage_key: string?
-- mime_type: string
-- width: int?
-- height: int?
-- duration_ms: int?
-- sha256: string?
-- created_at
-```
-
-Large media belongs in object storage, not relational rows.
-
-## 7. Experience
-
-An Experience captures why the user cared about an Artifact.
-
-```text
-Experience
-- id: UUID
-- user_id: UUID
-- artifact_id: UUID
-- place_id: UUID?
-- title: string
-- normalized_title: string?
-- description: string?
-- category_id: UUID?
-- extraction_confidence: decimal?
-- extraction_source: enum
-- extraction_model_version: string?
-- created_at
-- updated_at
-```
-
-Enrichment for an Experience should retain provenance, confidence, and the last successful processing time. Categories and interests should reflect what the user wanted to do or see, not only the venue type. For example, a café save may also imply matcha, desserts, interior design, or neighborhood exploration when supported by the artifact or user note. Recommendation signals derive from accepted or sufficiently confident enrichment across all destinations, while explicit saves remain a separate signal.
+Collection membership is stored as strings on the Artifact.
 
 Examples:
 
-- “Try the strawberry matcha parfait.”
-- “Visit teamLab Planets.”
-- “See the skyline from this viewpoint.”
-- “Ride this scenic train.”
+- `Matcha`
+- `Vanessa and Rhys`
+- `New York City Fit Guide · Museums`
 
-## 8. Place
+One Artifact can belong to several Apple/Google collections and Fit Guides. Adding a new membership clears generated enrichment and schedules a refresh because the collection title may explain why the item was saved.
 
-A Place is a canonical physical location.
+Fit Guide membership is recognized by an exact guide title or its `guide · pattern` prefix.
 
-```text
-Place
-- id: UUID
-- canonical_name: string
-- latitude: decimal?
-- longitude: decimal?
-- geo_area_id: UUID?
-- address_text: string?
-- place_type: string?
-- status: enum
-- created_at
-- updated_at
-```
+## 10. SwiftData record
 
-Provider identities live in `PlaceAlias`.
+`StoredArtifact` stores scalar fields directly and encodes nested values to JSON `Data`:
 
-## 9. PlaceAlias
+- additional collection titles
+- link metadata
+- place
+- enrichment
+- user details
 
-```text
-PlaceAlias
-- id: UUID
-- place_id: UUID
-- provider: enum
-- provider_id: string
-- provider_url: string?
-- valid_from: timestamp?
-- valid_to: timestamp?
-- is_current: bool
-- created_at
-```
+The model uses a unique UUID attribute. Repository mapping validates enum raw values and throws for unknown required values.
 
-Example providers:
+This single-record design keeps capture and restore simple for the local MVP. It does not prevent future normalization behind the repository boundary.
+
+## 11. Image storage
+
+Image bytes are stored outside SwiftData in the App Group:
 
 ```text
-apple_maps
-google_places
-openstreetmap
-manual
-other
+group.com.rhysgilk.graviti/
+└── MediaAssets/
+    └── <artifact UUID>.<extension>
 ```
 
-## 10. GeoArea
+Rules:
 
-GeoArea forms a recursive geographic tree.
+- filename only; no directory traversal
+- JPEG, PNG, HEIC/HEIF, WebP, or GIF
+- maximum 50 MB
+- atomic writes
+- cleanup on failed Artifact save
+- cleanup after successful Artifact deletion
+- embedded into backup on export
+
+## 12. Derived canonical views
+
+### Place groups
+
+Unique `SavedPlace.id` values create the Places Library. Repeated artifacts remain separate evidence.
+
+### Geography and OrbitNode
+
+`OrbitNode` is computed from placed Artifacts and contains:
+
+- deterministic UUID
+- geographic name
+- level: country, state/province, city, district, or neighborhood
+- Gravity
+- save count
+
+No destination aggregate table is persisted.
+
+### InterestProfile
+
+Computed from effective Artifact details:
+
+`InterestPattern` contains name, supporting Artifacts, distinct place count, and distinct area names.
+
+`CategoryPattern` contains category and save count.
+
+### Recommendation
+
+`DestinationRecommendation` is computed and contains:
+
+- destination name and country
+- displayed Fit
+- raw relevance
+- confidence band and percentage
+- matched interests
+- supporting Artifacts
+- explicit preference matches
+
+Recommendations are not persisted as Library records.
+
+### FitGuide
+
+`FitGuide` contains a `SavedDestination` and up to four interests. Its live result sections are transient MapKit results. Saved guide membership persists through Artifact collection titles.
+
+## 13. Preference storage outside SwiftData
+
+The following values use `UserDefaults` through `@AppStorage`:
+
+| Key | Purpose |
+| --- | --- |
+| `onboarding.completed` | first-run completion |
+| `library.mode` | last Library mode |
+| `orbit.resolutionMode` | automatic/country/state/city grouping |
+| `explore.region` | recommendation region |
+| `explore.preferredInterests` | pipe-delimited interest IDs |
+| `explore.avoidedInterests` | pipe-delimited interest IDs |
+| `explore.savedDestinations` | saved recommendation IDs |
+| `explore.excludedDestinations` | Not for me IDs |
+| `debug.dogfoodArtifactIDs` | Debug-only fixture cleanup |
+
+These preferences are local and are not part of backup schema version 1. Artifact-based Fit Guide memberships are backed up.
+
+## 14. Backup schema
+
+`LibraryBackupArchive`:
 
 ```text
-GeoArea
-- id: UUID
-- parent_geo_area_id: UUID?
-- type: enum
-- canonical_name: string
-- country_code: string?
-- administrative_code: string?
-- centroid_latitude: decimal?
-- centroid_longitude: decimal?
-- bounds_json: jsonb?
-- created_at
-- updated_at
+schemaVersion: Int = 1
+exportedAt: Date
+artifacts: [LibraryBackupEntry]
 ```
 
-`type`:
+`LibraryBackupEntry`:
 
 ```text
-country
-state_province
-region
-city
-district
-neighborhood
-other
+artifact: Artifact
+mediaData: Data?
+mediaFileExtension: String?
 ```
 
-No code should assume every country uses a U.S.-style city → state → country hierarchy.
-
-## 11. GeoAreaLocalizedName
-
-```text
-GeoAreaLocalizedName
-- id: UUID
-- geo_area_id: UUID
-- locale: string
-- name: string
-- name_type: enum
-```
-
-`name_type`:
-
-```text
-localized
-native
-alternate
-short
-```
-
-## 12. Category
-
-Categories are controlled and intentionally broad.
-
-```text
-Category
-- id: UUID
-- slug: string
-- localization_key: string
-- sort_order: int
-- is_active: bool
-```
-
-Suggested initial categories:
-
-```text
-food_drink
-sights_scenery
-culture_attractions
-experiences
-shopping
-outdoors
-stays
-events
-other
-```
-
-## 13. Interest
-
-Interests are extensible concepts.
-
-```text
-Interest
-- id: UUID
-- slug: string
-- canonical_name: string
-- parent_interest_id: UUID?
-- is_system_defined: bool
-- created_at
-```
-
-Examples include matcha, tea, ramen, anime, architecture, bookstores, scenic trains, and contemporary art.
-
-## 14. ExperienceInterest
-
-```text
-ExperienceInterest
-- experience_id: UUID
-- interest_id: UUID
-- confidence: decimal?
-- source: enum
-- model_version: string?
-- created_at
-```
-
-Unique key:
-
-```text
-(experience_id, interest_id)
-```
-
-`source`:
-
-```text
-user
-system_rule
-model
-import
-```
-
-## 15. UserExperienceSignal
-
-Tracks intentional user behavior against an Experience.
-
-```text
-UserExperienceSignal
-- id: UUID
-- user_id: UUID
-- experience_id: UUID
-- signal_type: enum
-- strength: decimal?
-- created_at
-```
-
-`signal_type`:
-
-```text
-saved
-visited
-loved
-liked
-neutral
-disliked
-dismissed
-```
-
-## 16. UserPlaceSignal
-
-```text
-UserPlaceSignal
-- id: UUID
-- user_id: UUID
-- place_id: UUID
-- signal_type: enum
-- strength: decimal?
-- created_at
-```
-
-Useful for repeated saves and visited-place tracking.
-
-## 17. ArtifactPlaceCandidate
-
-Used during extraction and low-confidence review.
-
-```text
-ArtifactPlaceCandidate
-- id: UUID
-- artifact_id: UUID
-- place_id: UUID?
-- raw_candidate_name: string?
-- confidence: decimal
-- rank: int
-- extraction_source: string
-- model_version: string?
-- selected: bool
-- created_at
-```
-
-## 18. InferenceRecord
-
-Generalized provenance for inferred fields.
-
-```text
-InferenceRecord
-- id: UUID
-- user_id: UUID
-- entity_type: string
-- entity_id: UUID
-- field_name: string
-- proposed_value_json: jsonb
-- confidence: decimal
-- source_type: enum
-- model_version: string?
-- accepted_at: timestamp?
-- rejected_at: timestamp?
-- corrected_value_json: jsonb?
-- created_at
-```
-
-## 19. DuplicateGroup
-
-```text
-DuplicateGroup
-- id: UUID
-- user_id: UUID
-- canonical_place_id: UUID?
-- resolution_state: enum
-- confidence: decimal?
-- created_at
-```
-
-```text
-DuplicateGroupMember
-- duplicate_group_id: UUID
-- artifact_id: UUID
-```
-
-`resolution_state`:
-
-```text
-candidate
-auto_merged
-user_merged
-rejected
-```
-
-Artifacts remain intact when Places are reconciled.
-
-## 20. UserInterestProfile
-
-Cached learned-preference signal.
-
-```text
-UserInterestProfile
-- user_id: UUID
-- interest_id: UUID
-- explicit_score: decimal
-- behavioral_score: decimal
-- recommendation_score: decimal
-- confidence: decimal
-- updated_at
-```
-
-Recommendation exposure alone must not increase `explicit_score`.
-
-## 21. RecommendationFeedback
-
-```text
-RecommendationFeedback
-- id: UUID
-- user_id: UUID
-- recommendation_id: UUID
-- action: enum
-- created_at
-```
-
-`action`:
-
-```text
-shown
-opened
-saved
-dismissed
-not_for_me
-visited
-```
-
-## 22. DestinationAggregate
-
-Cached user + GeoArea aggregate.
-
-```text
-DestinationAggregate
-- user_id: UUID
-- geo_area_id: UUID
-- explicit_save_count: int
-- experience_count: int
-- distinct_place_count: int
-- category_count: int
-- gravity_score: decimal
-- fit_score: decimal?
-- recent_save_count: int
-- last_signal_at: timestamp?
-- updated_at
-```
-
-Primary key:
-
-```text
-(user_id, geo_area_id)
-```
-
-Update incrementally rather than recomputing the entire user graph on every save.
-
-## 23. Adaptive Orbit Resolution
-
-Orbit rendering operates on the GeoArea tree plus `DestinationAggregate`.
-
-Conceptual algorithm:
-
-```text
-resolve(node):
-    if user forced a geography level:
-        return nodes at requested level
-
-    if node has weak or diffuse child-level signal:
-        keep node grouped
-
-    if meaningful child clusters exist
-       AND children fit within visual capacity:
-        replace node with selected children
-
-    recurse where useful
-```
-
-Inputs:
-
-- Gravity score
-- number of child clusters
-- share of Gravity concentrated in children
-- label capacity
-- maximum ~10 labeled nodes
-- minimum legible visual size
-- user resolution preference
-
-The output may contain mixed geographic levels.
-
-## 24. Gravity Score Inputs
-
-Initial Gravity should remain interpretable.
-
-Potential components:
-
-```text
-explicit_save_weight
-distinct_experience_weight
-repeat_source_bonus
-recency_weight
-category_diversity_bonus
-manual_interest_bonus
-```
-
-Do not include passive recommendation exposure.
-
-A first implementation should use deterministic weights and be easy to inspect.
-
-## 25. Fit Score Inputs
-
-Fit may consider:
-
-- UserInterestProfile overlap
-- explicit Explore preferences
-- hard geographic/travel constraints
-- negative preferences
-- destination category composition
-- destination interest composition
-
-Fit remains separate from Gravity.
-
-## 26. Sync Metadata
-
-Locally persisted user-owned entities should support sync state such as:
-
-```text
-local_only
-pending_upload
-synced
-pending_delete
-conflict
-```
-
-Related fields may include server version, last synced time, soft-delete time, and local update time.
-
-## 27. Indexing Guidance
-
-Likely indexes:
-
-```text
-Artifact(user_id, created_at desc)
-Artifact(user_id, processing_state)
-Experience(user_id, place_id)
-Place(geo_area_id)
-PlaceAlias(provider, provider_id)
-GeoArea(parent_geo_area_id)
-ExperienceInterest(interest_id, experience_id)
-DestinationAggregate(user_id, gravity_score desc)
-RecommendationFeedback(user_id, created_at desc)
-```
-
-Add PostGIS indexes if server-side spatial queries become part of the MVP.
-
-## 28. Deletion and Privacy
-
-Deleting an Artifact should not automatically delete globally canonical Place/GeoArea records.
-
-User-owned deletion must remove or sever:
-
-- Artifact
-- MediaAsset
-- Experience
-- user-specific signals
-- user-specific inference/provenance
-- derived destination aggregates
-
-Derived caches must never become the only source of truth.
-
-## 29. Future-Compatible Entities
-
-Possible future entities:
-
-```text
-Guide
-GuideEntry
-PublicProfile
-Follow
-GuideSave
-TasteSimilarity
-```
-
-Do not implement these until needed.
-
-## 30. Open Questions
-
-Before schema freeze:
-
-1. Are canonical Place records global or user-scoped for MVP?
-2. Which provider owns initial place resolution?
-3. How much original social-source metadata can legally/reliably be retained?
-4. Can Experience remain locationless indefinitely?
-5. Which inference metadata should be normalized versus generalized in `InferenceRecord`?
-6. Does GeoArea use an external gazetteer, provider hierarchy, or Graviti-maintained canonical tree?
-7. What threshold moves an inference into `needs_review`?
-8. What exact inputs and weights make up Gravity v1?
+Dates encode as seconds since 1970. JSON is pretty printed and sorted.
+
+Restore identity is `Artifact.id`. Existing IDs are skipped; place identity alone does not suppress restoration of a separate source Artifact.
+
+## 15. Deletion semantics
+
+### Delete a save
+
+- repository batch delete validates all IDs
+- removes Artifact records
+- removes local image files
+- recomputes derived Places, destinations, Gravity, patterns, and Fit from the remaining in-memory Library
+
+### Remove a place
+
+- preserves every source Artifact
+- clears matching `place` values
+- marks them `needsReview`
+- reruns eligible enrichment
+
+### Remove repeated-place association
+
+The same place-removal semantics apply across all selected canonical place IDs.
+
+## 16. Identity and duplicate rules
+
+- Artifact identity: UUID
+- Place identity: MapKit identifier string
+- Apple guide item identity: stable Apple place identifier
+- Google list import identity: normalized stable Google source URL; transient coordinate hints are excluded where needed
+- Collection membership identity: case-insensitive title on the existing Artifact
+- Backup duplicate identity: Artifact UUID
+- Search result saved-state identity: SavedPlace ID
+
+Original Artifacts are retained even when they refer to one canonical Place.
+
+## 17. Future normalized model
+
+Possible post-MVP entities include User, Experience, PlaceAlias, GeoArea, Interest, ExperienceInterest, RecommendationFeedback, DestinationAggregate, Guide, and GuideItem.
+
+They are intentionally absent today. Introducing them should happen only when a concrete feature needs independent lifecycle, querying, sync, or sharing.
+
+Migration requirements:
+
+- preserve every Artifact UUID and original source
+- map MapKit place IDs into aliases rather than discarding them
+- preserve user corrections and provenance
+- preserve all collection and Fit Guide memberships
+- keep local backup import available
+- avoid treating recommendation exposure as explicit user interest
+- make future account sync opt-in

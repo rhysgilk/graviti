@@ -1,9 +1,13 @@
 # Graviti — MVP Product Specification
 
-**Version:** 0.1  
-**Status:** Local MVP complete
-**Platform:** iOS  
-**Product:** Graviti  
+**Version:** 1.0
+
+**Status:** Implemented local MVP
+
+**Platform:** iOS
+
+**Product:** Graviti
+
 **Tagline:** *Save what pulls you.*
 
 ---
@@ -163,7 +167,7 @@ A hierarchy such as Shinjuku → Tokyo → Japan or Boston → Massachusetts →
 ### Interest
 Concepts such as matcha, tea, ramen, anime, architecture, museums, or scenic trains.
 
-One Artifact may produce multiple Experiences. Multiple Artifacts may refer to the same Place.
+In the current local model, Experience is represented by an Artifact's generated or user-edited description, category, and interests rather than a separate persisted entity. Multiple Artifacts may refer to the same canonical Place.
 
 ## 10. Geographic Organization
 
@@ -213,16 +217,9 @@ Automatic remains recommended.
 
 **Gravity represents explicit accumulated user interest in a geographic destination.**
 
-Potential inputs include:
+The current deterministic score uses explicit save count and distinct canonical place count. It starts at 22, adds 11 per save and 5 for each distinct place after the first, and caps at 100. Display diameter uses bounded nonlinear scaling across the visible field.
 
-- explicit saves
-- number of distinct Experiences
-- repeated independent saves of the same Place
-- recency
-- category/interest diversity
-- explicit “want to visit” behavior
-
-The exact formula may evolve during dogfooding.
+Recency, category diversity, and explicit “want to visit” behavior remain possible future inputs and must be validated before changing the meaning of Gravity.
 
 Gravity must not increase merely because Graviti recommended something.
 
@@ -240,28 +237,27 @@ A recommendation with high Fit but low Gravity remains distinguishable from an e
 
 MVP recommendations use:
 
-- user saves
-- inferred interests
-- visited/saved behavior if available
-- explicit Explore constraints
-- geographic restrictions
-- negative preferences
+- effective interests inferred from or explicitly edited on saved Artifacts
+- distinct places and geographic areas
+- source-kind diversity and rich note/description evidence
+- explicit preferred interests
+- an Anywhere, Asia, Europe, or North America filter
+- avoided interests
+- persisted Save Destination and Not for Me actions
 
 Recommendations should not constantly over-explain themselves.
 
 Recommendation synthesis must look across the full Library. Repeated interests such as scenery, matcha, architecture, or hiking across many saved destinations should influence Fit for new destinations that match those interests. The app should explain a recommendation using the underlying pattern and supporting saves, even when the recommended destination has little or no explicit Gravity yet.
 
-The initial offline implementation uses a small versioned destination-interest catalog and deterministic weights. It excludes destinations already represented in the Library, labels every result as Fit, and exposes the matched interests and supporting-save count. Catalog coverage should expand or move to a reviewed service without changing the separation between recommendations and explicit Gravity.
+The initial offline implementation uses a small versioned destination-interest catalog and deterministic weights. It excludes destinations already represented in the Library, separates raw relevance from evidence confidence, shrinks uncertain scores toward 50, labels sparse results as Early signal, and exposes matched interests and supporting-save count. Catalog coverage should expand or move to a reviewed service without changing the separation between recommendations and explicit Gravity.
 
-Every Fit recommendation must lead to an actionable **Fit Guide**. The guide searches for specific places within the destination for each pattern that contributed to the recommendation, groups results by that pattern, and lets the user save individual results. Saved results retain their Fit Guide membership in the Library and backup so the user can return to the destination from Explore and continue planning. The local implementation uses live Apple Maps search relevance and sends users to the Maps listing for current ratings, hours, and details; it must not invent or display a review score that MapKit does not provide.
+Every Fit recommendation leads to an actionable **Fit Guide**. The guide resolves the destination first, constrains live Apple MapKit queries to that region, searches for specific places within the destination for each contributing pattern, retries empty narrow categories with a broader term, groups results by pattern, and lets the user save individual results. Saved results retain Fit Guide and pattern membership in the Library and backup so the user can return from Explore and continue planning. The app sends users to the Maps listing for current ratings, hours, and details; it does not invent or display a review score that MapKit does not provide.
 
 Prefer concise evidence:
 
-> **Taipei · 93% fit**  
-> Tea & matcha  
-> Transit-friendly cities  
-> Night markets & food  
-> Contemporary design
+> **Mexico City · 64 FIT**
+> Developing signal · 67% evidence confidence
+> Museums · Architecture · Coffee · Desserts
 
 Detailed reasoning may be accessible when useful.
 
@@ -273,32 +269,7 @@ Explore begins with:
 
 Explore also keeps saved Fit Guides visible. A recommendation is useful only when the user can move from the destination level to concrete experiences, save those experiences, and retrieve the resulting guide later.
 
-Users can specify hard constraints, preferences, and things to avoid.
-
-Examples of hard constraints:
-
-- United States only
-- Europe only
-- under five hours from home
-- no car required
-- exclude destinations already visited
-
-Examples of preferences:
-
-- matcha
-- great food
-- scenery
-- architecture
-- museums
-- walkability
-- quiet
-- nightlife
-
-Examples of avoid rules:
-
-- beach-only trips
-- huge resorts
-- car-dependent travel
+Current controls let users select a broad region, choose preferred interests, and choose interests to avoid. Save Destination retains a recommendation in Your Fit Guides; Not for Me excludes that destination from later results. More detailed travel-time, transportation, budget, season, accessibility, and visited-place constraints remain future work.
 
 ## 16. Gravity Field
 
@@ -308,13 +279,16 @@ Planet behavior:
 
 - size represents relative Gravity
 - maximum approximately 10 labeled planets
-- lower-priority destinations may appear as smaller unlabeled bodies
+- at most ten destinations appear at once
 - differences in Gravity are visible without allowing one planet to dominate the screen
 - subtle internal gradients
 - thin same-color-family iridescent/holographic edge
 - restrained glow
 - gentle ambient motion
+- decorative pulsing white and yellow stars behind the field
 - no cartoon or realistic planets
+
+Stars are noninteractive and do not participate in collision or motion calculations. Reduce Motion keeps them static. Selecting another visible planet switches directly to it without requiring an intermediate zoom-out tap.
 
 Users always have conventional alternatives through Library and Search.
 
@@ -345,23 +319,24 @@ The MVP preserves and displays original source material when available:
 
 - photos
 - screenshots
-- video/Reel previews
 - links
 - map places
 - manual saves
+
+Video files and live social-platform media ingestion are outside the current MVP. A public social or video URL can still be preserved as an ordinary link and may receive a web preview.
 
 Media becomes visually prominent after drilling into a destination or saved item.
 
 Visual principle:
 
-> **Space = organization and possibility**  
+> **Space = organization and possibility**
 > **Media = the actual things that inspired you**
 
 ## 20. Saved Item Detail
 
 A Saved Item screen can show:
 
-- original image/video/link preview
+- original image or link preview
 - Experience
 - associated Place
 - Destination
@@ -399,10 +374,10 @@ When confidence is insufficient, Graviti surfaces a **Needs your help** state.
 The user can correct:
 
 - Place
-- Destination
-- Experience
+- description
 - category
 - interests
+- note
 
 The user may preserve an Artifact as a note even if Graviti cannot resolve it to a Place.
 
@@ -412,13 +387,7 @@ Background enrichment may use place data, source metadata, user notes, and, with
 
 After importing existing saves, Graviti communicates the organizational work it performed.
 
-Example:
-
-> **243 places imported**  
-> 7 countries  
-> 18 cities  
-> 11 duplicates merged  
-> 5 need review
+Import summaries report the values available for the source, including imported, refreshed, duplicate, skipped, country, and city counts. Place resolution continues in the background and ambiguous results remain in Needs Your Help.
 
 This is a core value moment.
 

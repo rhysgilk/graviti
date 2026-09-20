@@ -1,6 +1,6 @@
 # Graviti MVP Steering Guide
 
-This document records product decisions and implementation priorities that should guide continued MVP work. Update it when user feedback changes the direction.
+This document records product decisions and implementation priorities that should guide continued work. The local MVP checklist is complete; open items below are post-MVP direction rather than release blockers. The exact implemented feature inventory is in [CAPABILITIES.md](CAPABILITIES.md).
 
 ## Product principle
 
@@ -93,6 +93,40 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 ### MVP decision gate
 
 **Decision: local-only MVP.** Library > Actions provides a versioned JSON export and restore flow. The backup preserves saved records, place matches, enrichment, cached link details, and embedded photo bytes; restore skips stable-ID duplicates and resumes background processing. Any future distributed beta must state that data stays on the device unless the user exports a backup. Sign in and cloud sync remain a post-MVP option.
+
+## Post-MVP product steering
+
+### Richer understanding
+
+- [ ] Expand semantic detail beyond the current deterministic vocabulary so Graviti can distinguish motifs such as forest versus desert hiking, rocky coast versus beach, historic versus modern architecture, and a specific dish versus generic food.
+- [ ] Evaluate on-device or privacy-preserving background AI enrichment. It must remain asynchronous, expose provenance and confidence, preserve the original source, and never overwrite user corrections.
+- [ ] Let a user inspect why a description or interest was inferred and which source text, detected image text, place metadata, or collection title supported it.
+- [ ] Preserve optional user descriptions on every media type and give user-authored evidence more weight than generated text.
+
+### Recommendation depth and calibration
+
+- [ ] Expand the reviewed destination catalog and represent destination knowledge with sourced, versioned evidence rather than unreviewed generated claims.
+- [ ] Add more contextual constraints only when the app has trustworthy data for them: season, budget, trip length, transit, accessibility, travel time, climate, and visited places.
+- [ ] Build a held-out evaluation set and calibrate Fit bands against later save, dismiss, and visit feedback before treating any displayed score as a probability.
+- [ ] Surface the contribution of relevance, evidence confidence, preference match, novelty, and negative feedback without overwhelming the main recommendation card.
+- [ ] Keep confidence conservative for small or highly correlated libraries even after the candidate catalog grows.
+
+### Fit Guide evolution
+
+- [ ] Add reviewed ranking signals beyond Apple Maps relevance when a permitted provider exposes current ratings or quality data. Never scrape or fabricate review scores.
+- [ ] Add guide-level organization, notes, removal, and explicit archival when users accumulate many Fit Guides.
+- [ ] Preserve the current pattern-grouped flow so destination recommendations always lead to concrete places a user can save and revisit.
+- [ ] If social features are introduced, use trusted people and compatible interest patterns as an additional ranking signal while keeping personal Library evidence understandable and separately weighted.
+
+### Data ownership and portability
+
+- [ ] Include saved-destination, Not for Me, and Explore preference state in a future backward-compatible backup schema.
+- [ ] If account sync is added, make it opt-in and provide an explicit migration path from the existing SwiftData Library and version 1 backup.
+- [ ] Define conflict handling that preserves original Artifacts, collection memberships, and user corrections across devices.
+
+### Social boundary
+
+Social profiles, shared recommendations, and collaboration may extend Graviti later, but they must support the core purpose: learning from saved experiences and helping a person discover fitting destinations and places. Public feeds, follower counts, and engagement mechanics are not goals by themselves.
 
 ### Repository and architecture
 

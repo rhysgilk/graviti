@@ -10,6 +10,8 @@
 
 This audit maps the local MVP Definition of Done to current evidence. External distribution is outside the completion criteria.
 
+The complete implemented feature inventory, data behavior, limitations, and network boundaries are maintained in [CAPABILITIES.md](CAPABILITIES.md).
+
 ## Automated release evidence
 
 - 67 of 67 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
@@ -43,6 +45,7 @@ This audit maps the local MVP Definition of Done to current evidence. External d
 | Core Library data remains accessible offline | Verified | SwiftData is authoritative. Tests confirm failed network lookup preserves the original save and resumes later. Backup export remains explicit and local. |
 | Substantial real-world dogfooding is complete | Verified for internal beta | Focused datasets, a 30-save stress library, live MapKit search, the supplied Google list, the supplied Apple guide, web metadata, Share Extension capture, force quit, and relaunch were exercised. |
 | Major crashes and data-loss bugs are resolved | Verified to current coverage | Both runtime suites pass; batch deletion is atomic; persistence, backup, migration, retry, and force-quit checks pass. No known crash or data-loss defect remains open. |
+| Repository documentation matches the implementation | Verified | README links to a complete capability reference. Architecture and data-model documents describe the actual SwiftData/App Group system and separate future server, sync, AI, and social direction from shipped behavior. |
 
 ## Optional future distribution work
 

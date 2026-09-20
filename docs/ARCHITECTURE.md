@@ -1,704 +1,327 @@
-# Graviti — Architecture
+# Graviti Implemented Architecture
 
-**Version:** 0.1  
-**Status:** Implemented local MVP architecture
-**Primary client:** Native iOS / SwiftUI
+**Version:** 1.0
 
----
+**Status:** Local MVP implementation
 
-## 1. Architecture Principles
+**Platform:** Native iOS, SwiftUI, SwiftData
 
-1. Capture must be fast; network/model work never blocks saving.
-2. The user's own library is offline-first.
-3. UI does not talk directly to persistence or HTTP clients.
-4. External providers live behind adapters.
-5. Original source data is preserved.
-6. Machine inference is asynchronous, confidence-aware, and correctable.
-7. Accessibility and localization are architecture concerns, not polish.
-8. Recommendation-derived data is separated from explicit user intent.
-9. Start simple; add distributed complexity only when actual load requires it.
-10. The MVP should remain debuggable by one developer.
+**Minimum OS:** iOS 18.0
 
-Artifact capture and enrichment have separate persisted lifecycles. Capturing the original source completes first. Description, category, interests, and other derived details then move through `pending`, `processing`, `processed`, `unavailable`, or `failed` without hiding or invalidating the saved Artifact. The app resumes interrupted and failed enrichment when it next becomes active. This contract stays the same when the local enricher is replaced or supplemented by backend jobs.
+This document describes the code that exists today. Future server and social directions are separated at the end.
 
-## 2. High-Level System
+## 1. Design rules
+
+1. Persist the user's source before optional interpretation.
+2. Keep the Library usable offline.
+3. Put persistence and provider behavior behind interfaces.
+4. Preserve original text, URL, image, and collection context.
+5. Make place resolution and enrichment resumable and correctable.
+6. Keep explicit Gravity evidence separate from recommendation state.
+7. Treat accessibility, localization, privacy, and data recovery as core behavior.
+8. Prefer deterministic, inspectable local algorithms for the MVP.
+
+## 2. Runtime system
 
 ```text
-iOS App
- ├── SwiftUI Presentation
- ├── Feature / Domain Layer
- ├── Repository Interfaces
- ├── SwiftData Local Store
- ├── Sync Engine
- ├── Share Extension
- ├── Map / Place Provider Adapter
- └── Ingestion Client
-          │
-          ▼
-Backend API / Supabase
- ├── Auth
- ├── PostgreSQL
- ├── Object Storage
- ├── Ingestion Jobs
- ├── Place Resolution
- ├── Classification / Interest Extraction
- ├── Gravity Aggregation
- └── Recommendation Queries
+SwiftUI App
+├── ContentView and five feature tabs
+├── ArtifactLibrary (@MainActor ObservableObject)
+│   ├── ArtifactRepository
+│   │   └── SwiftDataArtifactRepository
+│   ├── ArtifactProcessingCoordinator
+│   │   ├── MapPlaceResolver
+│   │   │   └── MapKitPlaceSearchProvider
+│   │   ├── VisionTextRecognizer
+│   │   ├── LinkMetadataFetcher
+│   │   └── ArtifactEnricher
+│   ├── ArtifactImportCoordinator
+│   │   ├── AppleMapsGuideParser
+│   │   ├── GoogleMapsListImporter
+│   │   └── GoogleSavedCSVParser
+│   └── LibraryBackupService
+├── DestinationOrbitBuilder and OrbitLayoutEngine
+├── InterestProfileBuilder and DestinationFitEngine
+├── FitGuideSearchEngine
+└── App Group
+    ├── SharedArtifactInbox JSON envelopes
+    └── MediaAssets image files
+
+Share Extension
+└── validates one URL, text item, or image
+    └── writes envelope/media into the App Group
 ```
 
-## 3. Recommended iOS Project Structure
+There is no account, sync engine, remote database, Graviti API, telemetry service, or server job system in the local MVP.
+
+## 3. Repository layout
 
 ```text
-Graviti/
+graviti/graviti/
 ├── App/
 │   ├── GravitiApp.swift
-│   ├── AppEnvironment.swift
-│   ├── AppRouter.swift
-│   └── DependencyContainer.swift
-│
+│   ├── ContentView.swift
+│   └── ArtifactLibrary.swift
+├── Data/
+│   ├── Local/StoredArtifact.swift
+│   └── Repositories/
+│       ├── SwiftDataArtifactRepository.swift
+│       └── PreviewArtifactRepository.swift
 ├── DesignSystem/
-│   ├── ColorTokens.swift
-│   ├── Typography.swift
-│   ├── Spacing.swift
-│   ├── Radius.swift
-│   ├── Motion.swift
-│   ├── Components/
-│   └── Accessibility/
-│
 ├── Domain/
 │   ├── Models/
-│   ├── Repositories/
-│   ├── Services/
-│   └── UseCases/
-│
-├── Data/
-│   ├── Local/
-│   │   ├── SwiftData/
-│   │   └── Mappers/
-│   ├── Remote/
-│   │   ├── API/
-│   │   ├── DTOs/
-│   │   └── Auth/
-│   ├── Repositories/
-│   └── Sync/
-│
+│   ├── Repositories/ArtifactRepository.swift
+│   └── Services/
 ├── Features/
-│   ├── Authentication/
 │   ├── Onboarding/
-│   ├── GravityField/
+│   ├── Home/
+│   ├── Explore/
 │   ├── Capture/
 │   ├── Library/
-│   ├── Search/
-│   ├── Destination/
-│   ├── SavedItem/
-│   ├── Review/
-│   └── Explore/
-│
+│   └── Search/
 ├── Integrations/
 │   ├── MapKit/
-│   ├── Photos/
-│   ├── Vision/
 │   └── ShareExtensionSupport/
-│
-├── Resources/
-│   ├── Localization/
-│   ├── Assets.xcassets
-│   └── PreviewData/
-│
-└── Tests/
-    ├── Unit/
-    ├── Integration/
-    ├── Accessibility/
-    └── Snapshot/
+└── Resources/
+
+graviti/GravitiShareExtension/
+graviti/gravitiTests/
 ```
 
-Separate target:
+## 4. Composition and state
+
+`GravitiApp` configures Sora appearance and opens a `ModelContainer` for `StoredArtifact`. Failure produces a visible Library unavailable screen.
+
+`ContentView` owns one `ArtifactLibrary` and injects it into all tabs. It also manages onboarding, tab selection, shared-inbox import notices, and lifecycle resumption.
+
+On initial task and every return to the active scene, the app:
+
+1. loads queued Share Extension items
+2. retries pending or interrupted Maps resolution
+3. schedules pending OCR
+4. schedules pending link metadata
+5. resumes enrichment
+
+Small UI preferences use `@AppStorage`:
+
+- onboarding completion
+- last Library mode
+- Gravity resolution mode
+- Explore region
+- preferred and avoided interests
+- saved destination IDs
+- excluded destination IDs
+- Debug fixture IDs
+
+## 5. ArtifactLibrary facade
+
+`ArtifactLibrary` is the single observable application facade. It owns the in-memory ordered Artifact array and coordinates repository writes.
+
+Responsibilities include:
+
+- load and save
+- update generated and user-edited fields
+- assign and remove place matches
+- atomic bulk save deletion
+- bulk place-association removal
+- image storage cleanup
+- backup and restore
+- Share Extension inbox ingestion
+- CSV, `.webloc`, Apple guide, and Google list import
+- collection-title backfill and refresh
+- background processing state transitions
+
+The UI does not manipulate SwiftData directly.
+
+## 6. Persistence
+
+`ArtifactRepository` defines load, save, batch save, update, batch update, delete, and batch delete behavior.
+
+`SwiftDataArtifactRepository` maps the domain `Artifact` to `StoredArtifact`. Structured nested values are encoded as JSON blobs so the domain remains Codable and backup-compatible.
+
+Batch update and delete operations validate all requested IDs before mutating and save once. This provides atomic behavior for bulk actions.
+
+Image bytes live in the App Group's `MediaAssets` directory. Artifacts store only a validated filename key. Writes are atomic; deletion removes the corresponding file after the repository delete succeeds.
+
+## 7. Capture and processing state machine
+
+Capture persists synchronously from the user's perspective. Optional work begins afterward.
+
+### Place resolution
 
 ```text
-GravitiShareExtension/
+saved or failed
+  → processing
+  → processed(place)
+  → processed(collection)
+  → needsReview
+  → failed
 ```
 
-## 4. Layer Responsibilities
+Map links are eligible. Collection links are recognized separately so they are not misclassified as a single place.
 
-### Presentation
+### OCR, link metadata, and enrichment
 
-SwiftUI views and presentation models handle rendering, interaction, navigation state, accessibility, animation, and loading/error presentation.
-
-They do not own SQL, HTTP, provider details, scoring logic, or social-link parsing.
-
-### Domain
-
-Pure application concepts and policies:
-
-- Artifact
-- Experience
-- Place
-- GeoArea
-- GravityScore
-- OrbitResolution
-- Recommendation
-- use cases such as CaptureArtifact and ResolveOrbit
-
-### Data
-
-Implements repositories and handles:
-
-- SwiftData persistence
-- backend API
-- sync
-- DTO mapping
-- conflict handling
-- caching
-
-### Integrations
-
-Provider-specific adapters such as MapKit, Vision, Photos, and Share Extension inbox handling.
-
-## 5. Repository Interfaces
-
-Illustrative contracts:
-
-```swift
-protocol ArtifactRepository {
-    func save(_ artifact: Artifact) async throws
-    func artifact(id: Artifact.ID) async throws -> Artifact?
-    func artifacts(filter: ArtifactFilter) async throws -> [Artifact]
-}
-
-protocol PlaceRepository {
-    func place(id: Place.ID) async throws -> Place?
-    func search(query: String) async throws -> [Place]
-    func resolve(alias: PlaceAlias) async throws -> Place?
-}
-
-protocol GeoAreaRepository {
-    func ancestors(of areaID: GeoArea.ID) async throws -> [GeoArea]
-    func children(of areaID: GeoArea.ID) async throws -> [GeoArea]
-}
-
-protocol DestinationRepository {
-    func aggregates() async throws -> [DestinationAggregate]
-}
-
-protocol RecommendationRepository {
-    func recommendations(for request: ExploreRequest) async throws -> [DestinationRecommendation]
-}
-```
-
-Views should not know whether data comes from SwiftData, network, or both.
-
-## 6. Local-First Repository Pattern
+Each uses:
 
 ```text
-SwiftUI
-  ↓
-Repository
-  ↓
-Local SwiftData store  ← immediate read/write
-  ↓
-Sync Queue
-  ↓
-Backend
+pending → processing → processed
+                     → unavailable
+                     → failed
 ```
 
-Capture writes locally first. The user sees success before server processing.
-
-## 7. Capture Flow
-
-```text
-User selects photo/link/place
-        ↓
-Create local Artifact UUID
-        ↓
-Persist immediately
-        ↓
-UI confirms "Saved"
-        ↓
-Queue sync
-        ↓
-Upload source/media if required
-        ↓
-Start backend processing
-        ↓
-Receive processing result
-        ↓
-Update local Experience / Place / Interests
-        ↓
-Update affected Destination aggregates
-```
-
-## 8. Share Extension Flow
-
-The Share Extension is intentionally small.
-
-It should:
-
-1. accept supported content types
-2. capture source URL/media/optional note
-3. write a lightweight payload into an App Group container
-4. confirm save immediately
-5. exit
-
-Avoid expensive model calls, full synchronization, complex place resolution, or blocking uploads inside the extension.
-
-Conceptual payload:
-
-```text
-SharedArtifactEnvelope
-- local_id
-- content_type
-- source_url
-- app_group_media_url
-- note
-- captured_at
-```
-
-## 9. Ingestion Pipeline
-
-```text
-Artifact saved
-      ↓
-Source normalization
-      ↓
-Text / metadata extraction
-      ↓
-Experience candidate extraction
-      ↓
-Place candidate extraction
-      ↓
-Place resolution
-      ↓
-Category classification
-      ↓
-Interest extraction
-      ↓
-Duplicate detection
-      ↓
-Confidence evaluation
-      ↓
-Destination aggregate update
-```
-
-Every stage should be retryable/idempotent where practical.
-
-## 10. Confidence Handling
-
-Suggested initial policy:
-
-```text
-high confidence:
-    apply automatically
+Cancellation returns an active job to `pending`. A transient failure can retry on the next foreground pass. Existing successful enrichment is retained if a later refresh fails.
 
-medium confidence:
-    apply provisionally and expose easy correction
+`unavailable` means the inputs were insufficient; it is different from a processing error.
 
-low confidence:
-    mark Needs Review
-    do not allow uncertain geography to materially affect Gravity
-```
+## 8. Place resolution
 
-Tune thresholds with real dogfood data.
+`MapPlaceResolver` expands supported short links with a bounded HEAD request. It extracts name, query, and coordinate hints, then asks `PlaceSearchProviding` for candidates.
 
-## 11. Provider Abstractions
+Automatic acceptance requires:
 
-Domain code must not depend directly on MapKit IDs.
+- one unique exact normalized name match; or
+- compatible token overlap plus a coordinate match within 250 meters
+- enough distance separation from the next candidate
 
-```swift
-protocol PlaceSearchProvider {
-    func search(_ query: PlaceSearchQuery) async throws -> [PlaceCandidate]
-}
+Anything ambiguous becomes `needsReview`.
 
-protocol GeocodingProvider {
-    func resolve(_ input: GeocodingInput) async throws -> GeoCandidate
-}
-```
+`MapItemPlaceAdapter` converts MapKit results into provider-stable `SavedPlace` values. The MapKit identifier is the canonical local place ID for this MVP.
 
-Initial implementation may use MapKit.
+## 9. Import architecture
 
-## 12. SwiftData Strategy
+`ArtifactImportCoordinator` creates side-effect-free plans against existing Artifacts. `ArtifactLibrary` applies the plan through batch repository calls.
 
-SwiftData acts as:
+### CSV
 
-- local source for responsive UI
-- offline library
-- pending mutation store
-- cache of server-derived results
+The parser handles RFC-style quoting and creates map-link artifacts. Stable source URL identity prevents repeat imports.
 
-It should not dictate the backend schema.
+### Apple Maps guides
 
-Use explicit mappers if domain models and persistence models need to diverge.
+The importer retrieves the public guide payload, decodes its protobuf-like wire representation, extracts a title and place IDs, requests each MapKit item, and builds placed Artifacts.
 
-## 13. Backend Direction
+### Google Maps lists
 
-The MVP beta is local only. SwiftData and the versioned Library backup are authoritative for user-owned data. No account or backend is required for capture, organization, recommendation, or restore.
+The importer retrieves a public shared-list page, finds a same-provider HTTPS data endpoint with an exact allowed path, parses the bounded JSON payload, and retains names, notes, addresses, coordinates, and feature identifiers.
 
-If post-MVP sync is added, a Supabase-style backend remains a reasonable option:
+Collection import planning can:
 
-- PostgreSQL
-- authentication
-- object storage
-- row-level security
-- server functions/jobs where needed
+- insert new records
+- count duplicates and skipped records
+- backfill collection membership
+- refresh unresolved older Google records with better hints
+- preserve user-matched places
+- avoid duplicate collection wrapper artifacts
 
-The backend becomes authoritative only for users who explicitly enable a future synchronized account, after their local library migrates successfully.
+## 10. OCR, web metadata, and enrichment
 
-## 14. Backend Modules
+`VisionTextRecognizer` performs on-device recognition against the stored image file.
 
-Conceptual modules:
+`LinkMetadataFetcher` uses an ephemeral URL session and follows safe public HTTP(S) redirects. It blocks private, loopback, link-local, and otherwise unsafe targets and bounds response and image sizes.
 
-```text
-auth
-artifacts
-media
-experiences
-places
-geo
-interests
-processing
-gravity
-recommendations
-imports
-```
+`ArtifactEnricher` is deterministic. It uses MapKit POI types and text evidence to generate a summary, broad category, interest tags, provenance, confidence, and timestamp. User details remain in a separate value and override generated values.
 
-Keep this a modular monolith/serverless-function set for MVP rather than separate microservices.
+## 11. Geography and Gravity
 
-## 15. Object Storage
+`DestinationOrbitBuilder` derives nodes directly from placed Artifacts. It can group by country, state/province, or city.
 
-Example paths:
+Automatic resolution starts broad and expands a country only when:
 
-```text
-users/{user_id}/artifacts/{artifact_id}/original
-users/{user_id}/artifacts/{artifact_id}/thumbnail
-```
+- it has at least six saves
+- at least two child clusters have at least two saves
+- those meaningful children cover at least 65% of the country's saves
+- the expansion fits the ten-label budget
 
-Consider privacy, lifecycle rules, thumbnails, duplicate hashing, and deletion.
+Several cities in one useful region can group at state/province level. Unknown geography falls back without crashing.
 
-## 16. Geography Service
+Gravity is deterministic and based on explicit saved artifacts. Nodes rank by Gravity, then save count, then localized name, then stable ID.
 
-Responsibilities:
+`OrbitLayoutEngine` produces deterministic bounded positions with collision checks. Visual drift is a view modifier and is disabled by Reduce Motion.
 
-- canonical GeoArea lookup
-- parent/child traversal
-- localized names
-- place-to-area mapping
-- aggregate propagation
+## 12. Search
 
-A Place references its most specific useful known GeoArea. Gravity aggregates propagate upward to ancestors.
+`LibrarySearchEngine` is pure and synchronous. It searches cached local fields and builds grouped results.
 
-## 17. Adaptive Orbit Resolution Service
+`SearchView` runs local matching immediately and debounces live MapKit search. Saving a result goes through `ArtifactLibrary`.
 
-Input:
+## 13. Fit recommendation architecture
 
-```text
-DestinationAggregate tree
-user resolution preference
-screen label budget
-current navigation context
-```
+`InterestProfileBuilder` reads each Artifact's effective interests and category. It records distinct places and geographic areas to distinguish independent evidence from duplicates.
 
-Output:
+`DestinationFitEngine` uses a reviewed in-code candidate catalog with weighted destination strengths. It filters by saved geography, region, exclusions, and avoided interests.
 
-```text
-[OrbitNode]
-```
+The engine calculates:
 
-Example:
+- weighted semantic affinity
+- destination specificity
+- match breadth
+- explicit preference boost
+- raw relevance
+- evidence confidence from artifact, place, area, source-kind, and rich-text counts
+- confidence-shrunk displayed Fit
 
-```text
-[
-  Tokyo(city),
-  Kyoto(city),
-  Uji(city),
-  California(state),
-  Montreal(city),
-  Portugal(country)
-]
-```
+The recommendation retains supporting Artifacts so the UI can explain its evidence. Explore state does not mutate the explicit Library or Gravity.
 
-Potential approach:
+## 14. Fit Guide architecture
 
-1. start from broad high-level nodes
-2. score whether splitting a node increases information value
-3. split highest-value nodes while label count ≤ 10 and minimum legibility is maintained
-4. return stable ordering/layout seeds
+`FitGuideSearchEngine` maps interests to specific and fallback MapKit terms.
 
-The algorithm should be deterministic for identical inputs.
+`MapKitPlaceSearchProvider` first resolves and caches the destination region. Scoped requests:
 
-## 18. Gravity Field Layout Engine
+- require the region
+- request points of interest and physical features
+- use destination-specific spans for broad regions
+- retry server failure or throttling twice
+- return an empty result for placemark-not-found
 
-Requirements:
+The engine deduplicates places between pattern sections and limits each section to six suggestions.
 
-- deterministic initial layout seed
-- maximum ~10 labeled nodes
-- optional background unlabeled nodes
-- collision avoidance
-- gentle drift
-- bounded motion
-- no node escaping tappable space
-- stable selected-node transitions
-- Reduce Motion fallback
+Guide persistence uses source collection titles on Artifacts rather than a separate guide table. This supports multiple guide memberships on one canonical place and automatically includes membership in backup/restore.
 
-Potential implementation:
+## 15. Backup architecture
 
-- custom SwiftUI layout + lightweight physics
-- Canvas where useful for background visuals
-- TimelineView only if performance/battery testing justifies it
+`LibraryBackupService` serializes a schema-versioned archive with full Artifacts and optional image bytes.
 
-Avoid constant high-frequency animation.
+Decode validates total size, schema, count, unique IDs, and media consistency before returning an archive. Restore skips existing Artifact IDs and cleans up newly written media if repository insertion fails.
 
-## 19. Planet Size Mapping
+## 16. Accessibility, localization, and resources
 
-Do not map Gravity linearly to diameter.
+Customer-facing text uses String Catalogs. Spanish coverage exists in the app and Share Extension. Sora Regular and SemiBold are registered in the product; other font source files and Debug CSV fixtures are excluded from Release packaging.
 
-Initial bounds:
+The Gravity Field exposes a logical accessibility order, combined labels, persisted resolution control, Reduce Motion behavior, and conventional Library/Search access.
 
-```text
-minimum labeled diameter ≈ 58pt
-maximum labeled diameter ≈ 170–180pt
-```
+## 17. Security and privacy boundaries
 
-A square-root-like mapping is a reasonable starting point.
+- no Graviti backend or account
+- no analytics, ads, or crash SDK
+- local SwiftData and App Group files are authoritative
+- privacy manifests declare no collected data and no tracking
+- UserDefaults required-reason API declaration is present for the app
+- public-link fetches use scheme, host, redirect, response, and size validation
+- file imports use security-scoped access
+- media keys reject path traversal
+- backups are user-initiated exports
 
-## 20. Navigation
+## 18. Tests and packaging
 
-MVP primary tabs:
+The `gravitiTests` target contains deterministic unit and integration tests for domain services, repositories, import parsers, backup behavior, OCR, link safety, search, place resolution, Fit, Fit Guides, and layout.
 
-```text
-Home
-Explore
-Save (+)
-Library
-Search
-```
+Release scripts:
 
-Profile/settings live behind a secondary affordance.
+- `scripts/verify-release-archive.sh` validates identifiers, versions, minimum OS, privacy manifests, encryption declaration, fonts, Debug fixture exclusion, signatures, and App Group entitlements.
+- `scripts/export-testflight.sh` prepares an App Store Connect export only when valid distribution signing is available. It does not upload.
 
-Map is a Library mode, not a primary tab.
+## 19. Future architecture direction
 
-## 21. Brand Motion
+Potential post-MVP work includes opt-in account sync, a larger reviewed destination knowledge service, server-assisted or on-device semantic enrichment, social recommendation signals, collaboration, and cross-device recovery.
 
-Use the custom `graviti` dot animation only on brand-focused screens.
+Any future sync design must:
 
-Implementation should respect:
+- migrate the existing local Library safely
+- remain opt-in
+- preserve original sources and user corrections
+- keep explicit Gravity separate from recommendation exposure
+- provide deletion and export controls
+- document new collection, telemetry, and network behavior before release
 
-```swift
-@Environment(\.accessibilityReduceMotion) var reduceMotion
-```
-
-If motion is allowed:
-
-- alternate dot scale values
-- ~1.8 seconds
-- easeInOut
-- repeatForever(autoreverses: true)
-
-If Reduce Motion is enabled, keep static asymmetric dots.
-
-## 22. Media UI
-
-Home remains abstract.
-
-Media-heavy screens include:
-
-- Destination saved-media view
-- Saved Artifact detail
-- Saves Library tab
-
-Support:
-
-- photo
-- screenshot
-- link preview
-- Reel/video thumbnail
-- guide/source card
-
-Artifact remains first-class even after place extraction.
-
-## 23. Search
-
-Search should query:
-
-1. local user library immediately
-2. external/world places as network results arrive
-3. destinations/GeoAreas
-4. Interests where useful
-
-Results distinguish already-saved content from external results.
-
-## 24. Recommendation Architecture
-
-Start deterministic.
-
-Inputs:
-
-```text
-UserInterestProfile
-ExploreRequest hard constraints
-ExploreRequest preferences
-negative preferences
-destination interest/category aggregates
-```
-
-Do not start with a generalized AI travel chat system.
-
-AI may assist with messy Artifact understanding without owning the recommendation stack.
-
-## 25. Internationalization
-
-Use localization infrastructure from day one:
-
-- String Catalogs / localized strings
-- no hardcoded customer-facing strings
-- leading/trailing semantics
-- locale-aware formatting
-- localized/native GeoArea names
-- script-appropriate font fallback
-- no assumption of city/state/country hierarchy
-
-Test English, German expansion, Chinese/Japanese, and an RTL language.
-
-## 26. Accessibility
-
-Support:
-
-- Dynamic Type
-- VoiceOver
-- Reduce Motion
-- Increase Contrast
-- Differentiation Without Color
-- practical 44×44pt interactive targets
-
-Gravity Field VoiceOver should expose logical Gravity order rather than arbitrary visual coordinate order.
-
-Example:
-
-```text
-"Tokyo. Gravity 86. City. 27 saved experiences."
-```
-
-## 27. Observability
-
-Track non-sensitive operational events such as:
-
-- capture succeeded/failed
-- processing-stage timing
-- resolution confidence
-- review correction rate
-- duplicate merge accuracy
-- orbit-resolution output size
-- recommendation save/dismiss actions
-
-Avoid logging private source content by default.
-
-## 28. Testing Strategy
-
-### Unit
-
-- Gravity calculation
-- Orbit resolution
-- duplicate matching rules
-- category mapping
-- sync state machine
-
-### Integration
-
-- Share Extension inbox → app import
-- local save → remote sync
-- ingestion result → local update
-- provider alias resolution
-
-### UI
-
-- primary capture loop
-- low-confidence review
-- Gravity Field selection/zoom
-- Library modes
-
-### Accessibility
-
-- VoiceOver labels/order
-- Dynamic Type
-- Reduce Motion
-- contrast
-
-### Localization
-
-Snapshot/stress tests for long strings, CJK, and RTL.
-
-## 29. Initial Technical Spikes
-
-Before full UI implementation, prove these risks:
-
-### Spike A — Share Extension
-Can a user share a URL/photo from another app, close immediately, and reliably find it in Graviti later?
-
-### Spike B — Place Resolution
-Can MapKit/provider search reliably turn messy extracted names into canonical Places?
-
-### Spike C — Artifact Extraction
-Can screenshots/URLs yield useful Experience + Place candidates without unacceptable failure rates?
-
-### Spike D — Gravity Field
-Can 10 labeled planets move smoothly, remain stable, support accessibility, and avoid excessive battery use?
-
-## 30. First Vertical Slice
-
-The first meaningful milestone:
-
-> **Share an artifact from another app → save instantly → process asynchronously → resolve Experience/Place → organize into GeoArea → update Gravity → see result in Library and Gravity Field.**
-
-Build this before a sophisticated recommendation engine.
-
-## 31. Suggested Build Order
-
-1. Project scaffolding + design tokens
-2. Domain models / repository interfaces
-3. SwiftData local persistence
-4. Local-only data ownership and backup
-5. Share Extension spike
-6. In-app Capture
-7. Artifact processing-state UI
-8. Place search/resolution
-9. Library
-10. Destination aggregates
-11. Gravity v1
-12. Adaptive orbit resolution
-13. Gravity Field
-14. Review/correction flow
-15. Search
-16. Saved media/detail
-17. Explore + Fit
-18. Import workflow
-19. Accessibility/localization hardening
-20. TestFlight dogfood
-
-Authentication and synchronized storage follow the MVP only if the user opts into a future account and the existing local Library can migrate safely.
-
-## 32. Architecture Non-goals
-
-For MVP, do not introduce:
-
-- microservices
-- Kafka/event streaming
-- distributed caches
-- custom ML infrastructure
-- overly generic plugin frameworks
-- premature multi-platform abstractions
-- complex CQRS/event sourcing
-
-The interesting complexity belongs in the product model and interaction, not infrastructure theater.
-
-## 33. Open Architecture Decisions
-
-Before implementation freeze:
-
-1. Revisit the iOS 18.0 minimum only when a product requirement needs a newer system API.
-2. Post-MVP sync provider and local-library migration path.
-3. Post-MVP authentication providers.
-4. SwiftData domain-model coupling vs separate persistence models.
-5. Place canonicalization source of truth.
-6. Background task strategy for pending processing.
-7. Whether media originals are always uploaded or user-configurable.
-8. Gravity v1 formula.
-9. Adaptive orbit-resolution thresholds.
-10. Analytics/crash-reporting choice.
+Microservices, event streaming, generalized agent chat, and premature multi-platform abstractions remain unnecessary until product requirements justify them.
