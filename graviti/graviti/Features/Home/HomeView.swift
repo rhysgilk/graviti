@@ -11,6 +11,7 @@ struct HomeView: View {
     @ObservedObject var library: ArtifactLibrary
     let onSave: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var presentation: HomePresentation = .field
     @State private var fieldPath: [OrbitItem] = []
     @State private var presentedDestination: OrbitNode?
@@ -277,8 +278,15 @@ struct HomeView: View {
 
                         if homeInsight != nil {
                             Button(action: showInsight) {
-                                Label("Insight", systemImage: "chart.bar.xaxis")
+                                Group {
+                                    if dynamicTypeSize.isAccessibilitySize {
+                                        Image(systemName: "chart.bar.xaxis")
+                                    } else {
+                                        Label("Insight", systemImage: "chart.bar.xaxis")
+                                    }
+                                }
                                     .font(.subheadline.weight(.medium))
+                                    .dynamicTypeSize(.large)
                                     .frame(minHeight: 44)
                                     .padding(.horizontal, 12)
                                     .background(.white.opacity(0.08), in: Capsule())
@@ -309,6 +317,8 @@ struct HomeView: View {
             }
         } label: {
             Image(systemName: "scope")
+                .font(.system(size: 17, weight: .medium))
+                .dynamicTypeSize(.large)
                 .frame(width: 44, height: 44)
                 .background(.white.opacity(0.08), in: Circle())
         }

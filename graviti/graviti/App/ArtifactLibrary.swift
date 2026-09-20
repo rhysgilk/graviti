@@ -16,10 +16,10 @@ final class ArtifactLibrary: ObservableObject {
     init(
         repository: any ArtifactRepository,
         placeResolver: MapPlaceResolver? = nil,
-        sharedInbox: SharedArtifactInboxClient = .live
+        sharedInbox: SharedArtifactInboxClient? = nil
     ) {
         self.repository = repository
-        self.sharedInbox = sharedInbox
+        self.sharedInbox = sharedInbox ?? .live
         let resolver = placeResolver ?? MapPlaceResolver(
             searchProvider: MapKitPlaceSearchProvider(),
             linkExpander: URLSessionMapLinkExpander()

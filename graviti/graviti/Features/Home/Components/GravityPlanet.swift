@@ -71,6 +71,7 @@ struct GravityPlanet: View {
             .padding(diameter * 0.12)
         }
         .frame(width: diameter, height: diameter)
+        .dynamicTypeSize(.large)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(
             "\(name), \(level.displayName), \(saveCount) saved items"

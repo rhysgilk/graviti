@@ -52,7 +52,7 @@ struct GravitiWordmark: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            Text("grav")
+            Text(verbatim: "grav")
                 .font(GravitiTypography.display(size.fontSize))
 
             letterI(
@@ -60,7 +60,7 @@ struct GravitiWordmark: View {
                 color: GravitiColors.iris
             )
 
-            Text("t")
+            Text(verbatim: "t")
                 .font(GravitiTypography.display(size.fontSize))
 
             letterI(
@@ -69,7 +69,11 @@ struct GravitiWordmark: View {
             )
         }
         .foregroundStyle(.white)
+        .environment(\.layoutDirection, .leftToRight)
         .fixedSize()
+        .dynamicTypeSize(.large)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: "Graviti"))
         .onAppear {
             guard animated, !reduceMotion else { return }
 
@@ -87,7 +91,7 @@ struct GravitiWordmark: View {
         color: Color
     ) -> some View {
         ZStack(alignment: .top) {
-            Text("ı")
+            Text(verbatim: "ı")
                 .font(GravitiTypography.display(size.fontSize))
 
             Circle()
