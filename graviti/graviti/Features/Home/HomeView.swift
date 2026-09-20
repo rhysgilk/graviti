@@ -65,6 +65,9 @@ struct HomeView: View {
                         if presentation != .field { clearPresentation() }
                     }
 
+                GravityStarfield()
+                    .ignoresSafeArea()
+
                 header
 
                 if items.isEmpty {
@@ -271,7 +274,7 @@ struct HomeView: View {
 
                     Spacer()
                 } else {
-                    GravitiWordmark(size: .small)
+                    GravitiWordmark(size: .small, animated: true)
 
                     Spacer()
 

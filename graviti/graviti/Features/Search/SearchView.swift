@@ -34,9 +34,9 @@ struct SearchView: View {
                                 DestinationLibraryDetailView(node: node, library: library)
                             } label: {
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text(node.name).font(.headline)
+                                    Text(node.name).font(GravitiTypography.headline)
                                     Text("\(GravitiCopy.savedItems(node.saveCount)) · \(Int(node.gravity)) Gravity")
-                                        .font(.subheadline)
+                                        .font(GravitiTypography.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
                             }
@@ -51,9 +51,9 @@ struct SearchView: View {
                                 SearchInterestDetailView(pattern: pattern, library: library)
                             } label: {
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text(InterestDisplayName.localized(pattern.name)).font(.headline)
+                                    Text(InterestDisplayName.localized(pattern.name)).font(GravitiTypography.headline)
                                     Text(pattern.evidenceSummary)
-                                        .font(.subheadline)
+                                        .font(GravitiTypography.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
                             }
@@ -124,6 +124,7 @@ struct SearchView: View {
             .searchable(text: $query, prompt: "Saves, interests, or places")
             .task(id: query) { await search() }
         }
+        .font(GravitiTypography.body)
     }
 
     private var savedMatches: [SavedPlace] {
@@ -157,10 +158,10 @@ struct SearchView: View {
 
     private func placeRow(_ place: SavedPlace) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(place.name).font(.headline)
+            Text(place.name).font(GravitiTypography.headline)
             if !place.subtitle.isEmpty {
                 Text(place.subtitle)
-                    .font(.subheadline)
+                    .font(GravitiTypography.subheadline)
                     .foregroundStyle(.secondary)
             }
         }
@@ -169,10 +170,10 @@ struct SearchView: View {
 
     private func savedArtifactRow(_ artifact: Artifact) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(LibrarySearchEngine.title(for: artifact)).font(.headline).lineLimit(2)
+            Text(LibrarySearchEngine.title(for: artifact)).font(GravitiTypography.headline).lineLimit(2)
             Text([artifact.effectiveCategory?.displayName, artifact.place?.subtitle]
                 .compactMap { $0 }.joined(separator: " · "))
-                .font(.subheadline)
+                .font(GravitiTypography.subheadline)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
@@ -235,7 +236,7 @@ private struct SearchInterestDetailView: View {
                         .foregroundStyle(.secondary)
                     if !pattern.areaNames.isEmpty {
                         Text(pattern.areaNames.prefix(4).joined(separator: " · "))
-                            .font(.subheadline)
+                            .font(GravitiTypography.subheadline)
                             .foregroundStyle(GravitiColors.signalMint)
                     }
                 }
@@ -248,10 +249,10 @@ private struct SearchInterestDetailView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 3) {
                             Text(artifact.place?.name ?? artifact.linkMetadata?.title ?? artifact.originalText ?? String(localized: "Saved item"))
-                                .font(.headline)
+                                .font(GravitiTypography.headline)
                                 .lineLimit(2)
                             if let summary = artifact.effectiveSummary {
-                                Text(summary).font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
+                                Text(summary).font(GravitiTypography.subheadline).foregroundStyle(.secondary).lineLimit(2)
                             }
                         }
                     }
@@ -262,6 +263,7 @@ private struct SearchInterestDetailView: View {
         .background(GravitiColors.appBackground)
         .navigationTitle("Interest")
         .navigationBarTitleDisplayMode(.inline)
+        .font(GravitiTypography.body)
     }
 
     private var currentArtifacts: [Artifact] {

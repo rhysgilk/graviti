@@ -36,4 +36,35 @@ final class ArtifactImportCoordinatorTests: XCTestCase {
         XCTAssertEqual(plan.rawURL, rawURL)
         XCTAssertNil(plan.artifact)
     }
+
+    func testGoogleMapsListPlanPreservesNotesAndSkipsExistingPlaces() {
+        let existingPlace = GoogleMapsListPlace(
+            title: "Existing",
+            address: "1 Main St",
+            note: nil,
+            latitude: 1,
+            longitude: 2,
+            featureIdentifiers: ["1", "2"]
+        )
+        let newPlace = GoogleMapsListPlace(
+            title: "New place",
+            address: "2 Main St",
+            note: "Scenic roof",
+            latitude: 3,
+            longitude: 4,
+            featureIdentifiers: ["3", "4"]
+        )
+        let existing = Artifact(kind: .url, sourceURL: existingPlace.sourceURL, originalText: existingPlace.title)
+
+        let plan = ArtifactImportCoordinator.googleMapsList(
+            GoogleMapsList(title: "Shared list", places: [existingPlace, newPlace]),
+            existingArtifacts: [existing]
+        )
+
+        XCTAssertEqual(plan.title, "Shared list")
+        XCTAssertEqual(plan.duplicates, 1)
+        XCTAssertEqual(plan.artifacts.count, 1)
+        XCTAssertEqual(plan.artifacts.first?.originalText, "New place")
+        XCTAssertEqual(plan.artifacts.first?.userNote, "Scenic roof")
+    }
 }

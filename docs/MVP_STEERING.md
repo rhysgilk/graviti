@@ -78,6 +78,8 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Lower the minimum deployment target to iOS 18 and isolate iOS 26 MapKit address APIs behind a compatibility adapter.
 - [x] Keep dogfood datasets and unused font weights out of Release archives while preserving the dataset switcher in Debug builds.
 - [x] Add a production app icon with standard, dark, and tinted appearances, plus the branded system accent color.
+- [x] Import public Apple Maps guides and shared Google Maps lists directly from pasted links, while retaining Google Takeout CSV as a bulk export path.
+- [x] Keep ambient Home stars decorative, noninteractive, and motion accessible; apply Sora consistently to Library and Search.
 
 ### MVP decision gate
 

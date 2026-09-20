@@ -19,6 +19,13 @@ struct AppleGuideImportPlan {
     let skipped: Int
 }
 
+struct GoogleMapsListImportPlan {
+    let title: String
+    let artifacts: [Artifact]
+    let duplicates: Int
+    let skipped: Int
+}
+
 enum ArtifactImportCoordinator {
     static func googleCSV(_ text: String, existingArtifacts: [Artifact]) throws -> ArtifactImportPlan {
         let parsed = try GoogleSavedCSVParser.parse(text)
@@ -105,6 +112,43 @@ enum ArtifactImportCoordinator {
             artifacts: additions,
             duplicates: duplicates,
             skipped: failed
+        )
+    }
+
+    static func googleMapsList(
+        _ rawURL: String,
+        existingArtifacts: [Artifact]
+    ) async throws -> GoogleMapsListImportPlan {
+        let list = try await GoogleMapsListImporter.load(rawURL)
+        return googleMapsList(list, existingArtifacts: existingArtifacts)
+    }
+
+    static func googleMapsList(
+        _ list: GoogleMapsList,
+        existingArtifacts: [Artifact]
+    ) -> GoogleMapsListImportPlan {
+        var existingURLs = Set(existingArtifacts.compactMap(\.sourceURL))
+        var additions = [Artifact]()
+        var duplicates = 0
+
+        for place in list.places {
+            guard existingURLs.insert(place.sourceURL).inserted else {
+                duplicates += 1
+                continue
+            }
+            additions.append(Artifact(
+                kind: .url,
+                sourceURL: place.sourceURL,
+                originalText: place.title,
+                userNote: place.note
+            ))
+        }
+
+        return GoogleMapsListImportPlan(
+            title: list.title,
+            artifacts: additions,
+            duplicates: duplicates,
+            skipped: 0
         )
     }
 }

@@ -169,6 +169,7 @@ struct LibraryView: View {
                 Alert(title: Text("Library backup"), message: Text(status.message), dismissButton: .default(Text("OK")))
             }
         }
+        .font(GravitiTypography.body)
     }
 
     private func exportBackup() {
@@ -215,12 +216,12 @@ struct LibraryView: View {
                     .fontWeight(.semibold)
                 Spacer()
                 Text(needsReviewCount, format: .number)
-                    .font(.caption.weight(.bold))
+                    .font(GravitiTypography.captionSemibold)
                     .frame(minWidth: 28, minHeight: 28)
                     .background(.white.opacity(0.12), in: Circle())
                 Image(systemName: showsNeedsReviewOnly ? "checkmark.circle.fill" : "chevron.forward")
             }
-            .font(.subheadline)
+            .font(GravitiTypography.subheadline)
             .foregroundStyle(showsNeedsReviewOnly ? .white : GravitiColors.opportunityCoral)
             .padding(.horizontal, 16)
             .frame(minHeight: 48)
@@ -245,13 +246,13 @@ struct LibraryView: View {
                     Text("Repeated places")
                         .fontWeight(.semibold)
                     Text(GravitiCopy.repeatedPlaces(repeatedPlaceGroups.count))
-                        .font(.caption)
+                        .font(GravitiTypography.caption)
                         .foregroundStyle(.white.opacity(0.62))
                 }
                 Spacer()
                 Image(systemName: "chevron.forward")
             }
-            .font(.subheadline)
+            .font(GravitiTypography.subheadline)
             .foregroundStyle(.white)
             .padding(.horizontal, 16)
             .frame(minHeight: 58)
@@ -270,7 +271,7 @@ struct LibraryView: View {
                         mode = option
                     } label: {
                         Text(option.title)
-                            .font(.subheadline.weight(.semibold))
+                            .font(GravitiTypography.subheadlineSemibold)
                             .foregroundStyle(mode == option ? .white : .white.opacity(0.68))
                             .padding(.horizontal, 16)
                             .frame(minHeight: 44)
@@ -303,9 +304,9 @@ struct LibraryView: View {
                     DestinationLibraryDetailView(node: node, library: library)
                 } label: {
                     VStack(alignment: .leading, spacing: 5) {
-                        Text(node.name).font(.headline)
+                        Text(node.name).font(GravitiTypography.headline)
                         Text("\(node.level.displayName) · \(GravitiCopy.savedItems(node.saveCount))")
-                            .font(.subheadline)
+                            .font(GravitiTypography.subheadline)
                             .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 6)
@@ -338,7 +339,7 @@ struct LibraryView: View {
                         } label: {
                             HStack(spacing: 14) {
                                 Image(systemName: selectedPlaceIDs.contains(place.id) ? "checkmark.circle.fill" : "circle")
-                                    .font(.title3)
+                                    .font(GravitiTypography.title3)
                                     .foregroundStyle(selectedPlaceIDs.contains(place.id) ? GravitiColors.signalMint : .secondary)
                                 placeLabel(place)
                             }
@@ -362,8 +363,8 @@ struct LibraryView: View {
 
     private func placeLabel(_ place: SavedPlace) -> some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(place.name).font(.headline)
-            Text(place.subtitle).font(.subheadline).foregroundStyle(.secondary)
+            Text(place.name).font(GravitiTypography.headline)
+            Text(place.subtitle).font(GravitiTypography.subheadline).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 6)
@@ -373,7 +374,7 @@ struct LibraryView: View {
         VStack(spacing: 8) {
             if let placeActionError {
                 Text(placeActionError)
-                    .font(.caption)
+                    .font(GravitiTypography.caption)
                     .foregroundStyle(GravitiColors.opportunityCoral)
             }
             Button(role: .destructive) {
@@ -385,7 +386,7 @@ struct LibraryView: View {
                         : GravitiCopy.removeSelectedPlacesLabel(selectedPlaceIDs.count),
                     systemImage: "trash"
                 )
-                .font(.subheadline.weight(.semibold))
+                .font(GravitiTypography.subheadlineSemibold)
                 .frame(maxWidth: .infinity, minHeight: 48)
             }
             .buttonStyle(.borderedProminent)
@@ -418,7 +419,7 @@ struct LibraryView: View {
         VStack(spacing: 8) {
             if let saveActionError {
                 Text(saveActionError)
-                    .font(.caption)
+                    .font(GravitiTypography.caption)
                     .foregroundStyle(GravitiColors.opportunityCoral)
             }
             Button(role: .destructive) {
@@ -430,7 +431,7 @@ struct LibraryView: View {
                         : GravitiCopy.deleteSelectedSavesLabel(selectedArtifactIDs.count),
                     systemImage: "trash"
                 )
-                .font(.subheadline.weight(.semibold))
+                .font(GravitiTypography.subheadlineSemibold)
                 .frame(maxWidth: .infinity, minHeight: 48)
             }
             .buttonStyle(.borderedProminent)
@@ -546,7 +547,7 @@ struct LibraryView: View {
                         } label: {
                             HStack(spacing: 14) {
                                 Image(systemName: selectedArtifactIDs.contains(artifact.id) ? "checkmark.circle.fill" : "circle")
-                                    .font(.title3)
+                                    .font(GravitiTypography.title3)
                                     .foregroundStyle(selectedArtifactIDs.contains(artifact.id) ? GravitiColors.signalMint : .secondary)
                                 ArtifactRow(artifact: artifact)
                             }
@@ -623,13 +624,13 @@ private struct ArtifactRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(artifact.libraryTitle)
-                    .font(.headline)
+                    .font(GravitiTypography.headline)
                     .foregroundStyle(.white)
                     .lineLimit(2)
 
                 if let supportingText {
                     Text(supportingText)
-                        .font(.subheadline)
+                        .font(GravitiTypography.subheadline)
                         .foregroundStyle(.white.opacity(0.68))
                         .lineLimit(2)
                 }
@@ -648,12 +649,12 @@ private struct ArtifactRow: View {
                     Text(artifact.place?.name ?? artifact.capturedAt.formatted(.dateTime.month().day().year()))
                         .lineLimit(1)
                 }
-                .font(.caption)
+                .font(GravitiTypography.caption)
                 .foregroundStyle(.white.opacity(0.58))
 
                 if artifact.processingState == .needsReview || artifact.processingState == .failed {
                     Text(artifact.processingState == .needsReview ? "Needs place review" : "Place lookup failed")
-                        .font(.caption.weight(.medium))
+                        .font(GravitiTypography.captionSemibold)
                         .foregroundStyle(GravitiColors.opportunityCoral)
                 }
 

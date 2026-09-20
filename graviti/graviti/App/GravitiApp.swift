@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import UIKit
 
 @main
 struct GravitiApp: App {
@@ -14,6 +15,7 @@ struct GravitiApp: App {
     private let startupError: String?
 
     init() {
+        Self.configureTypography()
         do {
             let container = try ModelContainer(for: StoredArtifact.self)
             repository = SwiftDataArtifactRepository(context: ModelContext(container))
@@ -22,6 +24,19 @@ struct GravitiApp: App {
             repository = nil
             startupError = error.localizedDescription
         }
+    }
+
+    private static func configureTypography() {
+        guard let regular = UIFont(name: "Sora-Regular", size: 15),
+              let semibold = UIFont(name: "Sora-SemiBold", size: 17),
+              let largeTitle = UIFont(name: "Sora-SemiBold", size: 34) else { return }
+        UINavigationBar.appearance().titleTextAttributes = [.font: semibold]
+        UINavigationBar.appearance().largeTitleTextAttributes = [.font: largeTitle]
+        UITabBarItem.appearance().setTitleTextAttributes([.font: regular.withSize(10)], for: .normal)
+        UITabBarItem.appearance().setTitleTextAttributes([.font: semibold.withSize(10)], for: .selected)
+        UISegmentedControl.appearance().setTitleTextAttributes([.font: regular.withSize(13)], for: .normal)
+        UISegmentedControl.appearance().setTitleTextAttributes([.font: semibold.withSize(13)], for: .selected)
+        UISearchTextField.appearance().font = regular
     }
 
     var body: some Scene {

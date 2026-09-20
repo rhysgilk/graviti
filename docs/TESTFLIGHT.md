@@ -4,14 +4,14 @@ This document contains the copy and checks for Graviti's local-only MVP beta.
 
 ## Beta app description
 
-Graviti is a private travel-interest library. Save places, links, notes, screenshots, photos, Apple Maps guides, and Google Maps exports. Graviti organizes them into destinations and interests, shows where your saves have the most Gravity, and suggests future destinations using explainable Fit signals.
+Graviti is a private travel-interest library. Save places, links, notes, screenshots, photos, Apple Maps guides, shared Google Maps lists, and Google Maps exports. Graviti organizes them into destinations and interests, shows where your saves have the most Gravity, and suggests future destinations using explainable Fit signals.
 
 ## What to test
 
 - Complete onboarding and save a place through Search.
 - Save a link, note, and photo inside the app.
 - Share a link or image to Graviti from another app, then reopen Graviti.
-- Import an Apple Maps guide or Google Takeout Saved CSV.
+- Paste an Apple Maps guide or shared Google Maps list link and confirm its places import. Import a Google Takeout Saved CSV.
 - Review and correct a place that needs help.
 - Edit a saved item's description, category, and interests.
 - Inspect Destinations, Places, Saves, and Map in Library.
@@ -29,7 +29,8 @@ This beta stores its Library on the device. Graviti does not require an account 
 ## Current limitations
 
 - Library data does not sync between devices.
-- Place search, place resolution, Apple Maps guide import, and link previews require a network connection.
+- Place search, place resolution, Apple Maps and Google Maps list imports, and link previews require a network connection.
+- Shared Google Maps list import depends on Google's public list response format and may need maintenance if Google changes it.
 - Destination recommendations use a small reviewed offline catalog during the MVP beta.
 - Some imported or shared items may require manual place matching.
 
@@ -37,12 +38,15 @@ This beta stores its Library on the device. Graviti does not require an account 
 
 Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 50 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing, Fit scoring, persistence, backup restore, offline save preservation, safe Apple Maps URL generation, and deterministic ten-destination Gravity Field layout.
+- All 53 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing, Fit scoring, persistence, backup restore, offline save preservation, safe map URL generation, and deterministic ten-destination Gravity Field layout.
 - A clean signed Debug build completed without warnings. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
 - Direct bubble switching, bulk place removal confirmation, and bulk save deletion confirmation were exercised without committing destructive test actions.
 - A 30-save crowded-library fixture was exercised across Home, Explore, and Library. Home stayed within its ten-label budget with readable long names, Library exposed bulk selection, Explore synthesized varied interests with 66 FIT recommendations, and the imported library persisted after termination and relaunch.
+- A live shared Google Maps list link imported all 28 places from the supplied “Vanessa and Rhys” guide, preserved the guide title, and continued place enrichment in the background.
+- Home's white and yellow stars remain behind the Gravity Field, ignore input, and pulse gently; Reduce Motion keeps them static. The small Graviti wordmark animates both colored i dots.
+- Library and Search use Sora for navigation, tabs, segmented controls, search fields, and screen content.
 - Saturated Gravity ties now prefer destinations with more saved items before falling back to a stable name order, so a smaller destination cannot displace stronger evidence merely because both scores reached 100.
 - Maximum Dynamic Type, increased contrast, right-to-left layout, expanded pseudo-localized strings, and Reduce Motion were inspected in Simulator.
 - Spanish coverage was completed for the app and Share Extension. Home, Explore, Library, canonical interest names, singular/plural counts, accessibility labels, and bulk-selection copy were inspected in Spanish without clipping.

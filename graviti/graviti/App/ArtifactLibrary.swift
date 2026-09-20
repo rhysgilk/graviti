@@ -445,6 +445,25 @@ final class ArtifactLibrary: ObservableObject {
             cities: Set(plan.artifacts.compactMap { $0.place?.locality }).count
         )
     }
+
+    func importGoogleMapsListPlaces(from rawURL: String) async throws -> GoogleMapsListImportSummary {
+        let plan = try await ArtifactImportCoordinator.googleMapsList(rawURL, existingArtifacts: artifacts)
+
+        if !plan.artifacts.isEmpty {
+            try await repository.saveMany(plan.artifacts)
+            artifacts.insert(contentsOf: plan.artifacts, at: 0)
+            Task {
+                await processPendingMaps()
+                await processPendingEnrichment()
+            }
+        }
+        return GoogleMapsListImportSummary(
+            title: plan.title,
+            imported: plan.artifacts.count,
+            duplicates: plan.duplicates,
+            skipped: plan.skipped
+        )
+    }
 }
 
 struct AppleGuideImportSummary {
@@ -461,4 +480,11 @@ struct CSVImportSummary {
     let duplicates: Int
     let skipped: Int
     let importedIDs: [UUID]
+}
+
+struct GoogleMapsListImportSummary {
+    let title: String
+    let imported: Int
+    let duplicates: Int
+    let skipped: Int
 }

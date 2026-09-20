@@ -145,9 +145,25 @@ struct SaveView: View {
                         }
                         .buttonStyle(.plain)
 
-                        Text("Share an Apple Maps or Google Maps place, paste its link, or import a .webloc file. Apple Maps guides can bring in their places. For Google Maps lists, select Saved in Google Takeout and import its CSV.")
+                        Text("Paste an Apple Maps or Google Maps link to save a place or import a shared guide or list. You can also import Google Takeout CSVs and .webloc files.")
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.7))
+
+                        HStack(spacing: 12) {
+                            Label("Paste Maps link", systemImage: "doc.on.clipboard")
+                                .font(.subheadline.weight(.semibold))
+                            Spacer()
+                            PasteButton(payloadType: URL.self) { urls in
+                                guard let url = urls.first else { return }
+                                kind = .url
+                                urlText = url.absoluteString
+                                Task { await save() }
+                            }
+                            .tint(GravitiColors.iris)
+                        }
+                        .padding(.horizontal, 14)
+                        .frame(minHeight: 52)
+                        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
 
                         if let googleTakeoutURL = URL(string: "https://takeout.google.com") {
                             Link("Open Google Takeout", destination: googleTakeoutURL)
@@ -167,7 +183,7 @@ struct SaveView: View {
                         Button {
                             showingMapsLinkImporter = true
                         } label: {
-                            Label("Import Maps link file", systemImage: "link.badge.plus")
+                            Label("Import .webloc file", systemImage: "link.badge.plus")
                                 .font(.subheadline.weight(.semibold))
                                 .frame(maxWidth: .infinity, minHeight: 48)
                                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
@@ -243,7 +259,7 @@ struct SaveView: View {
                         let url = try await library.importMapsLinkFile(from: fileURL)
                         importSummary = nil
                         importMessage = String(localized: "Maps link saved to Library.")
-                        await importAppleGuideIfNeeded(url)
+                        await importMapCollectionIfNeeded(url)
                     } catch {
                         importSummary = nil
                         importMessage = error.localizedDescription
@@ -315,7 +331,7 @@ struct SaveView: View {
             selectedPhoto = nil
             didSave = true
             if let savedURL {
-                Task { await importAppleGuideIfNeeded(savedURL) }
+                Task { await importMapCollectionIfNeeded(savedURL) }
             }
         } catch {
             saveError = error.localizedDescription
@@ -323,24 +339,45 @@ struct SaveView: View {
         isSaving = false
     }
 
-    private func importAppleGuideIfNeeded(_ url: String) async {
-        guard MapLinkMetadata.provider(for: url) == .apple,
-              MapLinkMetadata.isCollectionLink(url) else { return }
-        importMessage = String(localized: "Importing places from Apple Maps guide…")
+    private func importMapCollectionIfNeeded(_ url: String) async {
+        guard let provider = MapLinkMetadata.provider(for: url) else { return }
         importSummary = nil
-        do {
-            let summary = try await library.importAppleGuidePlaces(from: url)
-            importMessage = nil
-            importSummary = SaveImportSummary(
-                title: summary.title,
-                imported: summary.imported,
-                duplicates: summary.duplicates,
-                skipped: summary.skipped,
-                countries: summary.countries,
-                cities: summary.cities
-            )
-        } catch {
-            importMessage = error.localizedDescription
+
+        switch provider {
+        case .apple:
+            guard MapLinkMetadata.isCollectionLink(url) else { return }
+            importMessage = String(localized: "Importing places from Apple Maps guide…")
+            do {
+                let summary = try await library.importAppleGuidePlaces(from: url)
+                importMessage = nil
+                importSummary = SaveImportSummary(
+                    title: summary.title,
+                    imported: summary.imported,
+                    duplicates: summary.duplicates,
+                    skipped: summary.skipped,
+                    countries: summary.countries,
+                    cities: summary.cities
+                )
+            } catch {
+                importMessage = error.localizedDescription
+            }
+        case .google:
+            importMessage = String(localized: "Checking for places in this Google Maps list…")
+            do {
+                let summary = try await library.importGoogleMapsListPlaces(from: url)
+                importMessage = nil
+                importSummary = SaveImportSummary(
+                    title: summary.title,
+                    imported: summary.imported,
+                    duplicates: summary.duplicates,
+                    skipped: summary.skipped,
+                    processingContinues: summary.imported > 0
+                )
+            } catch GoogleMapsListError.notAList {
+                importMessage = nil
+            } catch {
+                importMessage = error.localizedDescription
+            }
         }
     }
 

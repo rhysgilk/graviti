@@ -43,6 +43,50 @@ final class ImportParserTests: XCTestCase {
         XCTAssertThrowsError(try AppleMapsGuideParser.parse(components.url!.absoluteString))
     }
 
+    func testGoogleMapsListFindsValidatedDataEndpoint() throws {
+        let html = #"<html><head><link href="/maps/preview/entitylist/getlist?hl=en&amp;pb=%211m1%211sabc" as="fetch"></head></html>"#
+
+        let endpoint = try GoogleMapsListParser.dataEndpoint(
+            in: Data(html.utf8),
+            relativeTo: try XCTUnwrap(URL(string: "https://www.google.com/maps/placelists/list/abc"))
+        )
+
+        XCTAssertEqual(endpoint.host, "www.google.com")
+        XCTAssertEqual(endpoint.path, "/maps/preview/entitylist/getlist")
+        XCTAssertTrue(endpoint.absoluteString.contains("&pb="))
+    }
+
+    func testGoogleMapsListParsesPlacesNotesAndStableURLs() throws {
+        let firstDetails: [Any] = [
+            NSNull(), NSNull(), "Tea House, 1 Main St", NSNull(), "1 Main St",
+            [NSNull(), NSNull(), 40.7, -73.9], ["-1", "2"]
+        ]
+        let secondDetails: [Any] = [
+            NSNull(), NSNull(), "Forest Walk, Park Road", NSNull(), "Park Road",
+            [NSNull(), NSNull(), 44.3, -68.2], ["3", "4"]
+        ]
+        let list: [Any] = [
+            ["list-id"], 4, [], [], "Weekend ideas", "", NSNull(), NSNull(),
+            [
+                [NSNull(), firstDetails, "Tea House\n", "Try matcha"],
+                [NSNull(), secondDetails, "Forest Walk", ""],
+                [NSNull(), firstDetails, "Tea House", "Duplicate"]
+            ]
+        ]
+        let json = try JSONSerialization.data(withJSONObject: [list])
+        let payload = Data(")]}'\n".utf8) + json
+
+        let result = try GoogleMapsListParser.parse(payload)
+
+        XCTAssertEqual(result.title, "Weekend ideas")
+        XCTAssertEqual(result.places.count, 2)
+        XCTAssertEqual(result.places[0].title, "Tea House")
+        XCTAssertEqual(result.places[0].note, "Try matcha")
+        XCTAssertEqual(result.places[0].latitude, 40.7)
+        XCTAssertTrue(result.places[0].sourceURL.contains("0xffffffffffffffff:0x2"))
+        XCTAssertNil(result.places[1].note)
+    }
+
     private func guidePayload(title: String, placeIDs: [UInt64], namespace: UInt64 = 9_902) -> Data {
         var bytes = field(number: 1, bytes: Array(title.utf8))
         for id in placeIDs {
