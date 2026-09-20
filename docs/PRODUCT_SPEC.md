@@ -75,21 +75,21 @@ That save should contribute appropriately to destination Gravity and eventually 
 
 If this loop does not work reliably, other features do not compensate for it.
 
-## 6. Authentication and First Run
+## 6. First Run and Data Ownership
+
+The local-only MVP beta requires no account. The Library is stored on device, works offline, and can be exported and restored through a versioned backup. TestFlight notes must make this data promise explicit. Account-based sync remains a post-MVP option and must provide a migration path for existing local libraries.
 
 The user can:
 
-- Sign in with Apple
-- Sign in with Google
-- optionally use email authentication if implementation cost remains low
 - enter a lightweight first-run experience
 - immediately import existing saves, add a photo/screenshot, search for a place, or skip setup
+- export and restore their Library without creating an account
 
 No long preference questionnaire is required before using the app.
 
 ### Brand motion
 
-On Sign In and Start Your Orbit, the two dots above the `i` characters in `graviti` subtly alternate sizes:
+On first run and Start Your Orbit, the two dots above the `i` characters in `graviti` subtly alternate sizes:
 
 - left dot: small → large → small
 - right dot: large → small → large
@@ -533,7 +533,7 @@ These are not rejected forever; they are not required to ship the MVP.
 
 Graviti MVP is ready for external TestFlight users when:
 
-- authentication works reliably
+- the local-only data promise is clear and versioned backup/restore works reliably
 - a new user understands Graviti without a tutorial
 - users can capture content from inside and outside the app
 - saves appear immediately

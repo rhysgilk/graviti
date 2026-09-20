@@ -330,7 +330,9 @@ Use explicit mappers if domain models and persistence models need to diverge.
 
 ## 13. Backend Direction
 
-A Supabase-style backend is a reasonable MVP choice:
+The MVP beta is local only. SwiftData and the versioned Library backup are authoritative for user-owned data. No account or backend is required for capture, organization, recommendation, or restore.
+
+If post-MVP sync is added, a Supabase-style backend remains a reasonable option:
 
 - PostgreSQL
 - authentication
@@ -338,7 +340,7 @@ A Supabase-style backend is a reasonable MVP choice:
 - row-level security
 - server functions/jobs where needed
 
-The backend is authoritative for synchronized user-owned data after successful sync.
+The backend becomes authoritative only for users who explicitly enable a future synchronized account, after their local library migrates successfully.
 
 ## 14. Backend Modules
 
@@ -689,8 +691,8 @@ The interesting complexity belongs in the product model and interaction, not inf
 Before implementation freeze:
 
 1. Exact minimum iOS version.
-2. Supabase vs another backend.
-3. Sign in with Google dependency/provider.
+2. Post-MVP sync provider and local-library migration path.
+3. Post-MVP authentication providers.
 4. SwiftData domain-model coupling vs separate persistence models.
 5. Place canonicalization source of truth.
 6. Background task strategy for pending processing.
