@@ -6,6 +6,8 @@ struct ExploreView: View {
     @AppStorage("explore.region") private var regionRaw = RecommendationRegion.anywhere.rawValue
     @AppStorage("explore.preferredInterests") private var preferredRaw = ""
     @AppStorage("explore.avoidedInterests") private var avoidedRaw = ""
+    @AppStorage("explore.savedDestinations") private var savedDestinationsRaw = ""
+    @AppStorage("explore.excludedDestinations") private var excludedDestinationsRaw = ""
     @State private var showingPreferences = false
 
     private var profile: InterestProfile {
@@ -20,8 +22,22 @@ struct ExploreView: View {
         ExplorePreferences(
             region: RecommendationRegion(rawValue: regionRaw) ?? .anywhere,
             preferredInterests: Self.decode(preferredRaw),
-            avoidedInterests: Self.decode(avoidedRaw)
+            avoidedInterests: Self.decode(avoidedRaw),
+            excludedDestinationIDs: excludedDestinationIDs
         )
+    }
+
+    private var savedDestinationIDs: Set<String> { Self.decode(savedDestinationsRaw) }
+    private var excludedDestinationIDs: Set<String> { Self.decode(excludedDestinationsRaw) }
+
+    private var savedDestinations: [SavedDestination] {
+        var destinations = [SavedDestination]()
+        for id in savedDestinationIDs {
+            if let destination = DestinationFitEngine.savedDestination(for: id) {
+                destinations.append(destination)
+            }
+        }
+        return destinations.sorted { $0.name < $1.name }
     }
 
     var body: some View {
@@ -46,6 +62,31 @@ struct ExploreView: View {
 
                     if let leading = profile.strongestAcrossAreas {
                         leadingPattern(leading)
+                    }
+
+                    if !savedDestinations.isEmpty {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Saved destinations")
+                                .font(.headline)
+                            ForEach(savedDestinations) { destination in
+                                Button { onFindPlace(destination.name) } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "bookmark.fill")
+                                            .foregroundStyle(GravitiColors.signalMint)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(destination.name).font(.headline)
+                                            Text(destination.country).font(.caption).foregroundStyle(.white.opacity(0.62))
+                                        }
+                                        Spacer()
+                                        Image(systemName: "magnifyingglass")
+                                            .foregroundStyle(.white.opacity(0.55))
+                                    }
+                                    .padding(14)
+                                    .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
                     }
 
                     if profile.interests.isEmpty && recommendations.isEmpty {
@@ -89,7 +130,10 @@ struct ExploreView: View {
                                 NavigationLink {
                                     DestinationRecommendationView(
                                         recommendation: recommendation,
-                                        onSearch: { onFindPlace(recommendation.name) }
+                                        isSaved: savedDestinationIDs.contains(recommendation.id),
+                                        onSearch: { onFindPlace(recommendation.name) },
+                                        onSave: { saveDestination(recommendation) },
+                                        onNotForMe: { excludeDestination(recommendation) }
                                     )
                                 } label: {
                                     recommendationRow(recommendation)
@@ -196,6 +240,10 @@ struct ExploreView: View {
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
+                if savedDestinationIDs.contains(recommendation.id) {
+                    Image(systemName: "bookmark.fill")
+                        .foregroundStyle(GravitiColors.signalMint)
+                }
                 Text(recommendation.scoreLabel)
                     .font(recommendation.confidence == .early ? .caption.weight(.bold) : .title3.weight(.bold))
                 Text(recommendation.confidence == .early ? "MORE SAVES NEEDED" : recommendation.confidence.displayName.uppercased())
@@ -233,11 +281,37 @@ struct ExploreView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(GravitiColors.iris.opacity(0.25), in: RoundedRectangle(cornerRadius: 20))
     }
+
+    private func saveDestination(_ recommendation: DestinationRecommendation) {
+        var saved = savedDestinationIDs
+        var excluded = excludedDestinationIDs
+        saved.insert(recommendation.id)
+        excluded.remove(recommendation.id)
+        savedDestinationsRaw = Self.encode(saved)
+        excludedDestinationsRaw = Self.encode(excluded)
+    }
+
+    private func excludeDestination(_ recommendation: DestinationRecommendation) {
+        var saved = savedDestinationIDs
+        var excluded = excludedDestinationIDs
+        saved.remove(recommendation.id)
+        excluded.insert(recommendation.id)
+        savedDestinationsRaw = Self.encode(saved)
+        excludedDestinationsRaw = Self.encode(excluded)
+    }
+
+    private static func encode(_ values: Set<String>) -> String {
+        values.sorted().joined(separator: "|")
+    }
 }
 
 private struct DestinationRecommendationView: View {
+    @Environment(\.dismiss) private var dismiss
     let recommendation: DestinationRecommendation
+    let isSaved: Bool
     let onSearch: () -> Void
+    let onSave: () -> Void
+    let onNotForMe: () -> Void
 
     var body: some View {
         ScrollView {
@@ -285,6 +359,25 @@ private struct DestinationRecommendationView: View {
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity, minHeight: 50)
                     .background(GravitiColors.iris, in: RoundedRectangle(cornerRadius: 14))
+
+                Button {
+                    onSave()
+                } label: {
+                    Label(isSaved ? "Destination saved" : "Save destination", systemImage: isSaved ? "bookmark.fill" : "bookmark")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                }
+                .disabled(isSaved)
+
+                Button(role: .destructive) {
+                    onNotForMe()
+                    dismiss()
+                } label: {
+                    Label("Not for me", systemImage: "hand.thumbsdown")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                }
             }
             .padding(20)
         }

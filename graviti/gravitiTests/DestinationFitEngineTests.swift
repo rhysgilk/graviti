@@ -65,6 +65,26 @@ final class DestinationFitEngineTests: XCTestCase {
         XCTAssertFalse(results.contains { $0.name == "Vermont" || $0.name == "Seattle" })
     }
 
+    func testExcludedDestinationDoesNotReturnInLaterRecommendations() {
+        let artifacts = (0..<4).map { index in
+            artifact(
+                interests: ["Forests", "Hiking"],
+                place: place("forest-\(index)", locality: "Woodland \(index)", region: "Vermont")
+            )
+        }
+        let profile = InterestProfileBuilder.build(from: artifacts)
+        let initial = DestinationFitEngine.recommendations(from: profile, artifacts: artifacts, limit: 20)
+        let excluded = initial.first?.id
+        XCTAssertNotNil(excluded)
+
+        let preferences = ExplorePreferences(excludedDestinationIDs: Set([excluded].compactMap { $0 }))
+        let updated = DestinationFitEngine.recommendations(
+            from: profile, artifacts: artifacts, preferences: preferences, limit: 20
+        )
+
+        XCTAssertFalse(updated.contains { $0.id == excluded })
+    }
+
     private func recommendations(_ artifacts: [Artifact], limit: Int = 3) -> [DestinationRecommendation] {
         DestinationFitEngine.recommendations(from: InterestProfileBuilder.build(from: artifacts), artifacts: artifacts, limit: limit)
     }

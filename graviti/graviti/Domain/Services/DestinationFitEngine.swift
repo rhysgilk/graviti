@@ -50,6 +50,14 @@ struct ExplorePreferences: Equatable {
     var region: RecommendationRegion = .anywhere
     var preferredInterests: Set<String> = []
     var avoidedInterests: Set<String> = []
+    var excludedDestinationIDs: Set<String> = []
+}
+
+struct SavedDestination: Identifiable, Hashable {
+    let name: String
+    let country: String
+
+    var id: String { "\(name), \(country)" }
 }
 
 enum DestinationFitEngine {
@@ -59,6 +67,8 @@ enum DestinationFitEngine {
         let region: RecommendationRegion
         /// Values from 0...1 describe how characteristic each interest is of this destination.
         let strengths: [String: Double]
+
+        var id: String { "\(name), \(country)" }
     }
 
     private struct UserSignal {
@@ -102,6 +112,7 @@ enum DestinationFitEngine {
         })
 
         return candidates.compactMap { candidate -> DestinationRecommendation? in
+            guard !preferences.excludedDestinationIDs.contains(candidate.id) else { return nil }
             guard !savedAreas.contains(candidate.name.foldedKey) else { return nil }
             guard preferences.region == .anywhere || candidate.region == preferences.region else { return nil }
             guard Set(candidate.strengths.keys).isDisjoint(with: preferences.avoidedInterests) else { return nil }
@@ -145,6 +156,10 @@ enum DestinationFitEngine {
         }
         .prefix(limit)
         .map { $0 }
+    }
+
+    static func savedDestination(for id: String) -> SavedDestination? {
+        candidates.first { $0.id == id }.map { SavedDestination(name: $0.name, country: $0.country) }
     }
 
     private static func userSignals(from profile: InterestProfile, preferences: ExplorePreferences) -> [UserSignal] {
