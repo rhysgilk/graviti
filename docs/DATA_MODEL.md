@@ -1,8 +1,8 @@
 # Graviti — Data Model
 
 **Version:** 0.1  
-**Status:** Proposed MVP schema  
-**Storage direction:** PostgreSQL backend + SwiftData local cache
+**Status:** Implemented local MVP model with future sync references
+**Storage direction:** SwiftData local authority + versioned backup; optional backend after MVP
 
 ---
 

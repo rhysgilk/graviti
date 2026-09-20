@@ -64,7 +64,8 @@ Still required before external TestFlight distribution:
 
 - Complete the remaining core-flow checklist on a physical signed device. Initial physical-device testing has passed.
 - Supply the feedback email and App Store Connect review contact.
-- Produce and upload the distribution archive in the owner's App Store Connect account.
+- Enroll or associate team `V9W8HRDJQT` with an App Store Connect provider that can create App Store provisioning profiles. The September 20 export attempt reached Apple's signing service but reported no provider for the account and no permission to create profiles for either bundle.
+- Produce and upload the distribution archive in the owner's App Store Connect account after that account gate is resolved.
 
 Public privacy policy URL: <https://github.com/rhysgilk/graviti/blob/main/docs/PRIVACY.md>
 
@@ -100,3 +101,11 @@ Before upload, require a distribution provisioning profile:
 ```
 
 The upload gate fails for development provisioning so a locally installable archive cannot be mistaken for a TestFlight-ready archive.
+
+To have Xcode re-sign an archive and export an App Store Connect IPA without uploading it, run:
+
+```sh
+./scripts/export-testflight.sh /path/to/graviti.xcarchive
+```
+
+The script first runs the package checks, refuses to reuse an existing export directory, asks Xcode for automatic App Store signing, and leaves the IPA in a timestamped directory under `/tmp`. Upload remains a separate, deliberate step.

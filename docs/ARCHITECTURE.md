@@ -654,7 +654,7 @@ Build this before a sophisticated recommendation engine.
 1. Project scaffolding + design tokens
 2. Domain models / repository interfaces
 3. SwiftData local persistence
-4. Authentication shell
+4. Local-only data ownership and backup
 5. Share Extension spike
 6. In-app Capture
 7. Artifact processing-state UI
@@ -671,6 +671,8 @@ Build this before a sophisticated recommendation engine.
 18. Import workflow
 19. Accessibility/localization hardening
 20. TestFlight dogfood
+
+Authentication and synchronized storage follow the MVP only if the user opts into a future account and the existing local Library can migrate safely.
 
 ## 32. Architecture Non-goals
 

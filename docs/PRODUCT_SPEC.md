@@ -494,11 +494,11 @@ A failed network request must never make an existing save appear lost.
 Initial direction:
 
 - **UI:** SwiftUI
-- **Local persistence:** SwiftData behind repositories
+- **MVP persistence:** SwiftData behind repositories, with versioned local backup and restore
 - **Mapping/place resolution:** MapKit behind provider abstractions
-- **Backend:** PostgreSQL / Supabase-style relational service
-- **Media:** object storage for source/preview assets
-- **Processing:** asynchronous artifact-ingestion pipeline
+- **Backend:** none required for the local-only MVP beta; PostgreSQL / Supabase-style sync remains a post-MVP option
+- **Media:** local persisted source/preview assets for MVP; object storage may accompany future opt-in sync
+- **Processing:** asynchronous, resumable artifact-ingestion pipeline
 
 The UI communicates through repositories/services rather than directly depending on persistence implementations.
 
