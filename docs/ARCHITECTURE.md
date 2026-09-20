@@ -1,7 +1,7 @@
 # Graviti — Architecture
 
 **Version:** 0.1  
-**Status:** Proposed MVP architecture  
+**Status:** Implemented local MVP architecture
 **Primary client:** Native iOS / SwiftUI
 
 ---

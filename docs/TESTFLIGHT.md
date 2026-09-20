@@ -1,6 +1,6 @@
 # TestFlight Preparation
 
-This document contains the copy and checks for Graviti's local-only MVP beta.
+This document is optional future distribution guidance. Graviti's local MVP is complete without TestFlight or App Store Connect work.
 
 ## Beta app description
 
@@ -63,7 +63,7 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - A signed arm64 Release archive was produced with an iOS 18 minimum, matching app and extension versions, both privacy manifests, non-exempt encryption disabled, exactly the two registered Sora fonts, no dogfood CSVs, valid nested signatures, and matching App Group entitlements.
 - The current archive uses a seven-day Apple Development provisioning profile. It verifies the packaged release contents but is not eligible for TestFlight upload; the upload archive must use App Store distribution provisioning.
 
-Still required before external TestFlight distribution:
+If external TestFlight distribution is chosen later:
 
 - Complete the remaining hands-on core-flow checklist on the provisioned physical device. Initial manual testing and automated install/launch verification have passed.
 - Supply the feedback email and App Store Connect review contact.

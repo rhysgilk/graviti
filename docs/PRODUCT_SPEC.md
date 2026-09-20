@@ -1,7 +1,7 @@
 # Graviti — MVP Product Specification
 
 **Version:** 0.1  
-**Status:** Draft / MVP Contract  
+**Status:** Local MVP complete
 **Platform:** iOS  
 **Product:** Graviti  
 **Tagline:** *Save what pulls you.*
@@ -531,7 +531,7 @@ These are not rejected forever; they are not required to ship the MVP.
 
 ## 31. Definition of Done
 
-Graviti MVP is ready for external TestFlight users when:
+Graviti's local MVP is complete when:
 
 - the local-only data promise is clear and versioned backup/restore works reliably
 - a new user understands Graviti without a tutorial

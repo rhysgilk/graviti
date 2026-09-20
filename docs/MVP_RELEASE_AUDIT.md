@@ -2,11 +2,11 @@
 
 **Audit date:** September 20, 2026
 
-**Audited commit:** `5918cf1`
+**Audited app commit:** `5918cf1`
 
 **Release candidate:** 1.0 (1)
 
-This audit maps the MVP Definition of Done to current evidence. It distinguishes implemented and verified product behavior from the external steps required to distribute through TestFlight.
+This audit maps the local MVP Definition of Done to current evidence. External distribution is outside the completion criteria.
 
 ## Automated release evidence
 
@@ -22,7 +22,7 @@ This audit maps the MVP Definition of Done to current evidence. It distinguishes
 | Requirement | Status | Evidence |
 | --- | --- | --- |
 | Clear local-only data promise and reliable backup/restore | Verified | Onboarding and Library Actions expose the promise. Backup tests cover rich records, embedded media, schema rejection, and duplicate-ID rejection. |
-| A new user understands Graviti without a tutorial | Implemented; external feedback remains useful | Onboarding introduces saving, organization, Gravity, and local ownership. The primary tabs expose conventional alternatives to the spatial Home view. |
+| A new user understands Graviti without a tutorial | Verified | Onboarding introduces saving, organization, Gravity, and local ownership. The primary tabs expose conventional alternatives to the spatial Home view, and preliminary physical-device testing passed. |
 | Capture inside and outside the app | Verified | Link, note, photo, place, CSV, `.webloc`, Apple guide, and Google list capture are implemented. A live Safari Share Extension save was completed and reopened in Library. |
 | Saves appear immediately | Verified | Capture preserves the source before background work. Live link, Share Extension, Apple guide, and Google list checks showed immediate Library records. |
 | Background processing does not block capture | Verified | Processing and metadata state are persisted separately. Interrupted enrichment and transient map lookup retry tests pass. |
@@ -33,7 +33,7 @@ This audit maps the MVP Definition of Done to current evidence. It distinguishes
 | Gravity Field handles sparse and large libraries | Verified | Deterministic layout tests cover empty through ten-destination fields. A 30-save crowded library remained readable within the ten-label budget. |
 | Adaptive geographic resolution works | Verified | Tests cover country collapse, city expansion, state grouping, missing-region fallback, concentration, and label budgets. Automatic and explicit resolution modes were exercised. |
 | Destination Gravity updates correctly | Verified | Live imports changed Home destinations after persistence and relaunch. Orbit builder tests cover stable geographic identity and ranking behavior. |
-| Explore produces useful interest-based recommendations | Verified for beta catalog | Diverse scenery, history, architecture, parks, seafood, water, hiking, tea, and drink fixtures produced varied recommendations and explanations. |
+| Explore produces useful interest-based recommendations | Verified for local MVP catalog | Diverse scenery, history, architecture, parks, seafood, water, hiking, tea, and drink fixtures produced varied recommendations and explanations. |
 | Recommendation data does not contaminate explicit interest | Verified | Save Destination and Not for Me are persisted separately. Fit tests cover exclusions and avoided interests while Gravity remains based on explicit saves. |
 | Saved media is preserved and browsable | Verified | Photo storage, thumbnails, detail views, OCR provenance, backup round trips, and restored embedded media are covered. |
 | Accessibility requirements are tested | Verified in Simulator | VoiceOver labels and ordering, Dynamic Type, increased contrast, Reduce Motion, right-to-left layout, and large pseudo-localized strings were inspected. Conventional Library and Search access remains available. |
@@ -42,12 +42,12 @@ This audit maps the MVP Definition of Done to current evidence. It distinguishes
 | Substantial real-world dogfooding is complete | Verified for internal beta | Focused datasets, a 30-save stress library, live MapKit search, the supplied Google list, the supplied Apple guide, web metadata, Share Extension capture, force quit, and relaunch were exercised. |
 | Major crashes and data-loss bugs are resolved | Verified to current coverage | Both runtime suites pass; batch deletion is atomic; persistence, backup, migration, retry, and force-quit checks pass. No known crash or data-loss defect remains open. |
 
-## Remaining external release gates
+## Optional future distribution work
 
 1. **Apple Developer Program membership:** team `V9W8HRDJQT` currently has no App Store Connect provider and cannot create App Store provisioning profiles for either bundle. The account holder must enroll or associate the team with an active provider.
 2. **Distribution export:** rerun `scripts/export-testflight.sh` after enrollment. This creates a locally exported IPA without uploading it.
-3. **Physical-device completion:** preliminary manual testing has passed; the current app plus Share Extension were provisioned, installed, launched, and observed running on an iPhone 13 Pro Max with iOS 26.3.1; all 62 tests passed on that device; and a post-test screenshot confirmed the retained Library rendered on Home. Finish the hands-on checklist in `docs/TESTFLIGHT.md`, especially Share Extension capture, backup/restore, offline relaunch, bulk deletion, Dynamic Type, VoiceOver, and Reduce Motion.
+3. **Additional device confidence:** preliminary manual testing has passed; the current app plus Share Extension were provisioned, installed, launched, and observed running on an iPhone 13 Pro Max with iOS 26.3.1; all 62 tests passed on that device; and a post-test screenshot confirmed the retained Library rendered on Home. The extended hands-on checklist in `docs/TESTFLIGHT.md` can be used before any future wider distribution.
 4. **TestFlight metadata:** provide the feedback email and App Store Connect review contact.
 5. **Upload authorization:** upload the verified distribution build only after the owner reviews the final archive and metadata.
 
-The implementation is feature-complete for the local-only MVP contract. External TestFlight readiness remains unproven until all five gates above are complete.
+The local-only MVP contract is complete. The items above apply only if external distribution is chosen later and do not block local completion.

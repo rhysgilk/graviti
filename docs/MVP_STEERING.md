@@ -89,7 +89,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 
 ### MVP decision gate
 
-**Decision: local-only MVP beta.** Library > Actions provides a versioned JSON export and restore flow. The backup preserves saved records, place matches, enrichment, cached link details, and embedded photo bytes; restore skips stable-ID duplicates and resumes background processing. TestFlight notes must state that data stays on the device unless the user exports a backup. Sign in and cloud sync remain a post-MVP option.
+**Decision: local-only MVP.** Library > Actions provides a versioned JSON export and restore flow. The backup preserves saved records, place matches, enrichment, cached link details, and embedded photo bytes; restore skips stable-ID duplicates and resumes background processing. Any future distributed beta must state that data stays on the device unless the user exports a backup. Sign in and cloud sync remain a post-MVP option.
 
 ### Repository and architecture
 
