@@ -74,6 +74,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Persist the last Library mode; use Destinations as the initial mode for a new user.
 - [x] Replace repeated explanatory copy with concise headers such as Interests, Patterns, and Your saves.
 - [x] Make the local-only data promise visible during onboarding and from Library Actions, including network and backup behavior.
+- [x] Lower the minimum deployment target to iOS 18 and isolate iOS 26 MapKit address APIs behind a compatibility adapter.
 
 ### MVP decision gate
 

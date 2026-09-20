@@ -14,21 +14,11 @@ struct MapKitPlaceSearchProvider: PlaceSearchProviding {
         }
 
         return response.mapItems.compactMap { item in
-            guard let name = item.name, !name.isEmpty else { return nil }
-            let coordinate = item.location.coordinate
-            let place = SavedPlace(
-                id: item.identifier?.rawValue ?? String(format: "%.5f,%.5f:%@", coordinate.latitude, coordinate.longitude, name),
-                name: name,
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude,
-                locality: item.addressRepresentations?.cityName,
-                region: nil,
-                country: item.addressRepresentations?.regionName
-            )
+            guard let place = MapItemPlaceAdapter.savedPlace(from: item) else { return nil }
             var url = URLComponents(string: "https://maps.apple.com/")!
             url.queryItems = [
-                URLQueryItem(name: "ll", value: "\(coordinate.latitude),\(coordinate.longitude)"),
-                URLQueryItem(name: "q", value: name)
+                URLQueryItem(name: "ll", value: "\(place.latitude),\(place.longitude)"),
+                URLQueryItem(name: "q", value: place.name)
             ]
             return PlaceCandidate(place: place, sourceURL: url.url!.absoluteString)
         }

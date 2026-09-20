@@ -85,24 +85,14 @@ enum ArtifactImportCoordinator {
             }
             do {
                 let item = try await MKMapItemRequest(mapItemIdentifier: identifier).mapItem
-                guard let name = item.name, !name.isEmpty else {
+                guard let place = MapItemPlaceAdapter.savedPlace(from: item, fallbackID: rawIdentifier) else {
                     failed += 1
                     continue
                 }
-                let coordinate = item.location.coordinate
-                let place = SavedPlace(
-                    id: item.identifier?.rawValue ?? rawIdentifier,
-                    name: name,
-                    latitude: coordinate.latitude,
-                    longitude: coordinate.longitude,
-                    locality: item.addressRepresentations?.cityName,
-                    region: nil,
-                    country: item.addressRepresentations?.regionName
-                )
                 additions.append(Artifact(
                     kind: .url,
                     sourceURL: placeURL,
-                    originalText: name,
+                    originalText: place.name,
                     place: place,
                     processingState: .processed
                 ))

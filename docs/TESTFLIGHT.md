@@ -44,3 +44,4 @@ This beta stores its Library on the device. Graviti does not require an account 
 - Answer App Privacy with **No, we do not collect data from this app** while the implementation remains local-only and contains no telemetry SDK.
 - State the local-only data promise and backup instruction in every beta build's notes.
 - Complete the device, accessibility, localization, offline, import, backup, and data-loss checks above before inviting external testers.
+- Run the core flow on both the iOS 18 minimum and the latest iOS release before inviting external testers.

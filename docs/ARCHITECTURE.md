@@ -690,7 +690,7 @@ The interesting complexity belongs in the product model and interaction, not inf
 
 Before implementation freeze:
 
-1. Exact minimum iOS version.
+1. Revisit the iOS 18.0 minimum only when a product requirement needs a newer system API.
 2. Post-MVP sync provider and local-library migration path.
 3. Post-MVP authentication providers.
 4. SwiftData domain-model coupling vs separate persistence models.

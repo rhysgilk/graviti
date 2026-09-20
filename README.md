@@ -46,7 +46,7 @@ Views depend on domain models and repository interfaces. SwiftData and provider-
 ## Requirements
 
 - macOS with Xcode 26.2 or newer
-- iOS 26.2 simulator or device
+- iOS 18.0 or newer simulator or device
 - An Apple development team for device signing and Share Extension testing
 
 ## Build
