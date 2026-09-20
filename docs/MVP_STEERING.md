@@ -67,7 +67,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 
 ### Next
 
-- [ ] Improve Automatic geographic resolution using Gravity concentration, meaningful child clusters, state/province usefulness, and the available label budget.
+- [x] Improve Automatic geographic resolution using Gravity concentration, meaningful child clusters, state/province usefulness, and the available label budget.
 - [x] Make Search global across artifacts, interests, destinations, saved places, and MapKit results.
 - [ ] Add richer thumbnails and media cards to the Saves library with graceful note/link fallbacks.
 - [ ] Add persisted recommendation actions: **Save destination** and **Not for me**.

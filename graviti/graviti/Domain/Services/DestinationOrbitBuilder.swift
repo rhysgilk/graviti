@@ -2,6 +2,24 @@ import Foundation
 import CryptoKit
 
 enum DestinationOrbitBuilder {
+    private struct CountryRepresentation {
+        let collapsed: OrbitNode
+        let children: [OrbitNode]
+
+        var expansionPriority: Double {
+            let meaningfulSaves = children.filter { $0.saveCount >= 2 }.reduce(0) { $0 + $1.saveCount }
+            let coverage = Double(meaningfulSaves) / Double(max(collapsed.saveCount, 1))
+            return collapsed.gravity * (0.5 + coverage)
+        }
+
+        var shouldExpand: Bool {
+            let meaningfulChildren = children.filter { $0.saveCount >= 2 }
+            let meaningfulSaves = meaningfulChildren.reduce(0) { $0 + $1.saveCount }
+            let coverage = Double(meaningfulSaves) / Double(max(collapsed.saveCount, 1))
+            return collapsed.saveCount >= 6 && meaningfulChildren.count >= 2 && coverage >= 0.65
+        }
+    }
+
     static func nodes(
         from artifacts: [Artifact],
         mode: OrbitResolutionMode = .automatic,
@@ -20,34 +38,41 @@ enum DestinationOrbitBuilder {
     }
 
     private static func automaticNodes(from artifacts: [Artifact], limit: Int?) -> [OrbitNode] {
-        let raw = ungroupedNodes(from: artifacts)
-        var countries: [String: (name: String, cityIDs: Set<UUID>, placeIDs: Set<String>, count: Int)] = [:]
+        var countryArtifacts: [String: (name: String, artifacts: [Artifact])] = [:]
+        var artifactsWithoutCountry: [Artifact] = []
         for artifact in artifacts {
-            guard let place = artifact.place,
-                  let country = place.country?.trimmingCharacters(in: .whitespacesAndNewlines), !country.isEmpty else { continue }
-            let countryKey = normalized(country)
-            var group = countries[countryKey] ?? (country, [], [], 0)
-            if let city = place.locality?.trimmingCharacters(in: .whitespacesAndNewlines), !city.isEmpty {
-                group.cityIDs.insert(stableID(for: normalized("city|\(country)|\(city)")))
+            guard let place = artifact.place else { continue }
+            guard let country = cleaned(place.country) else {
+                artifactsWithoutCountry.append(artifact)
+                continue
             }
-            group.placeIDs.insert(place.id)
-            group.count += 1
-            countries[countryKey] = group
+            let countryKey = normalized(country)
+            var group = countryArtifacts[countryKey] ?? (country, [])
+            group.artifacts.append(artifact)
+            countryArtifacts[countryKey] = group
         }
 
-        let collapsed = countries.values.filter { $0.cityIDs.count >= 2 && $0.count <= 4 }
-        let hiddenCityIDs = Set(collapsed.flatMap(\.cityIDs))
-        let countryNodes = collapsed.map { group in
-            OrbitNode(
-                id: stableID(for: normalized("country|\(group.name)|\(group.name)")),
-                name: group.name,
-                level: .country,
-                gravity: score(count: group.count, places: group.placeIDs.count),
-                saveCount: group.count
-            )
+        var nodes = ungroupedNodes(from: artifactsWithoutCountry)
+        var expandable: [CountryRepresentation] = []
+        for group in countryArtifacts.values {
+            let collapsed = node(name: group.name, level: .country, country: group.name, artifacts: group.artifacts)
+            let children = adaptiveChildren(from: group.artifacts, country: group.name)
+            if children.count <= 1 {
+                nodes.append(contentsOf: children.isEmpty ? [collapsed] : children)
+            } else {
+                nodes.append(collapsed)
+                expandable.append(CountryRepresentation(collapsed: collapsed, children: children))
+            }
         }
-        let countryIDs = Set(countryNodes.map(\.id))
-        return sorted(raw.filter { !hiddenCityIDs.contains($0.id) && !countryIDs.contains($0.id) } + countryNodes, limit: limit)
+
+        let labelBudget = limit ?? Int.max
+        for representation in expandable.sorted(by: { $0.expansionPriority > $1.expansionPriority }) {
+            let addedLabels = representation.children.count - 1
+            guard representation.shouldExpand, nodes.count + addedLabels <= labelBudget else { continue }
+            nodes.removeAll { $0.id == representation.collapsed.id }
+            nodes.append(contentsOf: representation.children)
+        }
+        return sorted(nodes, limit: limit)
     }
 
     static func children(of country: OrbitNode, from artifacts: [Artifact], limit: Int? = 10) -> [OrbitNode] {
@@ -56,7 +81,57 @@ enum DestinationOrbitBuilder {
             guard let name = $0.place?.country else { return false }
             return normalized(name) == normalized(country.name)
         }
-        return sorted(ungroupedNodes(from: matching).filter { $0.level == .city }, limit: limit)
+        return sorted(adaptiveChildren(from: matching, country: country.name), limit: limit)
+    }
+
+    private static func adaptiveChildren(from artifacts: [Artifact], country: String) -> [OrbitNode] {
+        var regionArtifacts: [String: (name: String, artifacts: [Artifact])] = [:]
+        var withoutRegion: [Artifact] = []
+        for artifact in artifacts {
+            guard let place = artifact.place else { continue }
+            guard let region = cleaned(place.region) else {
+                withoutRegion.append(artifact)
+                continue
+            }
+            let key = normalized(region)
+            var group = regionArtifacts[key] ?? (region, [])
+            group.artifacts.append(artifact)
+            regionArtifacts[key] = group
+        }
+
+        var nodes = ungroupedNodes(from: withoutRegion)
+        for group in regionArtifacts.values {
+            let cities = Set(group.artifacts.compactMap { artifact -> String? in
+                guard let city = cleaned(artifact.place?.locality) else { return nil }
+                return normalized(city)
+            })
+            if cities.count >= 2 && group.artifacts.count >= 3 {
+                nodes.append(node(name: group.name, level: .stateProvince, country: country, artifacts: group.artifacts))
+            } else {
+                let cityNodes = ungroupedNodes(from: group.artifacts)
+                nodes.append(contentsOf: cityNodes.isEmpty
+                    ? [node(name: group.name, level: .stateProvince, country: country, artifacts: group.artifacts)]
+                    : cityNodes)
+            }
+        }
+        return sorted(nodes, limit: nil)
+    }
+
+    private static func node(
+        name: String,
+        level: GeoLevel,
+        country: String,
+        artifacts: [Artifact]
+    ) -> OrbitNode {
+        let placeIDs = Set(artifacts.compactMap(\.place?.id))
+        let key = normalized("\(level.rawValue)|\(country)|\(name)")
+        return OrbitNode(
+            id: stableID(for: key),
+            name: name,
+            level: level,
+            gravity: score(count: artifacts.count, places: placeIDs.count),
+            saveCount: artifacts.count
+        )
     }
 
     static func artifacts(for node: OrbitNode, from artifacts: [Artifact]) -> [Artifact] {

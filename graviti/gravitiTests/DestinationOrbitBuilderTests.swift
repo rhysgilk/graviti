@@ -18,6 +18,60 @@ final class DestinationOrbitBuilderTests: XCTestCase {
         XCTAssertEqual(DestinationOrbitBuilder.children(of: japan, from: artifacts).count, 3)
     }
 
+    func testAutomaticModeExpandsMultipleEvidenceBackedCityClusters() {
+        let artifacts = [
+            artifact("k1", city: "Kyoto", region: "Kyoto", country: "Japan"),
+            artifact("k2", city: "Kyoto", region: "Kyoto", country: "Japan"),
+            artifact("k3", city: "Kyoto", region: "Kyoto", country: "Japan"),
+            artifact("t1", city: "Tokyo", region: "Tokyo", country: "Japan"),
+            artifact("t2", city: "Tokyo", region: "Tokyo", country: "Japan"),
+            artifact("o1", city: "Osaka", region: "Osaka", country: "Japan")
+        ]
+
+        let nodes = DestinationOrbitBuilder.nodes(from: artifacts, limit: 10)
+
+        XCTAssertFalse(nodes.contains { $0.name == "Japan" })
+        XCTAssertEqual(Set(nodes.map(\.name)), ["Kyoto", "Tokyo", "Osaka"])
+    }
+
+    func testAutomaticModeUsesStateForSeveralCitiesInOneRegion() {
+        let artifacts = [
+            artifact("sf1", city: "San Francisco", region: "California", country: "United States"),
+            artifact("sf2", city: "San Francisco", region: "California", country: "United States"),
+            artifact("la1", city: "Los Angeles", region: "California", country: "United States"),
+            artifact("la2", city: "Los Angeles", region: "California", country: "United States"),
+            artifact("c1", city: "Chicago", region: "Illinois", country: "United States"),
+            artifact("c2", city: "Chicago", region: "Illinois", country: "United States")
+        ]
+
+        let nodes = DestinationOrbitBuilder.nodes(from: artifacts, limit: 10)
+
+        XCTAssertTrue(nodes.contains { $0.name == "California" && $0.level == .stateProvince && $0.saveCount == 4 })
+        XCTAssertTrue(nodes.contains { $0.name == "Chicago" && $0.level == .city && $0.saveCount == 2 })
+        XCTAssertFalse(nodes.contains { $0.name == "United States" })
+    }
+
+    func testAutomaticModeKeepsCountryGroupedWhenExpansionExceedsLabelBudget() {
+        let japan = [
+            artifact("k1", city: "Kyoto", region: "Kyoto", country: "Japan"),
+            artifact("k2", city: "Kyoto", region: "Kyoto", country: "Japan"),
+            artifact("t1", city: "Tokyo", region: "Tokyo", country: "Japan"),
+            artifact("t2", city: "Tokyo", region: "Tokyo", country: "Japan"),
+            artifact("o1", city: "Osaka", region: "Osaka", country: "Japan"),
+            artifact("o2", city: "Osaka", region: "Osaka", country: "Japan")
+        ]
+        let artifacts = japan + [
+            artifact("p", city: "Lisbon", region: "Lisbon", country: "Portugal"),
+            artifact("m", city: "Montreal", region: "Quebec", country: "Canada")
+        ]
+
+        let nodes = DestinationOrbitBuilder.nodes(from: artifacts, limit: 3)
+
+        XCTAssertEqual(nodes.count, 3)
+        XCTAssertTrue(nodes.contains { $0.name == "Japan" && $0.level == .country })
+        XCTAssertFalse(nodes.contains { ["Kyoto", "Tokyo", "Osaka"].contains($0.name) })
+    }
+
     func testExplicitStateModeFallsBackWhenRegionIsMissing() {
         let artifacts = [
             artifact("a", city: "Portland", region: "Oregon", country: "United States"),
