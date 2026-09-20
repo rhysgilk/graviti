@@ -7,6 +7,9 @@ final class ArtifactProcessingCoordinatorTests: XCTestCase {
         let artifact = Artifact(kind: .url, sourceURL: "https://maps.apple.com/?q=Acadia")
 
         XCTAssertTrue(ArtifactProcessingCoordinator.shouldResolvePlace(artifact))
+        XCTAssertTrue(ArtifactProcessingCoordinator.shouldResolvePlace(
+            artifact.withResolution(place: nil, state: .failed)
+        ))
         XCTAssertFalse(ArtifactProcessingCoordinator.shouldResolvePlace(
             artifact.withResolution(place: nil, state: .needsReview)
         ))

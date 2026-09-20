@@ -38,7 +38,7 @@ This beta stores its Library on the device. Graviti does not require an account 
 
 Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 56 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing, Fit scoring, persistence, backup restore, offline save preservation, safe map URL generation, and deterministic ten-destination Gravity Field layout.
+- All 57 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing, Fit scoring, persistence, backup restore, offline save preservation and recovery, safe map URL generation, and deterministic ten-destination Gravity Field layout.
 - A clean signed Debug build completed without warnings. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
@@ -46,6 +46,7 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - A 30-save crowded-library fixture was exercised across Home, Explore, and Library. Home stayed within its ten-label budget with readable long names, Library exposed bulk selection, Explore synthesized varied interests with 66 FIT recommendations, and the imported library persisted after termination and relaunch.
 - A live shared Google Maps list link imported all 28 places from the supplied “Vanessa and Rhys” guide, preserved the guide title, and continued place enrichment in the background.
 - Google list imports retain address and coordinate hints for place resolution. A live 28-place check matched 25 automatically, left 3 ambiguous names for review, and had no lookup failures.
+- Transient map lookup failures retry automatically when processing resumes, while the original save remains visible throughout.
 - Home's white and yellow stars remain behind the Gravity Field, ignore input, and pulse gently; Reduce Motion keeps them static. The small Graviti wordmark animates both colored i dots.
 - Library and Search use Sora for navigation, tabs, segmented controls, search fields, and screen content.
 - Saturated Gravity ties now prefer destinations with more saved items before falling back to a stable name order, so a smaller destination cannot displace stronger evidence merely because both scores reached 100.

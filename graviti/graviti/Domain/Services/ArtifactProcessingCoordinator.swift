@@ -13,7 +13,7 @@ final class ArtifactProcessingCoordinator {
     }
 
     static func shouldResolvePlace(_ artifact: Artifact) -> Bool {
-        artifact.processingState == .saved && artifact.place == nil &&
+        [.saved, .failed].contains(artifact.processingState) && artifact.place == nil &&
             artifact.sourceURL.map { MapLinkMetadata.provider(for: $0) != nil } == true
     }
 

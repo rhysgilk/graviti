@@ -26,6 +26,41 @@ final class ArtifactLibraryTests: XCTestCase {
         XCTAssertNil(library.loadError)
     }
 
+    func testFailedMapLookupRetriesWhenProcessingResumes() async throws {
+        let saved = Artifact(
+            kind: .url,
+            sourceURL: "https://maps.apple.com/?q=Acadia%20National%20Park",
+            originalText: "Acadia National Park"
+        )
+        let repository = PreviewArtifactRepository()
+        try await repository.save(saved)
+        let expectedPlace = SavedPlace(
+            id: "acadia",
+            name: "Acadia National Park",
+            latitude: 44.3386,
+            longitude: -68.2733,
+            locality: "Bar Harbor",
+            region: "Maine",
+            country: "United States"
+        )
+        let provider = RecoveringPlaceSearchProvider(place: expectedPlace)
+        let resolver = MapPlaceResolver(
+            searchProvider: provider,
+            linkExpander: IdentityMapLinkExpander()
+        )
+        let library = ArtifactLibrary(repository: repository, placeResolver: resolver)
+
+        await library.load()
+        await library.processPendingMaps()
+        XCTAssertEqual(library.artifacts.first?.processingState, .failed)
+
+        await library.processPendingMaps()
+
+        XCTAssertEqual(library.artifacts.first?.processingState, .processed)
+        XCTAssertEqual(library.artifacts.first?.place, expectedPlace)
+        XCTAssertEqual(provider.searchCount, 2)
+    }
+
     func testUnavailableSharedInboxDoesNotHideLoadedLibrary() async throws {
         let saved = Artifact(kind: .manual, originalText: "Quiet forest trail")
         let repository = PreviewArtifactRepository()
@@ -77,6 +112,22 @@ private enum TestInboxError: LocalizedError {
 private struct OfflinePlaceSearchProvider: PlaceSearchProviding {
     func search(_ query: String) async throws -> [PlaceCandidate] {
         throw URLError(.notConnectedToInternet)
+    }
+}
+
+@MainActor
+private final class RecoveringPlaceSearchProvider: PlaceSearchProviding {
+    let place: SavedPlace
+    private(set) var searchCount = 0
+
+    init(place: SavedPlace) {
+        self.place = place
+    }
+
+    func search(_ query: String) async throws -> [PlaceCandidate] {
+        searchCount += 1
+        if searchCount == 1 { throw URLError(.notConnectedToInternet) }
+        return [PlaceCandidate(place: place, sourceURL: "https://maps.apple.com/?q=Acadia")]
     }
 }
 
