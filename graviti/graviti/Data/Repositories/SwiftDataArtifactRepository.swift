@@ -44,7 +44,7 @@ final class SwiftDataArtifactRepository: ArtifactRepository {
                 guard let stored = try context.fetch(descriptor).first else {
                     throw ArtifactRepositoryError.notFound
                 }
-                try stored.applyResolution(artifact)
+                try stored.apply(artifact)
             }
             try context.save()
         } catch {

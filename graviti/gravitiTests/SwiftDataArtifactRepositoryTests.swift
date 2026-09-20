@@ -64,7 +64,7 @@ final class SwiftDataArtifactRepositoryTests: XCTestCase {
         XCTAssertEqual(Set(stored), Set([first, second]))
     }
 
-    func testSourceURLUpdatePersistsAcrossReload() async throws {
+    func testSourceURLAndDiscoveredTitleUpdatesPersistAcrossReload() async throws {
         let repository = try makeRepository()
         let original = Artifact(
             kind: .url,
@@ -74,12 +74,15 @@ final class SwiftDataArtifactRepositoryTests: XCTestCase {
         try await repository.save(original)
 
         let enrichedURL = "https://www.google.com/maps/place/Tea/data=!4m2?q=Tea%20House&ll=40.7,-73.9"
-        let updated = original.withSourceURL(enrichedURL, processingState: .saved)
+        let updated = original
+            .withSourceURL(enrichedURL, processingState: .saved)
+            .withOriginalText("Tea House Favorites")
         try await repository.update(updated)
 
         let artifacts = try await repository.artifacts()
         let stored = try XCTUnwrap(artifacts.first)
         XCTAssertEqual(stored.sourceURL, enrichedURL)
+        XCTAssertEqual(stored.originalText, "Tea House Favorites")
         XCTAssertEqual(stored.processingState, .saved)
     }
 

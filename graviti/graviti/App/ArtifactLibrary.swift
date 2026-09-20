@@ -430,6 +430,7 @@ final class ArtifactLibrary: ObservableObject {
 
     func importAppleGuidePlaces(from rawURL: String) async throws -> AppleGuideImportSummary {
         let plan = try await ArtifactImportCoordinator.appleGuide(rawURL, existingArtifacts: artifacts)
+        try await applyCollectionTitle(plan.title, sourceURL: rawURL)
 
         if !plan.artifacts.isEmpty {
             try await repository.saveMany(plan.artifacts)
@@ -451,6 +452,7 @@ final class ArtifactLibrary: ObservableObject {
         // Build the plan after the network request so background processing that
         // completed while the list loaded is not overwritten by a stale snapshot.
         let plan = ArtifactImportCoordinator.googleMapsList(list, existingArtifacts: artifacts)
+        try await applyCollectionTitle(plan.title, sourceURL: rawURL)
 
         if !plan.updatedArtifacts.isEmpty {
             try await repository.updateMany(plan.updatedArtifacts)
@@ -474,6 +476,14 @@ final class ArtifactLibrary: ObservableObject {
             duplicates: plan.duplicates,
             skipped: plan.skipped
         )
+    }
+
+    private func applyCollectionTitle(_ title: String, sourceURL: String) async throws {
+        guard let index = artifacts.firstIndex(where: { $0.sourceURL == sourceURL }),
+              artifacts[index].originalText != title else { return }
+        let updated = artifacts[index].withOriginalText(title)
+        try await repository.update(updated)
+        artifacts[index] = updated
     }
 }
 

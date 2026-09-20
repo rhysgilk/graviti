@@ -48,7 +48,7 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - Google list imports retain address and coordinate hints for place resolution. A live 28-place check matched 25 automatically, left 3 ambiguous names for review, and had no lookup failures.
 - Re-importing the same Google list upgrades unresolved items created by older builds in place and reports how many place details were refreshed without overwriting user-matched places.
 - Re-importing a known map collection does not add another generic guide wrapper to Library.
-- A saved Apple Maps guide or Google Maps list can retry or refresh its places directly from Saved Item detail. Upgraded Google lookup hints survived force quit and relaunch; the next import reported only duplicates and no redundant refreshes.
+- A saved Apple Maps guide or Google Maps list can retry or refresh its places directly from Saved Item detail. The real collection title replaces the generic Maps label. Upgraded Google lookup hints survived force quit and relaunch; the next import reported only duplicates and no redundant refreshes.
 - Transient map lookup failures retry automatically when processing resumes, while the original save remains visible throughout.
 - Home's white and yellow stars remain behind the Gravity Field, ignore input, and pulse gently; Reduce Motion keeps them static. The small Graviti wordmark animates both colored i dots.
 - Library and Search use Sora for navigation, tabs, segmented controls, search fields, and screen content.
