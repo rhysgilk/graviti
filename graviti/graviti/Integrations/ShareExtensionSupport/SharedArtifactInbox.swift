@@ -92,11 +92,11 @@ enum SharedArtifactInbox {
 }
 
 struct SharedArtifactInboxClient {
-    let pendingFiles: () throws -> [URL]
-    let read: (URL) throws -> SharedArtifactEnvelope
-    let remove: (URL) throws -> Void
+    let pendingFiles: @MainActor () throws -> [URL]
+    let read: @MainActor (URL) throws -> SharedArtifactEnvelope
+    let remove: @MainActor (URL) throws -> Void
 
-    static var live: SharedArtifactInboxClient {
+    @MainActor static var live: SharedArtifactInboxClient {
         SharedArtifactInboxClient(
             pendingFiles: SharedArtifactInbox.pendingFiles,
             read: SharedArtifactInbox.read,

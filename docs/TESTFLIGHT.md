@@ -33,6 +33,24 @@ This beta stores its Library on the device. Graviti does not require an account 
 - Destination recommendations use a small reviewed offline catalog during the MVP beta.
 - Some imported or shared items may require manual place matching.
 
+## Latest simulator validation
+
+Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2:
+
+- All 46 automated tests passed, including import parsing, Fit scoring, persistence, backup restore, and offline save preservation.
+- A clean signed Debug build completed without warnings. The app and Share Extension generated the same App Group entitlement.
+- Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
+- Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
+- Direct bubble switching, bulk place removal confirmation, and bulk save deletion confirmation were exercised without committing destructive test actions.
+- Maximum Dynamic Type, increased contrast, right-to-left layout, expanded pseudo-localized strings, and Reduce Motion were inspected in Simulator.
+
+Still required before external TestFlight distribution:
+
+- Run the core flow on a physical signed device and on the iOS 18 minimum runtime.
+- Publish the privacy policy at a stable public URL.
+- Supply the feedback email and App Store Connect review contact.
+- Produce and upload the distribution archive in the owner's App Store Connect account.
+
 ## App Store Connect checklist
 
 - Increment `CURRENT_PROJECT_VERSION` for every uploaded build.
