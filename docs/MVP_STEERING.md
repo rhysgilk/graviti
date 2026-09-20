@@ -86,8 +86,9 @@ The choice must not remain ambiguous because a travel library needs a clear data
 ### Repository and architecture
 
 - [ ] Add XCTest targets before declaring MVP complete.
-- [ ] Add `.gitignore`; untrack `.DS_Store`, `xcuserdata`, and Xcode UI state.
-- [ ] Remove stray document title lines and expand the README with setup, architecture, screenshots, and current MVP status.
+- [x] Add `.gitignore`; untrack `.DS_Store`, `xcuserdata`, and Xcode UI state.
+- [x] Remove stray document title lines and expand the README with setup, architecture, testing, and current MVP status.
+- [ ] Add current product screenshots to the README before the public repository or external beta announcement.
 - [ ] Extract import, processing, and enrichment coordinators incrementally. Keep `ArtifactLibrary` as the observable facade instead of adding every workflow to it.
 
 ## Scope guardrail

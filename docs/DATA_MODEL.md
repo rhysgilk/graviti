@@ -1,4 +1,3 @@
-DATA_MODEL
 # Graviti — Data Model
 
 **Version:** 0.1  

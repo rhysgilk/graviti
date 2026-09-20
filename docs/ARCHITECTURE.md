@@ -1,4 +1,3 @@
-ARCHITECTURE
 # Graviti — Architecture
 
 **Version:** 0.1  

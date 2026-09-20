@@ -1,4 +1,3 @@
-PRODUCT_SPEC
 # Graviti — MVP Product Specification
 
 **Version:** 0.1  

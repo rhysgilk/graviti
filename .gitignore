@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Xcode user state
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Build output
+DerivedData/
+build/
+*.xcresult
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Local import samples
+/*.webloc
