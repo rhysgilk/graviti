@@ -46,7 +46,7 @@ This audit maps the MVP Definition of Done to current evidence. It distinguishes
 
 1. **Apple Developer Program membership:** team `V9W8HRDJQT` currently has no App Store Connect provider and cannot create App Store provisioning profiles for either bundle. The account holder must enroll or associate the team with an active provider.
 2. **Distribution export:** rerun `scripts/export-testflight.sh` after enrollment. This creates a locally exported IPA without uploading it.
-3. **Physical-device completion:** preliminary manual testing has passed; the current app plus Share Extension were provisioned, installed, launched, and observed running on an iPhone 13 Pro Max with iOS 26.3.1; and all 62 tests passed on that device. Finish the hands-on checklist in `docs/TESTFLIGHT.md`, especially Share Extension capture, backup/restore, offline relaunch, bulk deletion, Dynamic Type, VoiceOver, and Reduce Motion.
+3. **Physical-device completion:** preliminary manual testing has passed; the current app plus Share Extension were provisioned, installed, launched, and observed running on an iPhone 13 Pro Max with iOS 26.3.1; all 62 tests passed on that device; and a post-test screenshot confirmed the retained Library rendered on Home. Finish the hands-on checklist in `docs/TESTFLIGHT.md`, especially Share Extension capture, backup/restore, offline relaunch, bulk deletion, Dynamic Type, VoiceOver, and Reduce Motion.
 4. **TestFlight metadata:** provide the feedback email and App Store Connect review contact.
 5. **Upload authorization:** upload the verified distribution build only after the owner reviews the final archive and metadata.
 
