@@ -10,4 +10,11 @@ struct PlaceCandidate: Identifiable, Hashable {
 @MainActor
 protocol PlaceSearchProviding {
     func search(_ query: String) async throws -> [PlaceCandidate]
+    func search(_ query: String, near destination: SavedDestination) async throws -> [PlaceCandidate]
+}
+
+extension PlaceSearchProviding {
+    func search(_ query: String, near destination: SavedDestination) async throws -> [PlaceCandidate] {
+        try await search("\(query) in \(destination.name), \(destination.country)")
+    }
 }

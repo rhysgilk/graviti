@@ -56,6 +56,13 @@ struct ExplorePreferences: Equatable {
 struct SavedDestination: Identifiable, Hashable {
     let name: String
     let country: String
+    let searchSpan: Double
+
+    init(name: String, country: String, searchSpan: Double = 0.35) {
+        self.name = name
+        self.country = country
+        self.searchSpan = searchSpan
+    }
 
     var id: String { "\(name), \(country)" }
 }
@@ -65,6 +72,7 @@ enum DestinationFitEngine {
         let name: String
         let country: String
         let region: RecommendationRegion
+        var searchSpan: Double = 0.35
         /// Values from 0...1 describe how characteristic each interest is of this destination.
         let strengths: [String: Double]
 
@@ -82,20 +90,20 @@ enum DestinationFitEngine {
         Candidate(name: "Kyoto", country: "Japan", region: .asia, strengths: ["Matcha": 0.85, "Tea": 0.9, "Gardens": 1, "Architecture": 0.95, "Museums": 0.65, "History": 0.95]),
         Candidate(name: "Taipei", country: "Taiwan", region: .asia, strengths: ["Matcha": 0.45, "Tea": 0.95, "Coffee": 0.8, "Desserts": 0.8, "Hiking": 0.55]),
         Candidate(name: "Seoul", country: "South Korea", region: .asia, strengths: ["Tea": 0.65, "Coffee": 0.9, "Desserts": 0.85, "Architecture": 0.7, "Shopping": 0.9, "History": 0.65]),
-        Candidate(name: "Madeira", country: "Portugal", region: .europe, strengths: ["Scenic views": 1, "Hiking": 0.9, "Nature": 0.9, "Gardens": 0.65, "Mountains": 0.75, "Coast & water": 0.85]),
-        Candidate(name: "Norwegian Fjords", country: "Norway", region: .europe, strengths: ["Mountains": 1, "Coast & water": 1, "Scenic views": 1, "Hiking": 0.8, "Nature": 0.95]),
-        Candidate(name: "Scottish Highlands", country: "United Kingdom", region: .europe, strengths: ["Mountains": 0.9, "History": 0.8, "Coast & water": 0.7, "Hiking": 0.9, "Forests": 0.65]),
+        Candidate(name: "Madeira", country: "Portugal", region: .europe, searchSpan: 1.0, strengths: ["Scenic views": 1, "Hiking": 0.9, "Nature": 0.9, "Gardens": 0.65, "Mountains": 0.75, "Coast & water": 0.85]),
+        Candidate(name: "Norwegian Fjords", country: "Norway", region: .europe, searchSpan: 6.0, strengths: ["Mountains": 1, "Coast & water": 1, "Scenic views": 1, "Hiking": 0.8, "Nature": 0.95]),
+        Candidate(name: "Scottish Highlands", country: "United Kingdom", region: .europe, searchSpan: 5.0, strengths: ["Mountains": 0.9, "History": 0.8, "Coast & water": 0.7, "Hiking": 0.9, "Forests": 0.65]),
         Candidate(name: "Copenhagen", country: "Denmark", region: .europe, strengths: ["Architecture": 0.95, "Coffee": 0.8, "Museums": 0.85, "Shopping": 0.75, "History": 0.6]),
         Candidate(name: "Lisbon", country: "Portugal", region: .europe, strengths: ["Scenic views": 0.8, "Architecture": 0.9, "Coffee": 0.75, "Museums": 0.65, "History": 0.8, "Seafood": 0.8]),
         Candidate(name: "New York City", country: "United States", region: .northAmerica, strengths: ["Matcha": 0.6, "Tea": 0.65, "Coffee": 0.9, "Desserts": 0.9, "Architecture": 0.9, "Museums": 1, "Shopping": 0.95]),
         Candidate(name: "Mexico City", country: "Mexico", region: .northAmerica, strengths: ["Architecture": 0.95, "Museums": 0.95, "Coffee": 0.75, "Desserts": 0.75, "Shopping": 0.75, "History": 0.9]),
         Candidate(name: "Vancouver", country: "Canada", region: .northAmerica, strengths: ["Scenic views": 0.9, "Hiking": 0.85, "Nature": 0.9, "Coffee": 0.8, "Mountains": 0.8, "Coast & water": 0.8, "Forests": 0.85]),
         Candidate(name: "Seattle", country: "United States", region: .northAmerica, strengths: ["Forests": 0.9, "Hiking": 0.85, "Mountains": 0.8, "Coast & water": 0.75, "Coffee": 1, "Scenic views": 0.75]),
-        Candidate(name: "Vermont", country: "United States", region: .northAmerica, strengths: ["Forests": 1, "Hiking": 0.85, "Mountains": 0.7, "Nature": 0.9, "History": 0.55]),
-        Candidate(name: "Maine", country: "United States", region: .northAmerica, strengths: ["National parks": 0.8, "Coast & water": 0.95, "Seafood": 1, "Forests": 0.95, "History": 0.65, "Hiking": 0.75]),
-        Candidate(name: "California", country: "United States", region: .northAmerica, strengths: ["National parks": 1, "Mountains": 0.85, "Coast & water": 0.8, "Forests": 0.55, "Hiking": 0.85, "Architecture": 0.65, "Seafood": 0.7]),
-        Candidate(name: "Alaska", country: "United States", region: .northAmerica, strengths: ["National parks": 0.95, "Mountains": 1, "Coast & water": 0.8, "Wildlife": 1, "Hiking": 0.8, "Forests": 0.7]),
-        Candidate(name: "Kauai", country: "United States", region: .northAmerica, strengths: ["Scenic views": 1, "Hiking": 0.85, "Nature": 0.95, "Beaches": 1, "Coast & water": 1, "Mountains": 0.75])
+        Candidate(name: "Vermont", country: "United States", region: .northAmerica, searchSpan: 3.0, strengths: ["Forests": 1, "Hiking": 0.85, "Mountains": 0.7, "Nature": 0.9, "History": 0.55]),
+        Candidate(name: "Maine", country: "United States", region: .northAmerica, searchSpan: 4.0, strengths: ["National parks": 0.8, "Coast & water": 0.95, "Seafood": 1, "Forests": 0.95, "History": 0.65, "Hiking": 0.75]),
+        Candidate(name: "California", country: "United States", region: .northAmerica, searchSpan: 9.0, strengths: ["National parks": 1, "Mountains": 0.85, "Coast & water": 0.8, "Forests": 0.55, "Hiking": 0.85, "Architecture": 0.65, "Seafood": 0.7]),
+        Candidate(name: "Alaska", country: "United States", region: .northAmerica, searchSpan: 20.0, strengths: ["National parks": 0.95, "Mountains": 1, "Coast & water": 0.8, "Wildlife": 1, "Hiking": 0.8, "Forests": 0.7]),
+        Candidate(name: "Kauai", country: "United States", region: .northAmerica, searchSpan: 1.0, strengths: ["Scenic views": 1, "Hiking": 0.85, "Nature": 0.95, "Beaches": 1, "Coast & water": 1, "Mountains": 0.75])
     ]
 
     static func recommendations(
@@ -159,7 +167,9 @@ enum DestinationFitEngine {
     }
 
     static func savedDestination(for id: String) -> SavedDestination? {
-        candidates.first { $0.id == id }.map { SavedDestination(name: $0.name, country: $0.country) }
+        candidates.first { $0.id == id }.map {
+            SavedDestination(name: $0.name, country: $0.country, searchSpan: $0.searchSpan)
+        }
     }
 
     static func fitGuide(
@@ -179,7 +189,7 @@ enum DestinationFitEngine {
             ? candidate.strengths.sorted { $0.value > $1.value }.map(\.key)
             : matched).prefix(4))
         return FitGuide(
-            destination: SavedDestination(name: candidate.name, country: candidate.country),
+            destination: SavedDestination(name: candidate.name, country: candidate.country, searchSpan: candidate.searchSpan),
             interests: interests
         )
     }

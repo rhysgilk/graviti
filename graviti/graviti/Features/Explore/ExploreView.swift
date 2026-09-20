@@ -364,7 +364,10 @@ private struct DestinationRecommendationView: View {
                 NavigationLink {
                     FitGuideView(
                         guide: FitGuide(
-                            destination: SavedDestination(name: recommendation.name, country: recommendation.country),
+                            destination: DestinationFitEngine.savedDestination(for: recommendation.id) ?? SavedDestination(
+                                name: recommendation.name,
+                                country: recommendation.country
+                            ),
                             interests: recommendation.matchedInterests
                         ),
                         library: library,

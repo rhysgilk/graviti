@@ -1,14 +1,55 @@
 import Foundation
 import MapKit
 
-struct MapKitPlaceSearchProvider: PlaceSearchProviding {
+@MainActor
+final class MapKitPlaceSearchProvider: PlaceSearchProviding {
+    private var destinationRegions = [String: MKCoordinateRegion]()
+
     func search(_ query: String) async throws -> [PlaceCandidate] {
+        try await search(query, region: nil, resultTypes: [.pointOfInterest, .address])
+    }
+
+    func search(_ query: String, near destination: SavedDestination) async throws -> [PlaceCandidate] {
+        guard let region = await region(for: destination) else {
+            return try await search("\(query) in \(destination.name), \(destination.country)")
+        }
+        return try await search(query, region: region, resultTypes: [.pointOfInterest, .physicalFeature])
+    }
+
+    private func search(
+        _ query: String,
+        region: MKCoordinateRegion?,
+        resultTypes: MKLocalSearch.ResultType
+    ) async throws -> [PlaceCandidate] {
+        let response: MKLocalSearch.Response
+        do {
+            response = try await searchResponse(query, region: region, resultTypes: resultTypes)
+        } catch let error as MKError where error.code == .placemarkNotFound {
+            return []
+        }
+        return response.mapItems.compactMap { item in
+            guard let place = MapItemPlaceAdapter.savedPlace(from: item) else { return nil }
+            guard let sourceURL = Self.sourceURL(for: place) else { return nil }
+            return PlaceCandidate(place: place, sourceURL: sourceURL)
+        }
+    }
+
+    private func searchResponse(
+        _ query: String,
+        region: MKCoordinateRegion?,
+        resultTypes: MKLocalSearch.ResultType
+    ) async throws -> MKLocalSearch.Response {
         var attempt = 0
         while true {
             do {
-                return try await performSearch(query)
-            } catch let error as MKError where error.code == .placemarkNotFound {
-                return []
+                let request = MKLocalSearch.Request()
+                request.naturalLanguageQuery = query
+                request.resultTypes = resultTypes
+                if let region {
+                    request.region = region
+                    request.regionPriority = .required
+                }
+                return try await MKLocalSearch(request: request).start()
             } catch let error as MKError where
                 [.serverFailure, .loadingThrottled].contains(error.code) && attempt < 2 {
                 attempt += 1
@@ -17,16 +58,26 @@ struct MapKitPlaceSearchProvider: PlaceSearchProviding {
         }
     }
 
-    private func performSearch(_ query: String) async throws -> [PlaceCandidate] {
-        let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = query
-        request.resultTypes = [.pointOfInterest, .address]
-        let response = try await MKLocalSearch(request: request).start()
-
-        return response.mapItems.compactMap { item in
-            guard let place = MapItemPlaceAdapter.savedPlace(from: item) else { return nil }
-            guard let sourceURL = Self.sourceURL(for: place) else { return nil }
-            return PlaceCandidate(place: place, sourceURL: sourceURL)
+    private func region(for destination: SavedDestination) async -> MKCoordinateRegion? {
+        if let cached = destinationRegions[destination.id] { return cached }
+        do {
+            let response = try await searchResponse(
+                "\(destination.name), \(destination.country)",
+                region: nil,
+                resultTypes: .address
+            )
+            guard let center = response.mapItems.first?.placemark.coordinate else { return nil }
+            let region = MKCoordinateRegion(
+                center: center,
+                span: MKCoordinateSpan(
+                    latitudeDelta: destination.searchSpan,
+                    longitudeDelta: destination.searchSpan
+                )
+            )
+            destinationRegions[destination.id] = region
+            return region
+        } catch {
+            return nil
         }
     }
 

@@ -3,20 +3,25 @@ import XCTest
 
 @MainActor
 final class FitGuideSearchEngineTests: XCTestCase {
-    func testBuildsOneDestinationScopedQueryPerInterest() async throws {
-        let provider = RecordingFitGuideProvider(responses: [:])
+    func testBuildsOneRegionScopedSearchPerInterest() async throws {
         let guide = FitGuide(
             destination: SavedDestination(name: "New York City", country: "United States"),
             interests: ["Museums", "Coffee", "Matcha"]
         )
+        let provider = RecordingFitGuideProvider(responses: [
+            "museum|\(guide.destination.id)": [candidate("museum", name: "Museum")],
+            "coffee shop|\(guide.destination.id)": [candidate("coffee", name: "Coffee")],
+            "matcha cafe|\(guide.destination.id)": [candidate("matcha", name: "Matcha")]
+        ])
 
         _ = try await FitGuideSearchEngine.search(guide: guide, using: provider)
 
         XCTAssertEqual(provider.queries, [
-            "Museums in New York City, United States",
-            "Coffee in New York City, United States",
-            "Matcha in New York City, United States"
+            "museum",
+            "coffee shop",
+            "matcha cafe"
         ])
+        XCTAssertEqual(provider.destinations, Array(repeating: guide.destination, count: 3))
     }
 
     func testGroupsByPatternAndDeduplicatesPlacesAcrossSections() async throws {
@@ -24,8 +29,8 @@ final class FitGuideSearchEngineTests: XCTestCase {
         let museum = candidate("museum", name: "City Museum")
         let coffee = candidate("coffee", name: "Good Coffee")
         let provider = RecordingFitGuideProvider(responses: [
-            "Museums in New York City, United States": [shared, museum],
-            "Coffee in New York City, United States": [shared, coffee]
+            "museum|New York City, United States": [shared, museum],
+            "coffee shop|New York City, United States": [shared, coffee]
         ])
         let guide = FitGuide(
             destination: SavedDestination(name: "New York City", country: "United States"),
@@ -37,6 +42,22 @@ final class FitGuideSearchEngineTests: XCTestCase {
         XCTAssertEqual(sections.map(\.interest), ["Museums", "Coffee"])
         XCTAssertEqual(sections[0].places.map(\.id), ["shared", "museum"])
         XCTAssertEqual(sections[1].places.map(\.id), ["coffee"])
+    }
+
+    func testRetriesWithBroaderTermWhenRegionalCategoryIsEmpty() async throws {
+        let landmark = candidate("landmark", name: "Historic Palace")
+        let provider = RecordingFitGuideProvider(responses: [
+            "historic landmark|Mexico City, Mexico": [landmark]
+        ])
+        let guide = FitGuide(
+            destination: SavedDestination(name: "Mexico City", country: "Mexico"),
+            interests: ["Architecture"]
+        )
+
+        let sections = try await FitGuideSearchEngine.search(guide: guide, using: provider)
+
+        XCTAssertEqual(provider.queries, ["architectural landmark", "historic landmark"])
+        XCTAssertEqual(sections.first?.places, [landmark])
     }
 
     private func candidate(_ id: String, name: String) -> PlaceCandidate {
@@ -59,6 +80,7 @@ final class FitGuideSearchEngineTests: XCTestCase {
 private final class RecordingFitGuideProvider: PlaceSearchProviding {
     let responses: [String: [PlaceCandidate]]
     private(set) var queries = [String]()
+    private(set) var destinations = [SavedDestination]()
 
     init(responses: [String: [PlaceCandidate]]) {
         self.responses = responses
@@ -67,5 +89,11 @@ private final class RecordingFitGuideProvider: PlaceSearchProviding {
     func search(_ query: String) async throws -> [PlaceCandidate] {
         queries.append(query)
         return responses[query] ?? []
+    }
+
+    func search(_ query: String, near destination: SavedDestination) async throws -> [PlaceCandidate] {
+        queries.append(query)
+        destinations.append(destination)
+        return responses["\(query)|\(destination.id)"] ?? []
     }
 }
