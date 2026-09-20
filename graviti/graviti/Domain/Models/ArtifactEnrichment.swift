@@ -29,12 +29,16 @@ struct ArtifactEnrichment: Codable, Hashable {
         case mapKit
         case savedText
         case mapKitAndSavedText
+        case detectedText
+        case mapKitAndDetectedText
 
         var displayName: String {
             switch self {
             case .mapKit: String(localized: "Apple Maps place details")
             case .savedText: String(localized: "Saved text")
             case .mapKitAndSavedText: String(localized: "Apple Maps place details and saved text")
+            case .detectedText: String(localized: "Detected image text")
+            case .mapKitAndDetectedText: String(localized: "Apple Maps place details and detected image text")
             }
         }
     }

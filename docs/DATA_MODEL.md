@@ -89,6 +89,9 @@ Artifact
 - original_text: string?
 - user_note: string?
 - media_asset_id: UUID?
+- extracted_text: string?
+- extracted_text_source: enum?
+- text_extraction_state: enum
 - processing_state: enum
 - processing_error_code: string?
 - captured_at
@@ -130,6 +133,8 @@ failed
 ```
 
 This lets a save remain safely captured while richer descriptions, categories, and interests are generated locally or by a future background service. `unavailable` means the current inputs were insufficient; it is distinct from a processing failure and can return to `pending` when the user adds a place or description.
+
+Image text extraction has the same resumable state vocabulary. The MVP runs Apple Vision locally after the media asset is secure, stores detected text separately from user-authored text, and records `apple_vision` as its source. Detected text can seed category and interest enrichment, while the saved-item detail keeps the extracted text and its provenance visible to the user.
 
 The Artifact is never deleted merely because extraction fails.
 

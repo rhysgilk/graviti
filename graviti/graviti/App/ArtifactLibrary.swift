@@ -12,6 +12,7 @@ final class ArtifactLibrary: ObservableObject {
     private let placeResolver: MapPlaceResolver
     private var processingIDs: Set<UUID> = []
     private var enrichingIDs: Set<UUID> = []
+    private var extractingTextIDs: Set<UUID> = []
     private var isImportingSharedArtifacts = false
 
     init(repository: any ArtifactRepository, placeResolver: MapPlaceResolver? = nil) {
@@ -40,6 +41,9 @@ final class ArtifactLibrary: ObservableObject {
         if shouldEnrich(artifact) {
             Task { await enrich(artifact.id) }
         }
+        if shouldExtractText(artifact) {
+            Task { await extractText(artifact.id) }
+        }
     }
 
     func processPendingEnrichment() {
@@ -48,8 +52,30 @@ final class ArtifactLibrary: ObservableObject {
         }
     }
 
+    func processPendingTextExtraction() {
+        for artifact in artifacts where shouldExtractText(artifact) || artifact.textExtractionState == .processing {
+            Task { await extractText(artifact.id) }
+        }
+    }
+
     func refreshEnrichment(_ id: UUID) async {
         await enrich(id, force: true)
+    }
+
+    func retryTextExtraction(_ id: UUID) async {
+        guard let artifact = artifacts.first(where: { $0.id == id }),
+              artifact.kind == .photo,
+              artifact.mediaKey != nil else { return }
+        do {
+            try await update(artifact.withExtractedText(
+                artifact.extractedText,
+                source: artifact.extractedTextSource,
+                state: .pending
+            ))
+            await extractText(id)
+        } catch {
+            loadError = error.localizedDescription
+        }
     }
 
     func saveEditedDetails(_ details: ArtifactUserDetails?, note: String?, for id: UUID) async throws {
@@ -154,8 +180,54 @@ final class ArtifactLibrary: ObservableObject {
     private func shouldEnrich(_ artifact: Artifact) -> Bool {
         artifact.enrichment == nil &&
             [.pending, .processing, .failed].contains(artifact.enrichmentState) &&
-            (artifact.place != nil || artifact.originalText != nil || artifact.userNote != nil) &&
+            (artifact.place != nil || artifact.originalText != nil || artifact.userNote != nil || artifact.extractedText != nil) &&
             artifact.sourceURL.map(MapLinkMetadata.isCollectionLink) != true
+    }
+
+    private func shouldExtractText(_ artifact: Artifact) -> Bool {
+        artifact.kind == .photo && artifact.mediaKey != nil &&
+            [.pending, .failed].contains(artifact.textExtractionState)
+    }
+
+    private func extractText(_ id: UUID) async {
+        guard let artifact = artifacts.first(where: { $0.id == id }),
+              (shouldExtractText(artifact) || artifact.textExtractionState == .processing),
+              let mediaKey = artifact.mediaKey,
+              extractingTextIDs.insert(id).inserted else { return }
+        defer { extractingTextIDs.remove(id) }
+
+        do {
+            try await update(artifact.withExtractedText(
+                artifact.extractedText,
+                source: artifact.extractedTextSource,
+                state: .processing
+            ))
+            let imageURL = try SharedMediaStore.url(for: mediaKey)
+            let text = try await VisionTextRecognizer().recognizeText(at: imageURL)
+            guard let current = artifacts.first(where: { $0.id == id }),
+                  current.mediaKey == mediaKey else { return }
+            try await update(current.withExtractedText(
+                text,
+                source: text == nil ? nil : .appleVision,
+                state: text == nil ? .unavailable : .processed
+            ))
+        } catch is CancellationError {
+            if let current = artifacts.first(where: { $0.id == id }) {
+                try? await update(current.withExtractedText(
+                    current.extractedText,
+                    source: current.extractedTextSource,
+                    state: .pending
+                ))
+            }
+        } catch {
+            if let current = artifacts.first(where: { $0.id == id }) {
+                try? await update(current.withExtractedText(
+                    current.extractedText,
+                    source: current.extractedTextSource,
+                    state: .failed
+                ))
+            }
+        }
     }
 
     private func enrich(_ id: UUID, force: Bool = false) async {

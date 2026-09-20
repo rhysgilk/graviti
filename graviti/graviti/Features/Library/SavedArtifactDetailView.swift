@@ -108,6 +108,10 @@ struct SavedArtifactDetailView: View {
                         .foregroundStyle(.white)
                 }
 
+                if current.kind == .photo {
+                    detectedTextSection
+                }
+
                 if current.enrichment != nil || current.userDetails != nil {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("About this save")
@@ -333,6 +337,51 @@ struct SavedArtifactDetailView: View {
             return ("Add a description or place to help Graviti understand this save.", "text.badge.plus")
         case .processed:
             return nil
+        }
+    }
+
+    @ViewBuilder
+    private var detectedTextSection: some View {
+        if let extractedText = current.extractedText,
+           let source = current.extractedTextSource {
+            DisclosureGroup {
+                Text(extractedText)
+                    .font(.subheadline)
+                    .textSelection(.enabled)
+                    .foregroundStyle(.white.opacity(0.82))
+                    .padding(.top, 8)
+            } label: {
+                VStack(alignment: .leading, spacing: 3) {
+                    Label("Detected text", systemImage: "text.viewfinder")
+                        .font(.subheadline.weight(.semibold))
+                    Text(source.displayName)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.58))
+                }
+            }
+            .tint(GravitiColors.signalMint)
+            .padding(16)
+            .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
+        } else {
+            switch current.textExtractionState {
+            case .pending, .processing:
+                Label("Reading text in this image on device…", systemImage: "text.viewfinder")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.68))
+            case .failed:
+                Button {
+                    Task { await library.retryTextExtraction(current.id) }
+                } label: {
+                    Label("Try reading image text again", systemImage: "arrow.clockwise")
+                        .font(.subheadline.weight(.semibold))
+                }
+            case .unavailable:
+                Label("No readable text was found in this image.", systemImage: "text.viewfinder")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.58))
+            case .processed:
+                EmptyView()
+            }
         }
     }
 }

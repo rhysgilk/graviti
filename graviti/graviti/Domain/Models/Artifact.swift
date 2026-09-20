@@ -22,6 +22,24 @@ enum ArtifactEnrichmentState: String, Codable {
     case failed
 }
 
+enum ArtifactTextExtractionState: String, Codable {
+    case pending
+    case processing
+    case processed
+    case unavailable
+    case failed
+}
+
+enum ArtifactTextSource: String, Codable {
+    case appleVision
+
+    var displayName: String {
+        switch self {
+        case .appleVision: String(localized: "Text detected on this device")
+        }
+    }
+}
+
 struct Artifact: Identifiable, Hashable {
     let id: UUID
     let kind: ArtifactKind
@@ -29,6 +47,9 @@ struct Artifact: Identifiable, Hashable {
     let originalText: String?
     let userNote: String?
     let mediaKey: String?
+    let extractedText: String?
+    let extractedTextSource: ArtifactTextSource?
+    let textExtractionState: ArtifactTextExtractionState
     let place: SavedPlace?
     let enrichment: ArtifactEnrichment?
     let enrichmentState: ArtifactEnrichmentState
@@ -43,6 +64,9 @@ struct Artifact: Identifiable, Hashable {
         originalText: String? = nil,
         userNote: String? = nil,
         mediaKey: String? = nil,
+        extractedText: String? = nil,
+        extractedTextSource: ArtifactTextSource? = nil,
+        textExtractionState: ArtifactTextExtractionState = .pending,
         place: SavedPlace? = nil,
         enrichment: ArtifactEnrichment? = nil,
         enrichmentState: ArtifactEnrichmentState = .pending,
@@ -56,6 +80,9 @@ struct Artifact: Identifiable, Hashable {
         self.originalText = originalText
         self.userNote = userNote
         self.mediaKey = mediaKey
+        self.extractedText = extractedText
+        self.extractedTextSource = extractedTextSource
+        self.textExtractionState = textExtractionState
         self.place = place
         self.enrichment = enrichment
         self.enrichmentState = enrichmentState
@@ -72,6 +99,9 @@ struct Artifact: Identifiable, Hashable {
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
+            extractedText: extractedText,
+            extractedTextSource: extractedTextSource,
+            textExtractionState: textExtractionState,
             place: place,
             enrichment: place?.id == self.place?.id ? enrichment : nil,
             enrichmentState: place?.id == self.place?.id ? enrichmentState : .pending,
@@ -89,6 +119,9 @@ struct Artifact: Identifiable, Hashable {
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
+            extractedText: extractedText,
+            extractedTextSource: extractedTextSource,
+            textExtractionState: textExtractionState,
             place: place,
             enrichment: enrichment,
             enrichmentState: .processed,
@@ -106,6 +139,9 @@ struct Artifact: Identifiable, Hashable {
             originalText: originalText,
             userNote: note,
             mediaKey: mediaKey,
+            extractedText: extractedText,
+            extractedTextSource: extractedTextSource,
+            textExtractionState: textExtractionState,
             place: place,
             enrichment: enrichment,
             enrichmentState: enrichmentState,
@@ -123,9 +159,36 @@ struct Artifact: Identifiable, Hashable {
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
+            extractedText: extractedText,
+            extractedTextSource: extractedTextSource,
+            textExtractionState: textExtractionState,
             place: place,
             enrichment: enrichment,
             enrichmentState: state,
+            userDetails: userDetails,
+            processingState: processingState,
+            capturedAt: capturedAt
+        )
+    }
+
+    func withExtractedText(
+        _ text: String?,
+        source: ArtifactTextSource?,
+        state: ArtifactTextExtractionState
+    ) -> Artifact {
+        Artifact(
+            id: id,
+            kind: kind,
+            sourceURL: sourceURL,
+            originalText: originalText,
+            userNote: userNote,
+            mediaKey: mediaKey,
+            extractedText: text,
+            extractedTextSource: source,
+            textExtractionState: state,
+            place: place,
+            enrichment: text == extractedText ? enrichment : nil,
+            enrichmentState: text == extractedText ? enrichmentState : .pending,
             userDetails: userDetails,
             processingState: processingState,
             capturedAt: capturedAt

@@ -99,6 +99,7 @@ struct ContentView: View {
             await library.load()
             await importSharedArtifactsWithNotice()
             await library.processPendingMaps()
+            library.processPendingTextExtraction()
             library.processPendingEnrichment()
         }
         .onChange(of: scenePhase) { _, newPhase in
@@ -106,6 +107,7 @@ struct ContentView: View {
             Task {
                 await importSharedArtifactsWithNotice()
                 await library.processPendingMaps()
+                library.processPendingTextExtraction()
                 library.processPendingEnrichment()
             }
         }

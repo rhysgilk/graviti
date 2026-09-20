@@ -9,6 +9,9 @@ final class StoredArtifact {
     var originalText: String?
     var userNote: String?
     var mediaKey: String?
+    var extractedText: String?
+    var extractedTextSourceRawValue: String?
+    var textExtractionStateRawValue: String?
     var placeJSON: Data?
     var enrichmentJSON: Data?
     var enrichmentStateRawValue: String?
@@ -23,6 +26,9 @@ final class StoredArtifact {
         originalText = artifact.originalText
         userNote = artifact.userNote
         mediaKey = artifact.mediaKey
+        extractedText = artifact.extractedText
+        extractedTextSourceRawValue = artifact.extractedTextSource?.rawValue
+        textExtractionStateRawValue = artifact.textExtractionState.rawValue
         placeJSON = try? artifact.place.map { try JSONEncoder().encode($0) }
         enrichmentJSON = try? artifact.enrichment.map { try JSONEncoder().encode($0) }
         enrichmentStateRawValue = artifact.enrichmentState.rawValue
@@ -43,6 +49,9 @@ final class StoredArtifact {
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
+            extractedText: extractedText,
+            extractedTextSource: extractedTextSourceRawValue.flatMap(ArtifactTextSource.init(rawValue:)),
+            textExtractionState: textExtractionState,
             place: try placeJSON.map { try JSONDecoder().decode(SavedPlace.self, from: $0) },
             enrichment: enrichmentJSON.flatMap { try? JSONDecoder().decode(ArtifactEnrichment.self, from: $0) },
             enrichmentState: enrichmentState,
@@ -58,12 +67,20 @@ final class StoredArtifact {
         enrichmentStateRawValue = artifact.enrichmentState.rawValue
         userDetailsJSON = try artifact.userDetails.map { try JSONEncoder().encode($0) }
         userNote = artifact.userNote
+        extractedText = artifact.extractedText
+        extractedTextSourceRawValue = artifact.extractedTextSource?.rawValue
+        textExtractionStateRawValue = artifact.textExtractionState.rawValue
         processingStateRawValue = artifact.processingState.rawValue
     }
 
     private var enrichmentState: ArtifactEnrichmentState {
         enrichmentStateRawValue.flatMap(ArtifactEnrichmentState.init(rawValue:))
             ?? (enrichmentJSON == nil ? .pending : .processed)
+    }
+
+    private var textExtractionState: ArtifactTextExtractionState {
+        textExtractionStateRawValue.flatMap(ArtifactTextExtractionState.init(rawValue:))
+            ?? (mediaKey == nil ? .unavailable : (extractedText == nil ? .pending : .processed))
     }
 }
 

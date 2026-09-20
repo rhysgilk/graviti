@@ -8,7 +8,7 @@ Graviti is a private iOS travel-interest library. Save a place, link, note, scre
 - SwiftData persistence with original source preservation
 - Apple Maps and Google Maps place links
 - Apple Maps guide and Google Takeout CSV imports
-- Photo and screenshot storage with optional descriptions
+- Photo and screenshot storage with optional descriptions and on-device Vision text recognition
 - Asynchronous place resolution and editable enrichment
 - Library views for destinations, places, saves, and a map
 - Bulk saved-item deletion and bulk place cleanup
