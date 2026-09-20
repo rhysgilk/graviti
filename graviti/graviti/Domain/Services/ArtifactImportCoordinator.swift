@@ -92,7 +92,9 @@ enum ArtifactImportCoordinator {
             guard existingURLs.insert(placeURL).inserted else {
                 duplicates += 1
                 if let existing = existingByURL[placeURL],
-                   existing.sourceCollectionTitle != guide.title {
+                   !existing.sourceCollectionTitles.contains(where: {
+                       $0.caseInsensitiveCompare(guide.title) == .orderedSame
+                   }) {
                     updates.append(existing.withSourceCollectionTitle(guide.title))
                 }
                 continue
@@ -160,7 +162,9 @@ enum ArtifactImportCoordinator {
                        [.saved, .needsReview, .failed].contains(existing.processingState) {
                         updated = updated.withSourceURL(place.sourceURL, processingState: .saved)
                     }
-                    if updated.sourceCollectionTitle != list.title {
+                    if !updated.sourceCollectionTitles.contains(where: {
+                        $0.caseInsensitiveCompare(list.title) == .orderedSame
+                    }) {
                         updated = updated.withSourceCollectionTitle(list.title)
                     }
                     if updated != existing {

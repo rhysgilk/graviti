@@ -59,6 +59,7 @@ final class ArtifactImportCoordinatorTests: XCTestCase {
         let existing = Artifact(
             kind: .url,
             sourceURL: legacyComponents.url?.absoluteString,
+            sourceCollectionTitle: "Matcha favorites",
             originalText: existingPlace.title
         )
 
@@ -76,7 +77,11 @@ final class ArtifactImportCoordinatorTests: XCTestCase {
         XCTAssertEqual(plan.updatedArtifacts.count, 1)
         XCTAssertEqual(plan.updatedArtifacts.first?.id, existing.id)
         XCTAssertEqual(plan.updatedArtifacts.first?.sourceURL, existingPlace.sourceURL)
-        XCTAssertEqual(plan.updatedArtifacts.first?.sourceCollectionTitle, "Shared list")
+        XCTAssertEqual(plan.updatedArtifacts.first?.sourceCollectionTitle, "Matcha favorites")
+        XCTAssertEqual(
+            plan.updatedArtifacts.first?.sourceCollectionTitles,
+            ["Matcha favorites", "Shared list"]
+        )
         XCTAssertEqual(plan.updatedArtifacts.first?.processingState, .saved)
         XCTAssertEqual(existingPlace.importIdentity, legacyComponents.url?.absoluteString)
     }
@@ -104,6 +109,7 @@ final class ArtifactImportCoordinatorTests: XCTestCase {
         let existing = Artifact(
             kind: .url,
             sourceURL: legacyComponents.url?.absoluteString,
+            sourceCollectionTitle: "Tea shops",
             originalText: place.title,
             place: matchedPlace,
             processingState: .processed
@@ -118,7 +124,7 @@ final class ArtifactImportCoordinatorTests: XCTestCase {
         XCTAssertTrue(plan.artifacts.isEmpty)
         XCTAssertEqual(plan.updatedArtifacts.count, 1)
         XCTAssertEqual(plan.updatedArtifacts.first?.place, matchedPlace)
-        XCTAssertEqual(plan.updatedArtifacts.first?.sourceCollectionTitle, "Shared list")
+        XCTAssertEqual(plan.updatedArtifacts.first?.sourceCollectionTitles, ["Tea shops", "Shared list"])
         XCTAssertEqual(plan.updatedArtifacts.first?.processingState, .processed)
     }
 }

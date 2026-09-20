@@ -83,6 +83,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Refresh unresolved items from earlier Google list imports in place when the same list is imported again.
 - [x] Avoid duplicate guide-wrapper saves when a known Apple or Google collection is imported again.
 - [x] Let saved Apple and Google collections retry or refresh their place imports from the saved-item screen, retain their discovered list titles, and persist upgraded lookup hints across relaunches.
+- [x] Preserve multiple guide/list memberships for the same imported place and expose that source history without overwriting user-edited details.
 - [x] Retry transient failed map lookups when the app next launches or returns to the foreground.
 - [x] Keep ambient Home stars decorative, noninteractive, and motion accessible; apply Sora consistently to Library and Search.
 

@@ -7,6 +7,7 @@ final class StoredArtifact {
     var kindRawValue: String
     var sourceURL: String?
     var sourceCollectionTitle: String?
+    var additionalSourceCollectionTitlesJSON: Data?
     var originalText: String?
     var userNote: String?
     var mediaKey: String?
@@ -27,6 +28,9 @@ final class StoredArtifact {
         kindRawValue = artifact.kind.rawValue
         sourceURL = artifact.sourceURL
         sourceCollectionTitle = artifact.sourceCollectionTitle
+        additionalSourceCollectionTitlesJSON = try? artifact.additionalSourceCollectionTitles.map {
+            try JSONEncoder().encode($0)
+        }
         originalText = artifact.originalText
         userNote = artifact.userNote
         mediaKey = artifact.mediaKey
@@ -53,6 +57,9 @@ final class StoredArtifact {
             kind: kind,
             sourceURL: sourceURL,
             sourceCollectionTitle: sourceCollectionTitle,
+            additionalSourceCollectionTitles: additionalSourceCollectionTitlesJSON.flatMap {
+                try? JSONDecoder().decode([String].self, from: $0)
+            },
             originalText: originalText,
             userNote: userNote,
             mediaKey: mediaKey,
@@ -73,6 +80,9 @@ final class StoredArtifact {
     @MainActor func apply(_ artifact: Artifact) throws {
         sourceURL = artifact.sourceURL
         sourceCollectionTitle = artifact.sourceCollectionTitle
+        additionalSourceCollectionTitlesJSON = try artifact.additionalSourceCollectionTitles.map {
+            try JSONEncoder().encode($0)
+        }
         originalText = artifact.originalText
         placeJSON = try artifact.place.map { try JSONEncoder().encode($0) }
         enrichmentJSON = try artifact.enrichment.map { try JSONEncoder().encode($0) }

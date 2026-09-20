@@ -8,6 +8,7 @@ final class LibraryBackupServiceTests: XCTestCase {
             id: UUID(),
             kind: .photo,
             sourceCollectionTitle: "Maine coast",
+            additionalSourceCollectionTitles: ["National parks"],
             userNote: "Rocky coast at sunrise",
             mediaKey: "photo.jpg",
             extractedText: "Acadia",
@@ -62,6 +63,7 @@ final class LibraryBackupServiceTests: XCTestCase {
         let decoded = try LibraryBackupService.decode(legacyData)
 
         XCTAssertNil(decoded.artifacts.first?.artifact.sourceCollectionTitle)
+        XCTAssertTrue(decoded.artifacts.first?.artifact.sourceCollectionTitles.isEmpty == true)
     }
 
     func testDecodeRejectsUnsupportedSchema() throws {

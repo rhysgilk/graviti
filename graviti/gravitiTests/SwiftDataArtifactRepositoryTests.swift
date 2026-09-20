@@ -99,6 +99,7 @@ final class SwiftDataArtifactRepositoryTests: XCTestCase {
             kind: .photo,
             sourceURL: "https://example.com/coastal-trail",
             sourceCollectionTitle: "Coastal scenery",
+            additionalSourceCollectionTitles: ["Weekend hikes"],
             originalText: "Coastal trail",
             userNote: "Rocky water views and seafood nearby",
             mediaKey: "photo.jpg",

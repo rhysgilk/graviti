@@ -1800,6 +1800,16 @@
         }
       }
     },
+    "Imported from" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importado de"
+          }
+        }
+      }
+    },
     "Import the places in this Apple Maps guide into your Library." : {
       "localizations" : {
         "es" : {

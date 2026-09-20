@@ -91,6 +91,20 @@ struct SavedArtifactDetailView: View {
                         .foregroundStyle(.white)
                 }
 
+                if !current.sourceCollectionTitles.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Imported from")
+                            .font(.headline)
+                            .foregroundStyle(.white.opacity(0.65))
+                        ForEach(current.sourceCollectionTitles, id: \.self) { title in
+                            Label(title, systemImage: "square.stack.3d.up")
+                                .font(.subheadline)
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+
                 if current.kind == .photo {
                     detectedTextSection
                 }

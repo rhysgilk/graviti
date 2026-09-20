@@ -70,6 +70,39 @@ final class PhotoTextExtractionTests: XCTestCase {
         XCTAssertEqual(enrichment?.source, .savedText)
     }
 
+    func testAdditionalCollectionContextPreservesEarlierReasonAndUserDetails() {
+        let details = ArtifactUserDetails(
+            summary: "My favorite tea counter.",
+            category: .foodAndDrink,
+            interests: ["Tea"]
+        )
+        let artifact = Artifact(
+            kind: .url,
+            sourceURL: "https://maps.apple.com/place?place-id=example",
+            sourceCollectionTitle: "Matcha favorites",
+            originalText: "Junbi",
+            enrichment: ArtifactEnrichment(
+                summary: "A matcha cafe.",
+                category: .foodAndDrink,
+                interests: ["Matcha"],
+                source: .savedText,
+                confidence: 0.8,
+                generatedAt: .now
+            ),
+            enrichmentState: .processed,
+            userDetails: details
+        )
+
+        let updated = artifact.withSourceCollectionTitle("Date night")
+        let duplicate = updated.withSourceCollectionTitle("date NIGHT")
+
+        XCTAssertEqual(updated.sourceCollectionTitles, ["Matcha favorites", "Date night"])
+        XCTAssertNil(updated.enrichment)
+        XCTAssertEqual(updated.enrichmentState, .pending)
+        XCTAssertEqual(updated.userDetails, details)
+        XCTAssertEqual(duplicate, updated)
+    }
+
     func testVisionRecognizerReadsClearImageText() async throws {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1200, height: 320))
         let image = renderer.image { context in
