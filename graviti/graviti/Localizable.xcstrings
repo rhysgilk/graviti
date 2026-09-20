@@ -1658,6 +1658,16 @@
         }
       }
     },
+    "Get support" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener ayuda"
+          }
+        }
+      }
+    },
     "Google Maps import complete" : {
       "localizations" : {
         "es" : {
@@ -3771,6 +3781,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ver %1$@"
+          }
+        }
+      }
+    },
+    "View full privacy policy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver la política de privacidad completa"
           }
         }
       }

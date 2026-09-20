@@ -49,9 +49,10 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 Still required before external TestFlight distribution:
 
 - Run the core flow on a physical signed device and on the iOS 18 minimum runtime.
-- Publish the privacy policy at a stable public URL.
 - Supply the feedback email and App Store Connect review contact.
 - Produce and upload the distribution archive in the owner's App Store Connect account.
+
+Public privacy policy URL: <https://github.com/rhysgilk/graviti/blob/main/docs/PRIVACY.md>
 
 ## App Store Connect checklist
 
@@ -62,7 +63,7 @@ Still required before external TestFlight distribution:
 - Confirm the archive contains no dogfood CSVs and only the registered Sora font weights.
 - Confirm the production app icon appears correctly in standard, dark, and tinted Home Screen appearances.
 - Supply the beta description, feedback email, review contact, and What to Test text.
-- Publish `docs/PRIVACY.md` at a stable URL and enter it as the privacy policy URL.
+- Enter <https://github.com/rhysgilk/graviti/blob/main/docs/PRIVACY.md> as the privacy policy URL.
 - Answer App Privacy with **No, we do not collect data from this app** while the implementation remains local-only and contains no telemetry SDK.
 - State the local-only data promise and backup instruction in every beta build's notes.
 - Complete the device, accessibility, localization, offline, import, backup, and data-loss checks above before inviting external testers.

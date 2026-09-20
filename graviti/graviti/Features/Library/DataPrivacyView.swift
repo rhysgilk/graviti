@@ -38,6 +38,20 @@ struct DataPrivacyView: View {
                         symbol: "slider.horizontal.3",
                         detail: "You can edit inferred details, remove place matches, and delete individual or multiple saves. Graviti has no advertising or analytics SDK in this beta."
                     )
+
+                    VStack(spacing: 10) {
+                        if let privacyPolicyURL = URL(string: "https://github.com/rhysgilk/graviti/blob/main/docs/PRIVACY.md") {
+                            Link(destination: privacyPolicyURL) {
+                                privacyLinkLabel("View full privacy policy", symbol: "doc.text")
+                            }
+                        }
+
+                        if let supportURL = URL(string: "https://github.com/rhysgilk/graviti/issues") {
+                            Link(destination: supportURL) {
+                                privacyLinkLabel("Get support", symbol: "questionmark.circle")
+                            }
+                        }
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(20)
@@ -65,6 +79,26 @@ struct DataPrivacyView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func privacyLinkLabel(_ title: LocalizedStringKey, symbol: String) -> some View {
+        Label {
+            HStack {
+                Text(title)
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.caption.weight(.semibold))
+                    .accessibilityHidden(true)
+            }
+        } icon: {
+            Image(systemName: symbol)
+                .foregroundStyle(GravitiColors.signalMint)
+        }
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(.white)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity, minHeight: 50, alignment: .leading)
+        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
     }
 }
 

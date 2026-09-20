@@ -2,6 +2,8 @@
 
 Graviti is a private, local-first travel-interest library.
 
+_Effective September 20, 2026._
+
 ## Data stored on the device
 
 Graviti stores saved links, notes, photos, screenshots, place matches, generated descriptions, interests, recommendation feedback, and app preferences on the device. The Share Extension uses an App Group container to pass items that a person explicitly shares into Graviti. A person can export a backup through Library > Actions; Graviti does not upload that backup.
@@ -26,4 +28,4 @@ A person can edit inferred details, remove a place association, delete individua
 
 ## Contact
 
-Before external distribution, publish this policy at a stable public URL and add the support contact used in App Store Connect.
+For privacy questions, support requests, or deletion help, [contact Graviti through the public support tracker](https://github.com/rhysgilk/graviti/issues/new). Do not include private or sensitive information in a public support request.
