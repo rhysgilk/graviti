@@ -35,20 +35,21 @@ This beta stores its Library on the device. Graviti does not require an account 
 
 ## Latest simulator validation
 
-Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2:
+Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 46 automated tests passed, including import parsing, Fit scoring, persistence, backup restore, and offline save preservation.
+- All 46 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing, Fit scoring, persistence, backup restore, and offline save preservation.
 - A clean signed Debug build completed without warnings. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
 - Direct bubble switching, bulk place removal confirmation, and bulk save deletion confirmation were exercised without committing destructive test actions.
 - Maximum Dynamic Type, increased contrast, right-to-left layout, expanded pseudo-localized strings, and Reduce Motion were inspected in Simulator.
 - Spanish coverage was completed for the app and Share Extension. Home, Explore, Library, canonical interest names, singular/plural counts, accessibility labels, and bulk-selection copy were inspected in Spanish without clipping.
+- The iOS 18.6 minimum runtime was validated on an iPhone 16 Pro simulator. MapKit search found and saved Nishiki Market, Home generated its Gravity destination, Library showed the enriched save, and the record persisted after force quit and relaunch.
 - An unsigned arm64 Release archive was produced with an iOS 18 minimum, both privacy manifests, non-exempt encryption disabled, exactly the two registered Sora fonts, and no dogfood CSVs.
 
 Still required before external TestFlight distribution:
 
-- Run the core flow on a physical signed device and on the iOS 18 minimum runtime.
+- Run the core flow on a physical signed device.
 - Supply the feedback email and App Store Connect review contact.
 - Produce and upload the distribution archive in the owner's App Store Connect account.
 

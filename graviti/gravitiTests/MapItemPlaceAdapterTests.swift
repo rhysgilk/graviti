@@ -4,12 +4,8 @@ import XCTest
 
 @MainActor
 final class MapItemPlaceAdapterTests: XCTestCase {
-    @available(iOS 26.0, *)
     func testMapItemBecomesStableSavedPlace() throws {
-        let item = MKMapItem(
-            location: CLLocation(latitude: 35.0116, longitude: 135.7681),
-            address: nil
-        )
+        let item = makeMapItem(latitude: 35.0116, longitude: 135.7681)
         item.name = "  Nishiki Market  "
 
         let place = try XCTUnwrap(MapItemPlaceAdapter.savedPlace(from: item, fallbackID: "nishiki"))
@@ -20,14 +16,24 @@ final class MapItemPlaceAdapterTests: XCTestCase {
         XCTAssertEqual(place.longitude, 135.7681, accuracy: 0.000_001)
     }
 
-    @available(iOS 26.0, *)
     func testMapItemWithoutNameIsRejected() {
-        let item = MKMapItem(
-            location: CLLocation(latitude: 0, longitude: 0),
-            address: nil
-        )
+        let item = makeMapItem(latitude: 0, longitude: 0)
         item.name = "   "
 
         XCTAssertNil(MapItemPlaceAdapter.savedPlace(from: item))
+    }
+
+    private func makeMapItem(latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> MKMapItem {
+        let location = CLLocation(latitude: latitude, longitude: longitude)
+        if #available(iOS 26.0, *) {
+            return MKMapItem(location: location, address: nil)
+        } else {
+            return legacyMapItem(coordinate: location.coordinate)
+        }
+    }
+
+    @available(iOS, obsoleted: 26.0)
+    private func legacyMapItem(coordinate: CLLocationCoordinate2D) -> MKMapItem {
+        MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
     }
 }

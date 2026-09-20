@@ -79,8 +79,10 @@ struct HomeView: View {
                             .foregroundStyle(.white.opacity(0.7))
                         Button("Find a place", action: onSave)
                             .font(.headline)
+                            .foregroundStyle(.white)
                             .frame(minWidth: 180, minHeight: 48)
                             .background(GravitiColors.iris, in: Capsule())
+                            .buttonStyle(.plain)
                     }
                     .padding(28)
                 }
