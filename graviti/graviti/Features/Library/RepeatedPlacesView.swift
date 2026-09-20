@@ -48,7 +48,7 @@ struct RepeatedPlacesView: View {
         .background(GravitiColors.appBackground)
         .navigationTitle("Repeated places")
         .safeAreaInset(edge: .top) {
-            Text("Each original save stays in your Library. Graviti connects them to one place so repeated interest strengthens its signal without creating duplicate places.")
+            Text("Original saves stay separate and strengthen this place’s signal.")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.72))
                 .padding(.horizontal, 20)

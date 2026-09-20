@@ -46,7 +46,7 @@ struct SavedPlaceDetailView: View {
                     .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
                 }
 
-                Text("Saved items")
+                Text("Your saves")
                     .font(.headline)
                 ForEach(artifacts) { artifact in
                     NavigationLink {

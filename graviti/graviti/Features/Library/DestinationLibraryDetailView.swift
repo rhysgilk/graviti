@@ -17,7 +17,7 @@ struct DestinationLibraryDetailView: View {
             }
 
             if !profile.interests.isEmpty || !profile.categories.isEmpty {
-                Section("What pulls you here") {
+                Section("Interests") {
                     VStack(alignment: .leading, spacing: 12) {
                         if !profile.interests.isEmpty {
                             Text(profile.interests.prefix(6).map(\.name).joined(separator: " · "))

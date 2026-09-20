@@ -72,7 +72,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Add richer thumbnails and media cards to the Saves library with graceful note/link fallbacks.
 - [x] Add persisted recommendation actions: **Save destination** and **Not for me**.
 - [x] Persist the last Library mode; use Destinations as the initial mode for a new user.
-- [ ] Replace repeated explanatory copy with concise headers such as Interests, Patterns, and Your saves.
+- [x] Replace repeated explanatory copy with concise headers such as Interests, Patterns, and Your saves.
 
 ### MVP decision gate
 

@@ -118,13 +118,8 @@ struct ExploreView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
                         } else if !recommendations.isEmpty {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text("Places that fit you")
-                                    .font(.headline)
-                                Text("Suggestions based on patterns across your Library")
-                                    .font(.caption)
-                                    .foregroundStyle(.white.opacity(0.6))
-                            }
+                            Text("Fit")
+                                .font(.headline)
 
                             ForEach(recommendations) { recommendation in
                                 NavigationLink {
@@ -143,7 +138,7 @@ struct ExploreView: View {
                         }
 
                         if !profile.interests.isEmpty {
-                            Text("Interests across your saves")
+                            Text("Interests")
                                 .font(.headline)
 
                             ForEach(profile.interests) { pattern in
@@ -174,7 +169,7 @@ struct ExploreView: View {
                         }
 
                         if !profile.categories.isEmpty {
-                            Text("Categories taking shape")
+                            Text("Categories")
                                 .font(.headline)
                                 .padding(.top, 4)
                             ForEach(profile.categories) { pattern in
@@ -263,7 +258,7 @@ struct ExploreView: View {
 
     private func leadingPattern(_ pattern: InterestPattern) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label("A pattern across places", systemImage: "circle.grid.cross")
+            Label("Pattern", systemImage: "circle.grid.cross")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(GravitiColors.signalMint)
             Text("\(pattern.name) keeps showing up")
