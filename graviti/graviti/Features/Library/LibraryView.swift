@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import UniformTypeIdentifiers
 
 struct LibraryView: View {
     @ObservedObject var library: ArtifactLibrary
@@ -12,6 +13,10 @@ struct LibraryView: View {
     @State private var showingBulkRemoveConfirmation = false
     @State private var isRemovingPlaces = false
     @State private var placeActionError: String?
+    @State private var backupDocument = LibraryBackupDocument()
+    @State private var isExportingBackup = false
+    @State private var isImportingBackup = false
+    @State private var backupStatus: LibraryBackupStatus?
 
     private var mode: LibraryMode {
         get { LibraryMode(rawValue: modeRawValue) ?? .destinations }
@@ -56,6 +61,23 @@ struct LibraryView: View {
                         }
                     }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            exportBackup()
+                        } label: {
+                            Label("Export backup", systemImage: "square.and.arrow.up")
+                        }
+                        Button {
+                            isImportingBackup = true
+                        } label: {
+                            Label("Restore backup", systemImage: "square.and.arrow.down")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                    .accessibilityLabel("Library actions")
+                }
             }
             .searchable(text: $query, prompt: "Places, interests, and saves")
             .onChange(of: query) { _, _ in
@@ -86,6 +108,56 @@ struct LibraryView: View {
             } message: {
                 Text("The associated saves stay in your Library and can be matched to places again later.")
             }
+            .fileExporter(
+                isPresented: $isExportingBackup,
+                document: backupDocument,
+                contentType: .json,
+                defaultFilename: "Graviti Backup"
+            ) { result in
+                switch result {
+                case .success:
+                    backupStatus = LibraryBackupStatus(message: "Your Graviti backup was exported.")
+                case .failure(let error):
+                    backupStatus = LibraryBackupStatus(message: error.localizedDescription)
+                }
+            }
+            .fileImporter(isPresented: $isImportingBackup, allowedContentTypes: [.json]) { result in
+                restoreBackup(result)
+            }
+            .alert(item: $backupStatus) { status in
+                Alert(title: Text("Library backup"), message: Text(status.message), dismissButton: .default(Text("OK")))
+            }
+        }
+    }
+
+    private func exportBackup() {
+        do {
+            backupDocument = LibraryBackupDocument(data: try library.backupData())
+            isExportingBackup = true
+        } catch {
+            backupStatus = LibraryBackupStatus(message: error.localizedDescription)
+        }
+    }
+
+    private func restoreBackup(_ result: Result<URL, Error>) {
+        do {
+            let url = try result.get()
+            let hasAccess = url.startAccessingSecurityScopedResource()
+            defer { if hasAccess { url.stopAccessingSecurityScopedResource() } }
+            let data = try Data(contentsOf: url, options: .mappedIfSafe)
+            Task {
+                do {
+                    let summary = try await library.restoreBackup(data)
+                    let duplicateText = summary.duplicates > 0 ? " · \(summary.duplicates) already present" : ""
+                    backupStatus = LibraryBackupStatus(
+                        message: "\(summary.imported) \(summary.imported == 1 ? "save" : "saves") restored\(duplicateText)."
+                    )
+                } catch {
+                    backupStatus = LibraryBackupStatus(message: error.localizedDescription)
+                }
+            }
+        } catch {
+            backupStatus = LibraryBackupStatus(message: error.localizedDescription)
         }
     }
 
@@ -403,6 +475,11 @@ struct LibraryView: View {
     private func noResultsState() -> some View {
         ContentUnavailableView.search(text: query)
     }
+}
+
+private struct LibraryBackupStatus: Identifiable {
+    let id = UUID()
+    let message: String
 }
 
 private enum LibraryMode: String, CaseIterable, Identifiable {

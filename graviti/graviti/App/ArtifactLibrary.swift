@@ -155,6 +155,44 @@ final class ArtifactLibrary: ObservableObject {
         }
     }
 
+    func backupData() throws -> Data {
+        try LibraryBackupService.encode(artifacts)
+    }
+
+    func restoreBackup(_ data: Data) async throws -> LibraryRestoreSummary {
+        let archive = try LibraryBackupService.decode(data)
+        let existingIDs = Set(artifacts.map(\.id))
+        let additions = archive.artifacts.filter { !existingIDs.contains($0.artifact.id) }
+        var restoredArtifacts = [Artifact]()
+        var createdMediaKeys = [String]()
+        do {
+            for entry in additions {
+                if let mediaData = entry.mediaData, let fileExtension = entry.mediaFileExtension {
+                    let key = try SharedMediaStore.store(mediaData, id: entry.artifact.id, fileExtension: fileExtension)
+                    createdMediaKeys.append(key)
+                    restoredArtifacts.append(entry.artifact.withMediaKey(key))
+                } else {
+                    restoredArtifacts.append(entry.artifact.withMediaKey(nil))
+                }
+            }
+            if !restoredArtifacts.isEmpty {
+                try await repository.saveMany(restoredArtifacts)
+                artifacts.insert(contentsOf: restoredArtifacts.sorted { $0.capturedAt > $1.capturedAt }, at: 0)
+                Task { await processPendingMaps() }
+                processPendingTextExtraction()
+                processPendingLinkMetadata()
+                await processPendingEnrichment()
+            }
+        } catch {
+            for key in createdMediaKeys { try? SharedMediaStore.remove(key) }
+            throw error
+        }
+        return LibraryRestoreSummary(
+            imported: restoredArtifacts.count,
+            duplicates: archive.artifacts.count - additions.count
+        )
+    }
+
     private func process(_ id: UUID) async {
         guard let artifact = artifacts.first(where: { $0.id == id }),
               shouldProcess(artifact) || artifact.processingState == .processing else { return }

@@ -76,12 +76,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 
 ### MVP decision gate
 
-Choose and document one path before external TestFlight distribution:
-
-- Sign in with Apple plus basic cloud sync, or
-- an explicitly local-only beta with reliable library export and backup.
-
-The choice must not remain ambiguous because a travel library needs a clear data durability promise.
+**Decision: local-only MVP beta.** Library > Actions provides a versioned JSON export and restore flow. The backup preserves saved records, place matches, enrichment, cached link details, and embedded photo bytes; restore skips stable-ID duplicates and resumes background processing. TestFlight notes must state that data stays on the device unless the user exports a backup. Sign in and cloud sync remain a post-MVP option.
 
 ### Repository and architecture
 

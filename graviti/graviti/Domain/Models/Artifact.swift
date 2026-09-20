@@ -40,7 +40,7 @@ enum ArtifactTextSource: String, Codable {
     }
 }
 
-struct Artifact: Identifiable, Hashable {
+struct Artifact: Identifiable, Hashable, Codable {
     let id: UUID
     let kind: ArtifactKind
     let sourceURL: String?
@@ -227,6 +227,28 @@ struct Artifact: Identifiable, Hashable {
             place: place,
             enrichment: metadata == linkMetadata ? enrichment : nil,
             enrichmentState: metadata == linkMetadata ? enrichmentState : .pending,
+            userDetails: userDetails,
+            processingState: processingState,
+            capturedAt: capturedAt
+        )
+    }
+
+    func withMediaKey(_ mediaKey: String?) -> Artifact {
+        Artifact(
+            id: id,
+            kind: kind,
+            sourceURL: sourceURL,
+            originalText: originalText,
+            userNote: userNote,
+            mediaKey: mediaKey,
+            extractedText: extractedText,
+            extractedTextSource: extractedTextSource,
+            textExtractionState: textExtractionState,
+            linkMetadata: linkMetadata,
+            linkMetadataState: linkMetadataState,
+            place: place,
+            enrichment: enrichment,
+            enrichmentState: enrichmentState,
             userDetails: userDetails,
             processingState: processingState,
             capturedAt: capturedAt

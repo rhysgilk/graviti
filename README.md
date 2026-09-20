@@ -13,6 +13,7 @@ Graviti is a private iOS travel-interest library. Save a place, link, note, scre
 - Cached link titles, descriptions, site names, and preview images
 - Library views for destinations, places, saves, and a map
 - Global search across saved items, destinations, interests, places, and MapKit results
+- Versioned local library backup and restore, including saved photos
 - Bulk saved-item deletion and bulk place cleanup
 - Gravity visualization with adaptive geographic resolution
 - Interest patterns across categories and geographic areas
@@ -78,4 +79,4 @@ Debug builds expose a dataset switcher at the bottom of the Save tab. Each datas
 
 ## Data status
 
-The current beta is local first. Authentication, cloud synchronization, and the alternative local-only export/backup path remain an explicit pre-TestFlight decision in the MVP steering guide.
+The MVP beta is local only. Data remains on the device unless the user exports a versioned JSON backup from Library > Actions. Backups include saved records, derived details, place matches, and saved photo bytes, and can be restored without duplicating existing records. Sign in and cloud sync are post-MVP options.
