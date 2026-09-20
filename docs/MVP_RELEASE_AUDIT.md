@@ -12,6 +12,7 @@ This audit maps the MVP Definition of Done to current evidence. It distinguishes
 
 - 62 of 62 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
 - 62 of 62 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
+- 62 of 62 tests passed with no failures or skips on a physical iPhone 13 Pro Max running iOS 26.3.1.
 - A signed arm64 Release archive of the audited commit completed Xcode's store validation phase.
 - `scripts/verify-release-archive.sh` passed every package check: bundle identifiers, matching app and extension versions, iOS 18 minimum, encryption declaration, both privacy manifests, exactly two Sora fonts, no CSV fixtures, nested signatures, and matching App Group entitlements.
 - The only archive warning is expected: the available seven-day Apple Development profile is suitable for device testing but not TestFlight distribution.
@@ -45,7 +46,7 @@ This audit maps the MVP Definition of Done to current evidence. It distinguishes
 
 1. **Apple Developer Program membership:** team `V9W8HRDJQT` currently has no App Store Connect provider and cannot create App Store provisioning profiles for either bundle. The account holder must enroll or associate the team with an active provider.
 2. **Distribution export:** rerun `scripts/export-testflight.sh` after enrollment. This creates a locally exported IPA without uploading it.
-3. **Physical-device completion:** preliminary manual testing has passed, and the current app plus Share Extension were provisioned, installed, launched, and observed running on an iPhone 13 Pro Max with iOS 26.3.1. Finish the hands-on checklist in `docs/TESTFLIGHT.md`, especially Share Extension capture, backup/restore, offline relaunch, bulk deletion, Dynamic Type, VoiceOver, and Reduce Motion.
+3. **Physical-device completion:** preliminary manual testing has passed; the current app plus Share Extension were provisioned, installed, launched, and observed running on an iPhone 13 Pro Max with iOS 26.3.1; and all 62 tests passed on that device. Finish the hands-on checklist in `docs/TESTFLIGHT.md`, especially Share Extension capture, backup/restore, offline relaunch, bulk deletion, Dynamic Type, VoiceOver, and Reduce Motion.
 4. **TestFlight metadata:** provide the feedback email and App Store Connect review contact.
 5. **Upload authorization:** upload the verified distribution build only after the owner reviews the final archive and metadata.
 
