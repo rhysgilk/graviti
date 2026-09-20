@@ -6,8 +6,8 @@ struct SavedArtifactDetailView: View {
     @ObservedObject var library: ArtifactLibrary
     @State private var showingPlaceReview = false
     @State private var actionError: String?
-    @State private var isImportingGuide = false
-    @State private var guideImportMessage: String?
+    @State private var isImportingCollection = false
+    @State private var collectionImportMessage: String?
     @State private var showingDeleteConfirmation = false
     @State private var isDeleting = false
     @State private var isRefreshingDetails = false
@@ -40,46 +40,29 @@ struct SavedArtifactDetailView: View {
                         .textSelection(.enabled)
                         .foregroundStyle(.white)
 
-                    if MapLinkMetadata.isCollectionLink(sourceURL) {
-                        Text(MapLinkMetadata.provider(for: sourceURL) == .google
-                             ? String(localized: "This saves the list link. To add each place, import its Google Saved CSV from the Save tab.")
-                             : String(localized: "Import the places in this Apple Maps guide into your Library."))
+                    if let provider = collectionProvider {
+                        Text(provider == .google
+                             ? String(localized: "Import or refresh every place from this Google Maps list.")
+                             : String(localized: "Import or refresh every place from this Apple Maps guide."))
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.68))
 
-                        if MapLinkMetadata.provider(for: sourceURL) == .apple {
-                            Button {
-                                isImportingGuide = true
-                                guideImportMessage = nil
-                                Task {
-                                    defer { isImportingGuide = false }
-                                    do {
-                                        let summary = try await library.importAppleGuidePlaces(from: sourceURL)
-                                        let details = [
-                                            GravitiCopy.imported(summary.imported),
-                                            summary.duplicates > 0 ? GravitiCopy.duplicatesAvoided(summary.duplicates) : nil,
-                                            summary.skipped > 0 ? GravitiCopy.couldNotImport(summary.skipped) : nil
-                                        ].compactMap { $0 }.joined(separator: " · ")
-                                        guideImportMessage = "\(summary.title): \(details)"
-                                    } catch {
-                                        guideImportMessage = error.localizedDescription
-                                    }
-                                }
-                            } label: {
-                                if isImportingGuide {
-                                    ProgressView("Importing guide")
-                                } else {
-                                    Label("Import guide places", systemImage: "square.and.arrow.down")
-                                }
+                        Button {
+                            Task { await importCollectionPlaces(from: sourceURL, provider: provider) }
+                        } label: {
+                            if isImportingCollection {
+                                ProgressView("Importing places")
+                            } else {
+                                Label("Import or refresh places", systemImage: "square.and.arrow.down")
                             }
-                            .disabled(isImportingGuide)
-                            .font(.subheadline.weight(.semibold))
-                            .frame(maxWidth: .infinity, minHeight: 48)
-                            .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
                         }
+                        .disabled(isImportingCollection)
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
 
-                        if let guideImportMessage {
-                            Text(guideImportMessage)
+                        if let collectionImportMessage {
+                            Text(collectionImportMessage)
                                 .font(.subheadline)
                                 .foregroundStyle(GravitiColors.signalMint)
                         }
@@ -327,8 +310,61 @@ struct SavedArtifactDetailView: View {
     }
 
     private var isCollectionSave: Bool {
-        guard let sourceURL = current.sourceURL else { return false }
-        return MapLinkMetadata.isCollectionLink(sourceURL)
+        collectionProvider != nil
+    }
+
+    private var collectionProvider: MapLinkMetadata.Provider? {
+        guard let sourceURL = current.sourceURL,
+              let provider = MapLinkMetadata.provider(for: sourceURL),
+              MapLinkMetadata.isCollectionLink(sourceURL) ||
+                ArtifactProcessingCoordinator.isResolvedMapCollection(current) else { return nil }
+        return provider
+    }
+
+    private func importCollectionPlaces(from sourceURL: String, provider: MapLinkMetadata.Provider) async {
+        isImportingCollection = true
+        collectionImportMessage = nil
+        defer { isImportingCollection = false }
+
+        do {
+            switch provider {
+            case .apple:
+                let summary = try await library.importAppleGuidePlaces(from: sourceURL)
+                collectionImportMessage = importMessage(
+                    title: summary.title,
+                    imported: summary.imported,
+                    duplicates: summary.duplicates,
+                    skipped: summary.skipped
+                )
+            case .google:
+                let summary = try await library.importGoogleMapsListPlaces(from: sourceURL)
+                collectionImportMessage = importMessage(
+                    title: summary.title,
+                    imported: summary.imported,
+                    refreshed: summary.refreshed,
+                    duplicates: summary.duplicates,
+                    skipped: summary.skipped
+                )
+            }
+        } catch {
+            collectionImportMessage = error.localizedDescription
+        }
+    }
+
+    private func importMessage(
+        title: String,
+        imported: Int,
+        refreshed: Int = 0,
+        duplicates: Int,
+        skipped: Int
+    ) -> String {
+        let details = [
+            GravitiCopy.imported(imported),
+            refreshed > 0 ? GravitiCopy.placeDetailsRefreshed(refreshed) : nil,
+            duplicates > 0 ? GravitiCopy.duplicatesAvoided(duplicates) : nil,
+            skipped > 0 ? GravitiCopy.couldNotImport(skipped) : nil
+        ].compactMap { $0 }.joined(separator: " · ")
+        return "\(title): \(details)"
     }
 
     private var enrichmentStatus: (text: String, symbol: String)? {

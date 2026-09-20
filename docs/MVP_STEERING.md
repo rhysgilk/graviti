@@ -82,6 +82,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Preserve Google list address and coordinate evidence so MapKit can disambiguate results while still sending unsafe matches to review.
 - [x] Refresh unresolved items from earlier Google list imports in place when the same list is imported again.
 - [x] Avoid duplicate guide-wrapper saves when a known Apple or Google collection is imported again.
+- [x] Let saved Apple and Google collections retry or refresh their place imports from the saved-item screen, and persist upgraded lookup hints across relaunches.
 - [x] Retry transient failed map lookups when the app next launches or returns to the foreground.
 - [x] Keep ambient Home stars decorative, noninteractive, and motion accessible; apply Sora consistently to Library and Search.
 

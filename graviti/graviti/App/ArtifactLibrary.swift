@@ -447,7 +447,10 @@ final class ArtifactLibrary: ObservableObject {
     }
 
     func importGoogleMapsListPlaces(from rawURL: String) async throws -> GoogleMapsListImportSummary {
-        let plan = try await ArtifactImportCoordinator.googleMapsList(rawURL, existingArtifacts: artifacts)
+        let list = try await GoogleMapsListImporter.load(rawURL)
+        // Build the plan after the network request so background processing that
+        // completed while the list loaded is not overwritten by a stale snapshot.
+        let plan = ArtifactImportCoordinator.googleMapsList(list, existingArtifacts: artifacts)
 
         if !plan.updatedArtifacts.isEmpty {
             try await repository.updateMany(plan.updatedArtifacts)

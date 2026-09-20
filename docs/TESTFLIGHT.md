@@ -38,7 +38,7 @@ This beta stores its Library on the device. Graviti does not require an account 
 
 Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 58 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing and migration, Fit scoring, persistence, backup restore, offline save preservation and recovery, safe map URL generation, and deterministic ten-destination Gravity Field layout.
+- All 59 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing and migration, Fit scoring, persistence, backup restore, offline save preservation and recovery, safe map URL generation, and deterministic ten-destination Gravity Field layout.
 - A clean signed Debug build completed without warnings. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
@@ -48,6 +48,7 @@ Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - Google list imports retain address and coordinate hints for place resolution. A live 28-place check matched 25 automatically, left 3 ambiguous names for review, and had no lookup failures.
 - Re-importing the same Google list upgrades unresolved items created by older builds in place and reports how many place details were refreshed without overwriting user-matched places.
 - Re-importing a known map collection does not add another generic guide wrapper to Library.
+- A saved Apple Maps guide or Google Maps list can retry or refresh its places directly from Saved Item detail. Upgraded Google lookup hints survived force quit and relaunch; the next import reported only duplicates and no redundant refreshes.
 - Transient map lookup failures retry automatically when processing resumes, while the original save remains visible throughout.
 - Home's white and yellow stars remain behind the Gravity Field, ignore input, and pulse gently; Reduce Motion keeps them static. The small Graviti wordmark animates both colored i dots.
 - Library and Search use Sora for navigation, tabs, segmented controls, search fields, and screen content.

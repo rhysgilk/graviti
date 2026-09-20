@@ -68,6 +68,7 @@ final class StoredArtifact {
     }
 
     @MainActor func applyResolution(_ artifact: Artifact) throws {
+        sourceURL = artifact.sourceURL
         placeJSON = try artifact.place.map { try JSONEncoder().encode($0) }
         enrichmentJSON = try artifact.enrichment.map { try JSONEncoder().encode($0) }
         enrichmentStateRawValue = artifact.enrichmentState.rawValue

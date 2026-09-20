@@ -84,6 +84,12 @@ enum GravitiCopy {
             : String(localized: "\(count) imported")
     }
 
+    static func placeDetailsRefreshed(_ count: Int) -> String {
+        count == 1
+            ? String(localized: "1 place detail refreshed")
+            : String(localized: "\(count) place details refreshed")
+    }
+
     static func duplicatesAvoided(_ count: Int) -> String {
         count == 1
             ? String(localized: "1 duplicate avoided")

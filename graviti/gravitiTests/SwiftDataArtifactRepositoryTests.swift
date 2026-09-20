@@ -64,6 +64,25 @@ final class SwiftDataArtifactRepositoryTests: XCTestCase {
         XCTAssertEqual(Set(stored), Set([first, second]))
     }
 
+    func testSourceURLUpdatePersistsAcrossReload() async throws {
+        let repository = try makeRepository()
+        let original = Artifact(
+            kind: .url,
+            sourceURL: "https://www.google.com/maps/place/Tea/data=!4m2",
+            originalText: "Tea"
+        )
+        try await repository.save(original)
+
+        let enrichedURL = "https://www.google.com/maps/place/Tea/data=!4m2?q=Tea%20House&ll=40.7,-73.9"
+        let updated = original.withSourceURL(enrichedURL, processingState: .saved)
+        try await repository.update(updated)
+
+        let artifacts = try await repository.artifacts()
+        let stored = try XCTUnwrap(artifacts.first)
+        XCTAssertEqual(stored.sourceURL, enrichedURL)
+        XCTAssertEqual(stored.processingState, .saved)
+    }
+
     private func makeRepository() throws -> SwiftDataArtifactRepository {
         let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: StoredArtifact.self, configurations: configuration)
