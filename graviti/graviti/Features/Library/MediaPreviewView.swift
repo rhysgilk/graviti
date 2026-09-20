@@ -5,6 +5,7 @@ struct MediaPreviewView: View {
     let mediaKey: String
     let maximumPixelSize: Int
     var minimumHeight: CGFloat = 200
+    var contentMode: ContentMode = .fit
 
     @State private var preview: UIImage?
     @State private var finishedLoading = false
@@ -14,7 +15,7 @@ struct MediaPreviewView: View {
             if let preview {
                 Image(uiImage: preview)
                     .resizable()
-                    .scaledToFit()
+                    .aspectRatio(contentMode: contentMode)
                     .accessibilityLabel("Saved photo")
             } else if finishedLoading {
                 Label("Photo unavailable", systemImage: "photo.badge.exclamationmark")

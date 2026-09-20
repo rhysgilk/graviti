@@ -422,22 +422,38 @@ private struct ArtifactRow: View {
     let artifact: Artifact
 
     var body: some View {
-        HStack(spacing: 14) {
-            Image(systemName: artifact.kind == .url ? "link" : (artifact.kind == .photo ? "photo" : "note.text"))
-                .font(.title3)
-                .foregroundStyle(GravitiColors.signalMint)
-                .frame(width: 44, height: 44)
-                .background(GravitiColors.appBackground, in: RoundedRectangle(cornerRadius: 12))
+        HStack(alignment: .top, spacing: 14) {
+            ArtifactThumbnailView(artifact: artifact)
 
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(artifact.libraryTitle)
                     .font(.headline)
                     .foregroundStyle(.white)
                     .lineLimit(2)
 
-                Text(artifact.capturedAt, format: .dateTime.month().day().year())
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.58))
+                if let supportingText {
+                    Text(supportingText)
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.68))
+                        .lineLimit(2)
+                }
+
+                HStack(spacing: 5) {
+                    if let category = artifact.effectiveCategory {
+                        Text(category.displayName)
+                            .foregroundStyle(GravitiColors.signalMint)
+                    } else if let siteName = artifact.linkMetadata?.siteName {
+                        Text(siteName)
+                            .foregroundStyle(GravitiColors.signalMint)
+                    }
+                    if artifact.effectiveCategory != nil || artifact.linkMetadata?.siteName != nil {
+                        Text("·")
+                    }
+                    Text(artifact.place?.name ?? artifact.capturedAt.formatted(.dateTime.month().day().year()))
+                        .lineLimit(1)
+                }
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.58))
 
                 if artifact.processingState == .needsReview || artifact.processingState == .failed {
                     Text(artifact.processingState == .needsReview ? "Needs place review" : "Place lookup failed")
@@ -445,17 +461,29 @@ private struct ArtifactRow: View {
                         .foregroundStyle(GravitiColors.opportunityCoral)
                 }
 
-                if let category = artifact.effectiveCategory {
-                    Text(category.displayName)
-                        .font(.caption)
-                        .foregroundStyle(GravitiColors.signalMint)
-                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 7)
         .accessibilityElement(children: .combine)
     }
 
+    private var supportingText: String? {
+        let candidates: [String?] = [
+            artifact.effectiveSummary,
+            artifact.linkMetadata?.summary,
+            artifact.userNote,
+            artifact.kind == .manual ? artifact.originalText : nil,
+            artifact.kind == .url ? URL(string: artifact.sourceURL ?? "")?.host(percentEncoded: false) : nil
+        ]
+        for candidate in candidates {
+            guard let value = candidate?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !value.isEmpty,
+                  value.localizedCaseInsensitiveCompare(artifact.libraryTitle) != .orderedSame else { continue }
+            return value
+        }
+        return nil
+    }
 }
 
 private extension Artifact {

@@ -157,18 +157,7 @@ private struct DestinationArtifactRow: View {
 
     @ViewBuilder
     private var thumbnail: some View {
-        if let mediaKey = artifact.mediaKey {
-            MediaPreviewView(mediaKey: mediaKey, maximumPixelSize: 180, minimumHeight: 58)
-                .frame(width: 58, height: 58)
-                .background(GravitiColors.deepInk)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-        } else {
-            Image(systemName: artifact.kind == .url ? "link" : "note.text")
-                .font(.title3)
-                .foregroundStyle(GravitiColors.signalMint)
-                .frame(width: 58, height: 58)
-                .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 10))
-        }
+        ArtifactThumbnailView(artifact: artifact, size: 58)
     }
 
     private var title: String {
