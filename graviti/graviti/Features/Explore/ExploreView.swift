@@ -196,9 +196,9 @@ struct ExploreView: View {
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
-                Text("\(recommendation.fitPercent)%")
-                    .font(.title3.weight(.bold))
-                Text("FIT")
+                Text(recommendation.scoreLabel)
+                    .font(recommendation.confidence == .early ? .caption.weight(.bold) : .title3.weight(.bold))
+                Text(recommendation.confidence == .early ? "MORE SAVES NEEDED" : recommendation.confidence.displayName.uppercased())
                     .font(.caption2.weight(.semibold))
                     .tracking(1)
                     .foregroundStyle(.white.opacity(0.55))
@@ -210,7 +210,7 @@ struct ExploreView: View {
         .padding(16)
         .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 16))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(recommendation.name), \(recommendation.country), \(recommendation.fitPercent) percent fit, because of \(recommendation.matchedInterests.joined(separator: ", "))")
+        .accessibilityLabel("\(recommendation.name), \(recommendation.country), \(recommendation.scoreLabel), \(recommendation.confidence.displayName), based on \(recommendation.matchedInterests.joined(separator: ", "))")
     }
 
     private func leadingPattern(_ pattern: InterestPattern) -> some View {
@@ -249,12 +249,15 @@ private struct DestinationRecommendationView: View {
                         .foregroundStyle(GravitiColors.signalMint)
                     Text(recommendation.name)
                         .font(.custom("Sora-SemiBold", size: 30, relativeTo: .title))
-                    Text("\(recommendation.fitPercent)% fit")
+                    Text(recommendation.scoreLabel)
                         .font(.title3.weight(.semibold))
+                    Text("\(recommendation.confidence.displayName) · \(recommendation.confidencePercent)% evidence confidence")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.68))
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Why it matches")
+                    Text("Patterns")
                         .font(.headline)
                     ForEach(recommendation.matchedInterests, id: \.self) { interest in
                         Label(interest, systemImage: "sparkles")
@@ -263,6 +266,11 @@ private struct DestinationRecommendationView: View {
                     Text("Based on \(recommendation.supportingArtifacts.count) of your saved items across the Library.")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.68))
+                    if recommendation.confidence == .early {
+                        Text("This is an early signal. More detailed saves from distinct places will make it more reliable.")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.68))
+                    }
                     if !recommendation.explicitMatches.isEmpty {
                         Text("Also matches what you asked for: \(recommendation.explicitMatches.joined(separator: ", ")).")
                             .font(.subheadline)
@@ -272,10 +280,6 @@ private struct DestinationRecommendationView: View {
                 .padding(18)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
-
-                Text("This is a Fit suggestion. It has no Gravity until you save something there.")
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.68))
 
                 Button("Search places in \(recommendation.name)", action: onSearch)
                     .font(.subheadline.weight(.semibold))
@@ -297,7 +301,7 @@ private struct ExplorePreferencesView: View {
     @Binding var preferredRaw: String
     @Binding var avoidedRaw: String
 
-    private let interests = ["Matcha", "Tea", "Coffee", "Desserts", "Scenic views", "Hiking", "Nature", "Beaches", "Architecture", "Museums", "Gardens", "Shopping"]
+    private let interests = ["Matcha", "Tea", "Coffee", "Desserts", "Seafood", "Scenic views", "Hiking", "Forests", "Mountains", "National parks", "Nature", "Beaches", "Coast & water", "Architecture", "History", "Museums", "Gardens", "Shopping", "Wildlife"]
 
     private var preferred: Set<String> { decode(preferredRaw) }
     private var avoided: Set<String> { decode(avoidedRaw) }

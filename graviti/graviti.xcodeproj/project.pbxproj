@@ -12,6 +12,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B10000000000000000000007 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4076AA9C305CBC1700E032E4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4076AAA3305CBC1700E032E4;
+			remoteInfo = graviti;
+		};
 		A10000000000000000000005 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4076AA9C305CBC1700E032E4 /* Project object */;
@@ -39,6 +46,7 @@
 		4076AAA4305CBC1700E032E4 /* graviti.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = graviti.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000002 /* graviti/Integrations/ShareExtensionSupport/SharedArtifactInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = graviti/Integrations/ShareExtensionSupport/SharedArtifactInbox.swift; sourceTree = "<group>"; };
 		A10000000000000000000004 /* GravitiShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = GravitiShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10000000000000000000001 /* gravitiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = gravitiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -75,6 +83,11 @@
 			path = GravitiShareExtension;
 			sourceTree = "<group>";
 		};
+		B10000000000000000000002 /* gravitiTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = gravitiTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +105,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B10000000000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -100,6 +120,7 @@
 			children = (
 				4076AAA6305CBC1700E032E4 /* graviti */,
 				A10000000000000000000009 /* GravitiShareExtension */,
+				B10000000000000000000002 /* gravitiTests */,
 				A10000000000000000000002 /* graviti/Integrations/ShareExtensionSupport/SharedArtifactInbox.swift */,
 				4076AAA5305CBC1700E032E4 /* Products */,
 			);
@@ -110,6 +131,7 @@
 			children = (
 				4076AAA4305CBC1700E032E4 /* graviti.app */,
 				A10000000000000000000004 /* GravitiShareExtension.appex */,
+				B10000000000000000000001 /* gravitiTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,6 +185,29 @@
 			productReference = A10000000000000000000004 /* GravitiShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		B10000000000000000000003 /* gravitiTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B1000000000000000000000A /* Build configuration list for PBXNativeTarget "gravitiTests" */;
+			buildPhases = (
+				B10000000000000000000005 /* Sources */,
+				B10000000000000000000004 /* Frameworks */,
+				B10000000000000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B10000000000000000000008 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B10000000000000000000002 /* gravitiTests */,
+			);
+			name = gravitiTests;
+			packageProductDependencies = (
+			);
+			productName = gravitiTests;
+			productReference = B10000000000000000000001 /* gravitiTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -178,6 +223,10 @@
 					};
 					A10000000000000000000006 = {
 						CreatedOnToolsVersion = 26.2;
+					};
+					B10000000000000000000003 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 4076AAA3305CBC1700E032E4;
 					};
 				};
 			};
@@ -198,6 +247,7 @@
 			targets = (
 				4076AAA3305CBC1700E032E4 /* graviti */,
 				A10000000000000000000006 /* GravitiShareExtension */,
+				B10000000000000000000003 /* gravitiTests */,
 			);
 		};
 /* End PBXProject section */
@@ -211,6 +261,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A1000000000000000000000E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B10000000000000000000006 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -235,6 +292,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B10000000000000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -242,6 +306,11 @@
 			isa = PBXTargetDependency;
 			target = A10000000000000000000006 /* GravitiShareExtension */;
 			targetProxy = A10000000000000000000005 /* PBXContainerItemProxy */;
+		};
+		B10000000000000000000008 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4076AAA3305CBC1700E032E4 /* graviti */;
+			targetProxy = B10000000000000000000007 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -483,6 +552,40 @@
 			};
 			name = Release;
 		};
+		B1000000000000000000000B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = V9W8HRDJQT;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rhysgilk.gravitiTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/graviti.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/graviti";
+		};
+			name = Debug;
+		};
+		B1000000000000000000000C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = V9W8HRDJQT;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rhysgilk.gravitiTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/graviti.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/graviti";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -509,6 +612,15 @@
 			buildConfigurations = (
 				A1000000000000000000000F /* Debug */,
 				A10000000000000000000010 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B1000000000000000000000A /* Build configuration list for PBXNativeTarget "gravitiTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B1000000000000000000000B /* Debug */,
+				B1000000000000000000000C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
