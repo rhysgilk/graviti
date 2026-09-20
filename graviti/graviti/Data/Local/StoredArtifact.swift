@@ -12,6 +12,8 @@ final class StoredArtifact {
     var extractedText: String?
     var extractedTextSourceRawValue: String?
     var textExtractionStateRawValue: String?
+    var linkMetadataJSON: Data?
+    var linkMetadataStateRawValue: String?
     var placeJSON: Data?
     var enrichmentJSON: Data?
     var enrichmentStateRawValue: String?
@@ -29,6 +31,8 @@ final class StoredArtifact {
         extractedText = artifact.extractedText
         extractedTextSourceRawValue = artifact.extractedTextSource?.rawValue
         textExtractionStateRawValue = artifact.textExtractionState.rawValue
+        linkMetadataJSON = try? artifact.linkMetadata.map { try JSONEncoder().encode($0) }
+        linkMetadataStateRawValue = artifact.linkMetadataState.rawValue
         placeJSON = try? artifact.place.map { try JSONEncoder().encode($0) }
         enrichmentJSON = try? artifact.enrichment.map { try JSONEncoder().encode($0) }
         enrichmentStateRawValue = artifact.enrichmentState.rawValue
@@ -52,6 +56,8 @@ final class StoredArtifact {
             extractedText: extractedText,
             extractedTextSource: extractedTextSourceRawValue.flatMap(ArtifactTextSource.init(rawValue:)),
             textExtractionState: textExtractionState,
+            linkMetadata: linkMetadataJSON.flatMap { try? JSONDecoder().decode(ArtifactLinkMetadata.self, from: $0) },
+            linkMetadataState: linkMetadataState,
             place: try placeJSON.map { try JSONDecoder().decode(SavedPlace.self, from: $0) },
             enrichment: enrichmentJSON.flatMap { try? JSONDecoder().decode(ArtifactEnrichment.self, from: $0) },
             enrichmentState: enrichmentState,
@@ -70,6 +76,8 @@ final class StoredArtifact {
         extractedText = artifact.extractedText
         extractedTextSourceRawValue = artifact.extractedTextSource?.rawValue
         textExtractionStateRawValue = artifact.textExtractionState.rawValue
+        linkMetadataJSON = try artifact.linkMetadata.map { try JSONEncoder().encode($0) }
+        linkMetadataStateRawValue = artifact.linkMetadataState.rawValue
         processingStateRawValue = artifact.processingState.rawValue
     }
 
@@ -81,6 +89,11 @@ final class StoredArtifact {
     private var textExtractionState: ArtifactTextExtractionState {
         textExtractionStateRawValue.flatMap(ArtifactTextExtractionState.init(rawValue:))
             ?? (mediaKey == nil ? .unavailable : (extractedText == nil ? .pending : .processed))
+    }
+
+    private var linkMetadataState: ArtifactLinkMetadataState {
+        linkMetadataStateRawValue.flatMap(ArtifactLinkMetadataState.init(rawValue:))
+            ?? (sourceURL == nil ? .unavailable : (linkMetadataJSON == nil ? .pending : .processed))
     }
 }
 

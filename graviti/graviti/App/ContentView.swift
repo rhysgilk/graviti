@@ -100,7 +100,8 @@ struct ContentView: View {
             await importSharedArtifactsWithNotice()
             await library.processPendingMaps()
             library.processPendingTextExtraction()
-            library.processPendingEnrichment()
+            library.processPendingLinkMetadata()
+            await library.processPendingEnrichment()
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
@@ -108,7 +109,8 @@ struct ContentView: View {
                 await importSharedArtifactsWithNotice()
                 await library.processPendingMaps()
                 library.processPendingTextExtraction()
-                library.processPendingEnrichment()
+                library.processPendingLinkMetadata()
+                await library.processPendingEnrichment()
             }
         }
     }

@@ -467,6 +467,7 @@ private extension Artifact {
         switch kind {
         case .url:
             if let title = originalText, !title.isEmpty { return title }
+            if let title = linkMetadata?.title, !title.isEmpty { return title }
             guard let source = sourceURL else { return "Saved link" }
             if MapLinkMetadata.isCollectionLink(source),
                let provider = MapLinkMetadata.provider(for: source) {
@@ -485,6 +486,9 @@ private extension Artifact {
             libraryTitle,
             sourceURL,
             originalText,
+            linkMetadata?.title,
+            linkMetadata?.summary,
+            linkMetadata?.siteName,
             userNote,
             effectiveSummary,
             effectiveCategory?.displayName,

@@ -32,7 +32,7 @@ struct SavedArtifactDetailView: View {
 
                 if let sourceURL = current.sourceURL {
                     if let url = openableURL(sourceURL) {
-                        LinkPreviewView(url: url)
+                        LinkPreviewView(url: url, cachedMetadata: current.linkMetadata)
                     }
 
                     Text(sourceURL)

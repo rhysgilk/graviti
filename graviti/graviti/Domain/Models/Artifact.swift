@@ -50,6 +50,8 @@ struct Artifact: Identifiable, Hashable {
     let extractedText: String?
     let extractedTextSource: ArtifactTextSource?
     let textExtractionState: ArtifactTextExtractionState
+    let linkMetadata: ArtifactLinkMetadata?
+    let linkMetadataState: ArtifactLinkMetadataState
     let place: SavedPlace?
     let enrichment: ArtifactEnrichment?
     let enrichmentState: ArtifactEnrichmentState
@@ -67,6 +69,8 @@ struct Artifact: Identifiable, Hashable {
         extractedText: String? = nil,
         extractedTextSource: ArtifactTextSource? = nil,
         textExtractionState: ArtifactTextExtractionState = .pending,
+        linkMetadata: ArtifactLinkMetadata? = nil,
+        linkMetadataState: ArtifactLinkMetadataState = .pending,
         place: SavedPlace? = nil,
         enrichment: ArtifactEnrichment? = nil,
         enrichmentState: ArtifactEnrichmentState = .pending,
@@ -83,6 +87,8 @@ struct Artifact: Identifiable, Hashable {
         self.extractedText = extractedText
         self.extractedTextSource = extractedTextSource
         self.textExtractionState = textExtractionState
+        self.linkMetadata = linkMetadata
+        self.linkMetadataState = linkMetadataState
         self.place = place
         self.enrichment = enrichment
         self.enrichmentState = enrichmentState
@@ -102,6 +108,8 @@ struct Artifact: Identifiable, Hashable {
             extractedText: extractedText,
             extractedTextSource: extractedTextSource,
             textExtractionState: textExtractionState,
+            linkMetadata: linkMetadata,
+            linkMetadataState: linkMetadataState,
             place: place,
             enrichment: place?.id == self.place?.id ? enrichment : nil,
             enrichmentState: place?.id == self.place?.id ? enrichmentState : .pending,
@@ -122,6 +130,8 @@ struct Artifact: Identifiable, Hashable {
             extractedText: extractedText,
             extractedTextSource: extractedTextSource,
             textExtractionState: textExtractionState,
+            linkMetadata: linkMetadata,
+            linkMetadataState: linkMetadataState,
             place: place,
             enrichment: enrichment,
             enrichmentState: .processed,
@@ -142,6 +152,8 @@ struct Artifact: Identifiable, Hashable {
             extractedText: extractedText,
             extractedTextSource: extractedTextSource,
             textExtractionState: textExtractionState,
+            linkMetadata: linkMetadata,
+            linkMetadataState: linkMetadataState,
             place: place,
             enrichment: enrichment,
             enrichmentState: enrichmentState,
@@ -162,6 +174,8 @@ struct Artifact: Identifiable, Hashable {
             extractedText: extractedText,
             extractedTextSource: extractedTextSource,
             textExtractionState: textExtractionState,
+            linkMetadata: linkMetadata,
+            linkMetadataState: linkMetadataState,
             place: place,
             enrichment: enrichment,
             enrichmentState: state,
@@ -186,9 +200,33 @@ struct Artifact: Identifiable, Hashable {
             extractedText: text,
             extractedTextSource: source,
             textExtractionState: state,
+            linkMetadata: linkMetadata,
+            linkMetadataState: linkMetadataState,
             place: place,
             enrichment: text == extractedText ? enrichment : nil,
             enrichmentState: text == extractedText ? enrichmentState : .pending,
+            userDetails: userDetails,
+            processingState: processingState,
+            capturedAt: capturedAt
+        )
+    }
+
+    func withLinkMetadata(_ metadata: ArtifactLinkMetadata?, state: ArtifactLinkMetadataState) -> Artifact {
+        Artifact(
+            id: id,
+            kind: kind,
+            sourceURL: sourceURL,
+            originalText: originalText,
+            userNote: userNote,
+            mediaKey: mediaKey,
+            extractedText: extractedText,
+            extractedTextSource: extractedTextSource,
+            textExtractionState: textExtractionState,
+            linkMetadata: metadata,
+            linkMetadataState: state,
+            place: place,
+            enrichment: metadata == linkMetadata ? enrichment : nil,
+            enrichmentState: metadata == linkMetadata ? enrichmentState : .pending,
             userDetails: userDetails,
             processingState: processingState,
             capturedAt: capturedAt
