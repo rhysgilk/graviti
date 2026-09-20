@@ -6,7 +6,7 @@ struct HomeInsight {
     let destinationCount: Int
 
     init?(nodes: [OrbitNode]) {
-        guard let leader = nodes.max(by: { $0.gravity < $1.gravity }) else {
+        guard let leader = nodes.sorted(by: OrbitNode.ranksBefore).first else {
             return nil
         }
         leadingDestination = leader

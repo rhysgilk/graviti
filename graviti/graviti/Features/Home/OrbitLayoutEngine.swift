@@ -41,12 +41,7 @@ enum OrbitLayoutEngine {
             return OrbitLayout(positions: [:], diameters: [:], focusPoint: focus, allowsDrift: false)
         }
 
-        let ranked = items.sorted {
-            if $0.node.gravity != $1.node.gravity {
-                return $0.node.gravity > $1.node.gravity
-            }
-            return $0.node.name < $1.node.name
-        }
+        let ranked = items.sorted { OrbitNode.ranksBefore($0.node, $1.node) }
         let gravities = ranked.map(\.node.gravity)
         let minimumGravity = gravities.min() ?? 0
         let maximumGravity = gravities.max() ?? 1

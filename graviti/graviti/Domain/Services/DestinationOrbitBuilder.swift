@@ -261,10 +261,7 @@ enum DestinationOrbitBuilder {
     }
 
     private static func sorted(_ nodes: [OrbitNode], limit: Int?) -> [OrbitNode] {
-        let ordered = nodes.sorted {
-            if $0.gravity != $1.gravity { return $0.gravity > $1.gravity }
-            return $0.name.localizedStandardCompare($1.name) == .orderedAscending
-        }
+        let ordered = nodes.sorted(by: OrbitNode.ranksBefore)
         return limit.map { Array(ordered.prefix($0)) } ?? ordered
     }
 

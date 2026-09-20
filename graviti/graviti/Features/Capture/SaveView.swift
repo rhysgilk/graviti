@@ -437,6 +437,7 @@ private enum DogfoodDataset: String, CaseIterable, Identifiable {
     case cultureAndHistory = "culture-and-history"
     case foodAndWater = "food-and-water"
     case diverseLibrary = "diverse-library"
+    case crowdedLibrary = "crowded-library"
 
     var id: Self { self }
 
@@ -446,6 +447,7 @@ private enum DogfoodDataset: String, CaseIterable, Identifiable {
         case .cultureAndHistory: "Culture, architecture & history"
         case .foodAndWater: "Seafood, markets & water"
         case .diverseLibrary: "Diverse mixed library"
+        case .crowdedLibrary: "Crowded library stress test"
         }
     }
 

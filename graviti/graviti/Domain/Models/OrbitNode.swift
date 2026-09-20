@@ -27,6 +27,14 @@ struct OrbitNode: Identifiable, Hashable {
         self.gravity = gravity
         self.saveCount = saveCount
     }
+
+    nonisolated static func ranksBefore(_ lhs: OrbitNode, _ rhs: OrbitNode) -> Bool {
+        if lhs.gravity != rhs.gravity { return lhs.gravity > rhs.gravity }
+        if lhs.saveCount != rhs.saveCount { return lhs.saveCount > rhs.saveCount }
+        let nameOrder = lhs.name.localizedStandardCompare(rhs.name)
+        if nameOrder != .orderedSame { return nameOrder == .orderedAscending }
+        return lhs.id.uuidString < rhs.id.uuidString
+    }
 }
 
 enum GeoLevel: String, Hashable {

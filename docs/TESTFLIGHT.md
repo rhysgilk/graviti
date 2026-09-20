@@ -37,11 +37,13 @@ This beta stores its Library on the device. Graviti does not require an account 
 
 Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 47 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing, Fit scoring, persistence, backup restore, offline save preservation, and safe Apple Maps URL generation.
+- All 50 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing, Fit scoring, persistence, backup restore, offline save preservation, safe Apple Maps URL generation, and deterministic ten-destination Gravity Field layout.
 - A clean signed Debug build completed without warnings. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
 - Direct bubble switching, bulk place removal confirmation, and bulk save deletion confirmation were exercised without committing destructive test actions.
+- A 30-save crowded-library fixture was exercised across Home, Explore, and Library. Home stayed within its ten-label budget with readable long names, Library exposed bulk selection, Explore synthesized varied interests with 66 FIT recommendations, and the imported library persisted after termination and relaunch.
+- Saturated Gravity ties now prefer destinations with more saved items before falling back to a stable name order, so a smaller destination cannot displace stronger evidence merely because both scores reached 100.
 - Maximum Dynamic Type, increased contrast, right-to-left layout, expanded pseudo-localized strings, and Reduce Motion were inspected in Simulator.
 - Spanish coverage was completed for the app and Share Extension. Home, Explore, Library, canonical interest names, singular/plural counts, accessibility labels, and bulk-selection copy were inspected in Spanish without clipping.
 - The iOS 18.6 minimum runtime was validated on an iPhone 16 Pro simulator. MapKit search found and saved Nishiki Market, Home generated its Gravity destination, Library showed the enriched save, and the record persisted after force quit and relaunch.
