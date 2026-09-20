@@ -61,7 +61,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 - [x] Add multi-select to Library > Places with a bulk remove action. Preserve source saves and return them to place review.
 - [x] Replace the saturating Fit equation with weighted destination traits, evidence diversity, duplicate discounting, confidence bands, and conservative score shrinkage.
 - [x] Add an XCTest target and deterministic `DestinationFitEngine` fixtures for sparse evidence, semantic specificity, duplicate discounting, and avoid rules.
-- [ ] Extend deterministic XCTest coverage to `InterestProfileBuilder`, `DestinationOrbitBuilder`, `OrbitLayoutEngine`, and import parsers.
+- [x] Extend deterministic XCTest coverage to `InterestProfileBuilder`, `DestinationOrbitBuilder`, `OrbitLayoutEngine`, and import parsers.
 - [ ] Add local Vision OCR for screenshots and photos, preserve OCR provenance, and use detected text to seed enrichment and place review.
 - [ ] Feed safe link metadata (title, preview text, site, and image where available) into asynchronous artifact enrichment and cache it.
 
@@ -85,7 +85,7 @@ The choice must not remain ambiguous because a travel library needs a clear data
 
 ### Repository and architecture
 
-- [ ] Add XCTest targets before declaring MVP complete.
+- [x] Add XCTest targets before declaring MVP complete.
 - [x] Add `.gitignore`; untrack `.DS_Store`, `xcuserdata`, and Xcode UI state.
 - [x] Remove stray document title lines and expand the README with setup, architecture, testing, and current MVP status.
 - [ ] Add current product screenshots to the README before the public repository or external beta announcement.
