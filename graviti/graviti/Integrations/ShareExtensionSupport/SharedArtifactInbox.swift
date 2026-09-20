@@ -91,6 +91,18 @@ enum SharedArtifactInbox {
     }
 }
 
+struct SharedArtifactInboxClient {
+    let pendingFiles: () throws -> [URL]
+    let read: (URL) throws -> SharedArtifactEnvelope
+    let remove: (URL) throws -> Void
+
+    static let live = SharedArtifactInboxClient(
+        pendingFiles: SharedArtifactInbox.pendingFiles,
+        read: SharedArtifactInbox.read,
+        remove: SharedArtifactInbox.remove
+    )
+}
+
 private enum InboxError: LocalizedError {
     case unavailable
 

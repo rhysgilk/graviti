@@ -43,15 +43,19 @@ struct LibraryView: View {
                 }
 
                 Group {
-                    switch mode {
-                    case .destinations:
-                        destinationsContent
-                    case .places:
-                        placesContent
-                    case .saves:
-                        savesContent
-                    case .map:
-                        mapContent
+                    if library.artifacts.isEmpty, let error = library.loadError {
+                        libraryLoadError(error)
+                    } else {
+                        switch mode {
+                        case .destinations:
+                            destinationsContent
+                        case .places:
+                            placesContent
+                        case .saves:
+                            savesContent
+                        case .map:
+                            mapContent
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -517,15 +521,7 @@ struct LibraryView: View {
 
     @ViewBuilder
     private var savesContent: some View {
-        if let error = library.loadError {
-            ContentUnavailableView {
-                Label("Library couldn't load", systemImage: "exclamationmark.triangle")
-            } description: {
-                Text(error)
-            } actions: {
-                Button("Try Again") { Task { await library.load() } }
-            }
-        } else if filteredArtifacts.isEmpty {
+        if filteredArtifacts.isEmpty {
             if query.isEmpty {
                 emptyState("No saves yet", icon: "square.stack", detail: "Save a link or note to start your library.")
             } else {
@@ -563,6 +559,16 @@ struct LibraryView: View {
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
+        }
+    }
+
+    private func libraryLoadError(_ error: String) -> some View {
+        ContentUnavailableView {
+            Label("Library couldn't load", systemImage: "exclamationmark.triangle")
+        } description: {
+            Text(error)
+        } actions: {
+            Button("Try Again") { Task { await library.load() } }
         }
     }
 

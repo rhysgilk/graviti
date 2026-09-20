@@ -6,13 +6,20 @@ import Combine
 final class ArtifactLibrary: ObservableObject {
     @Published private(set) var artifacts: [Artifact] = []
     @Published private(set) var loadError: String?
+    @Published private(set) var shareImportError: String?
 
     private let repository: any ArtifactRepository
     private let processor: ArtifactProcessingCoordinator
+    private let sharedInbox: SharedArtifactInboxClient
     private var isImportingSharedArtifacts = false
 
-    init(repository: any ArtifactRepository, placeResolver: MapPlaceResolver? = nil) {
+    init(
+        repository: any ArtifactRepository,
+        placeResolver: MapPlaceResolver? = nil,
+        sharedInbox: SharedArtifactInboxClient = .live
+    ) {
         self.repository = repository
+        self.sharedInbox = sharedInbox
         let resolver = placeResolver ?? MapPlaceResolver(
             searchProvider: MapKitPlaceSearchProvider(),
             linkExpander: URLSessionMapLinkExpander()
@@ -356,8 +363,8 @@ final class ArtifactLibrary: ObservableObject {
         defer { isImportingSharedArtifacts = false }
         var importedCount = 0
         do {
-            for fileURL in try SharedArtifactInbox.pendingFiles() {
-                let envelope = try SharedArtifactInbox.read(fileURL)
+            for fileURL in try sharedInbox.pendingFiles() {
+                let envelope = try sharedInbox.read(fileURL)
                 if !artifacts.contains(where: { $0.id == envelope.id }) {
                     let artifact = Artifact(
                         id: envelope.id,
@@ -371,11 +378,11 @@ final class ArtifactLibrary: ObservableObject {
                     try await save(artifact)
                     importedCount += 1
                 }
-                try SharedArtifactInbox.remove(fileURL)
+                try sharedInbox.remove(fileURL)
             }
-            loadError = nil
+            shareImportError = nil
         } catch {
-            loadError = error.localizedDescription
+            shareImportError = error.localizedDescription
         }
         return importedCount
     }
