@@ -105,11 +105,11 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 
 ### Recommendation depth and calibration
 
-- [ ] Expand the reviewed destination catalog and represent destination knowledge with sourced, versioned evidence rather than unreviewed generated claims.
+- [x] Expand the reviewed destination catalog and represent destination knowledge with sourced, versioned evidence rather than unreviewed generated claims.
 - [ ] Add more contextual constraints only when the app has trustworthy data for them: season, budget, trip length, transit, accessibility, travel time, climate, and visited places.
 - [ ] Build a held-out evaluation set and calibrate Fit bands against later save, dismiss, and visit feedback before treating any displayed score as a probability.
 - [ ] Surface the contribution of relevance, evidence confidence, preference match, novelty, and negative feedback without overwhelming the main recommendation card.
-- [ ] Keep confidence conservative for small or highly correlated libraries even after the candidate catalog grows.
+- [x] Keep confidence conservative for small or highly correlated libraries even after the candidate catalog grows.
 
 ### Fit Guide evolution
 

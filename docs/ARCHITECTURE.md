@@ -258,7 +258,7 @@ Readiness is computed on demand for the selected destination and remains indepen
 
 `InterestProfileBuilder` reads each Artifact's effective interests and category. It records distinct places and geographic areas to distinguish independent evidence from duplicates.
 
-`DestinationFitEngine` uses a reviewed in-code candidate catalog with weighted destination strengths. It filters by saved geography, region, exclusions, and avoided interests.
+`DestinationFitEngine` loads `Resources/Recommendation/destination-catalog-v1.json`, a reviewed, schema-versioned catalog with weighted destination strengths, a conservative data-confidence value, review date, and HTTPS provenance for every destination. The loader rejects unsupported schemas, duplicate destinations, invalid weights or confidence, and missing or insecure sources. It filters valid candidates by saved geography, region, exclusions, and avoided interests.
 
 The engine calculates:
 
@@ -268,9 +268,12 @@ The engine calculates:
 - explicit preference boost
 - raw relevance
 - evidence confidence from artifact, place, area, source-kind, and rich-text counts
+- source-quality weighting that favors a user note or photo description over collection names and link metadata
+- a modest discount when several signals come from one imported collection
+- candidate knowledge confidence that caps combined confidence
 - confidence-shrunk displayed Fit
 
-The recommendation retains supporting Artifacts so the UI can explain its evidence. Explore state does not mutate the explicit Library or Gravity.
+The recommendation retains supporting Artifacts and destination sources so the detail screen can explain personal evidence and link to the reviewed knowledge provenance. Explore state does not mutate the explicit Library or Gravity.
 
 ## 14. Fit Guide architecture
 
@@ -314,7 +317,7 @@ The Gravity Field exposes a logical accessibility order, combined labels, persis
 
 ## 18. Tests and packaging
 
-The `gravitiTests` target contains deterministic unit and integration tests for domain services, repositories, import parsers, backup behavior, OCR, link safety, search, place resolution, Fit, Fit Guides, and layout.
+The `gravitiTests` target contains deterministic unit and integration tests for domain services, repositories, import parsers, backup behavior, OCR, link safety, search, place resolution, Fit, catalog validation, motif generalization, Fit Guides, and layout.
 
 Release scripts:
 

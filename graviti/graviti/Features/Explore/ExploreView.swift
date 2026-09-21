@@ -334,6 +334,9 @@ private struct DestinationRecommendationView: View {
                     Text("\(recommendation.confidence.displayName) · \(recommendation.confidencePercent)% evidence confidence")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.68))
+                    Text("Destination knowledge · \(recommendation.knowledgeConfidencePercent)% reviewed confidence")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.58))
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
@@ -360,6 +363,26 @@ private struct DestinationRecommendationView: View {
                 .padding(18)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
+
+                if !recommendation.knowledgeSources.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Destination sources")
+                            .font(.headline)
+                        Text("These reviewed sources support what Graviti knows about this destination. They do not determine your personal fit by themselves.")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.68))
+                        ForEach(recommendation.knowledgeSources) { source in
+                            Link(destination: source.url) {
+                                Label(source.title, systemImage: "arrow.up.right.square")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(GravitiColors.signalMint)
+                            }
+                        }
+                    }
+                    .padding(18)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
+                }
 
                 NavigationLink {
                     FitGuideView(

@@ -103,13 +103,159 @@ final class DestinationFitEngineTests: XCTestCase {
         XCTAssertEqual(Set(guide.interests), Set(["Museums", "Coffee", "Matcha", "Desserts"]))
     }
 
+    func testFineGrainedMotifsGeneralizeToSpecificDestinations() {
+        let desert = (0..<4).map { index in
+            artifact(interests: ["Desert hiking", "Hiking"], place: place("desert-\(index)", locality: "Trail \(index)", region: "Arizona"))
+        }
+        let forestCoast = (0..<4).map { index in
+            artifact(interests: ["Forest hiking", "Rocky coast"], place: place("coast-\(index)", locality: "Coast \(index)", region: "Oregon"))
+        }
+        let pho = (0..<4).map { index in
+            artifact(interests: ["Pho", "Food"], place: place("pho-\(index)", locality: "Neighborhood \(index)", region: "Massachusetts"))
+        }
+
+        XCTAssertEqual(recommendations(desert).first?.name, "Sedona")
+        XCTAssertEqual(recommendations(forestCoast).first?.name, "Olympic Peninsula")
+        XCTAssertEqual(recommendations(pho).first?.name, "Hanoi")
+    }
+
+    func testDestinationKnowledgeConfidenceCapsDisplayedCertainty() throws {
+        let artifacts = (0..<8).map { index in
+            artifact(interests: ["Museums"], place: place("museum-\(index)", locality: "City \(index)", region: "State \(index)"))
+        }
+        let source = DestinationKnowledgeSource(
+            title: "Reviewed source",
+            url: try XCTUnwrap(URL(string: "https://example.com/source")),
+            reviewedAt: "2026-09-20"
+        )
+        let catalog = DestinationKnowledgeCatalog(
+            schemaVersion: 1,
+            catalogVersion: "test",
+            reviewedAt: "2026-09-20",
+            destinations: [
+                DestinationKnowledge(
+                    name: "Low confidence city",
+                    country: "Test",
+                    region: .anywhere,
+                    searchSpan: 1,
+                    dataConfidence: 0.35,
+                    strengths: ["Museums": 1],
+                    sources: [source]
+                )
+            ]
+        )
+
+        let result = try XCTUnwrap(DestinationFitEngine.recommendations(
+            from: InterestProfileBuilder.build(from: artifacts),
+            artifacts: artifacts,
+            limit: 1,
+            catalog: catalog
+        ).first)
+
+        XCTAssertEqual(result.knowledgeConfidencePercent, 35)
+        XCTAssertLessThanOrEqual(result.confidencePercent, 35)
+        XCTAssertEqual(result.confidence, .early)
+        XCTAssertLessThan(result.fitPercent, 70)
+    }
+
+    func testReviewedCatalogIsBundledAndVersioned() {
+        let catalog = DestinationKnowledgeCatalogLoader.bundled
+
+        XCTAssertEqual(catalog.schemaVersion, 1)
+        XCTAssertFalse(catalog.catalogVersion.isEmpty)
+        XCTAssertGreaterThanOrEqual(catalog.destinations.count, 20)
+        XCTAssertTrue(catalog.destinations.allSatisfy { !$0.sources.isEmpty })
+    }
+
+    func testUserNotesCarryMoreSignalThanACollectionTitle() throws {
+        let noteEvidence = (0..<4).map { index in
+            artifact(
+                interests: ["Historic architecture", "Coffee"],
+                place: place("note-\(index)", locality: "City \(index)", region: "State \(index)"),
+                evidenceSources: ["Historic architecture": .userNote, "Coffee": .collectionTitle]
+            )
+        }
+        let collectionEvidence = (0..<4).map { index in
+            artifact(
+                interests: ["Historic architecture", "Coffee"],
+                place: place("collection-\(index)", locality: "City \(index)", region: "State \(index)"),
+                evidenceSources: ["Historic architecture": .collectionTitle, "Coffee": .userNote]
+            )
+        }
+
+        let noteResult = try XCTUnwrap(recommendations(noteEvidence, limit: 20).first { $0.name == "Kyoto" })
+        let collectionResult = try XCTUnwrap(recommendations(collectionEvidence, limit: 20).first { $0.name == "Kyoto" })
+        XCTAssertGreaterThan(noteResult.relevancePercent, collectionResult.relevancePercent)
+    }
+
+    func testOneImportedCollectionIsDiscountedAgainstIndependentSources() throws {
+        let oneCollectionMuseums = (0..<4).map { index in
+            artifact(
+                interests: ["Museums"],
+                place: place("one-collection-museum-\(index)", locality: "Museum city \(index)", region: "State \(index)"),
+                sourceCollectionTitle: "One imported guide"
+            )
+        }
+        let independentMuseums = (0..<4).map { index in
+            artifact(
+                interests: ["Museums"],
+                place: place("independent-museum-\(index)", locality: "Museum city \(index)", region: "State \(index)"),
+                sourceCollectionTitle: "Guide \(index)"
+            )
+        }
+        let independentCoffee = (0..<4).map { index in
+            artifact(
+                interests: ["Coffee"],
+                place: place("coffee-\(index)", locality: "Coffee city \(index)", region: "Region \(index)"),
+                sourceCollectionTitle: "Coffee source \(index)"
+            )
+        }
+        let source = DestinationKnowledgeSource(
+            title: "Reviewed source",
+            url: try XCTUnwrap(URL(string: "https://example.com/source")),
+            reviewedAt: "2026-09-20"
+        )
+        let catalog = DestinationKnowledgeCatalog(
+            schemaVersion: 1,
+            catalogVersion: "test",
+            reviewedAt: "2026-09-20",
+            destinations: [DestinationKnowledge(
+                name: "Museum destination",
+                country: "Test",
+                region: .anywhere,
+                searchSpan: 1,
+                dataConfidence: 0.9,
+                strengths: ["Museums": 1],
+                sources: [source]
+            )]
+        )
+
+        let correlated = oneCollectionMuseums + independentCoffee
+        let independent = independentMuseums + independentCoffee
+        let correlatedResult = try XCTUnwrap(DestinationFitEngine.recommendations(
+            from: InterestProfileBuilder.build(from: correlated), artifacts: correlated, limit: 1, catalog: catalog
+        ).first)
+        let independentResult = try XCTUnwrap(DestinationFitEngine.recommendations(
+            from: InterestProfileBuilder.build(from: independent), artifacts: independent, limit: 1, catalog: catalog
+        ).first)
+
+        XCTAssertGreaterThan(independentResult.relevancePercent, correlatedResult.relevancePercent)
+    }
+
     private func recommendations(_ artifacts: [Artifact], limit: Int = 3) -> [DestinationRecommendation] {
         DestinationFitEngine.recommendations(from: InterestProfileBuilder.build(from: artifacts), artifacts: artifacts, limit: limit)
     }
 
-    private func artifact(interests: [String], place: SavedPlace, note: String? = nil) -> Artifact {
+    private func artifact(
+        interests: [String],
+        place: SavedPlace,
+        note: String? = nil,
+        sourceCollectionTitle: String? = nil,
+        evidenceSources: [String: ArtifactEvidenceSource] = [:]
+    ) -> Artifact {
         Artifact(
             kind: .manual,
+            sourceCollectionTitle: sourceCollectionTitle,
             originalText: note ?? interests.joined(separator: " and "),
             userNote: note,
             place: place,
@@ -119,7 +265,12 @@ final class DestinationFitEngineTests: XCTestCase {
                 interests: interests,
                 source: .savedText,
                 confidence: 0.8,
-                generatedAt: .now
+                generatedAt: .now,
+                interestEvidence: evidenceSources.isEmpty ? nil : interests.compactMap { interest in
+                    evidenceSources[interest].map { source in
+                        ArtifactInterestEvidence(interest: interest, source: source, confidence: 0.8)
+                    }
+                }
             ),
             enrichmentState: .processed,
             processingState: .processed

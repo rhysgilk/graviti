@@ -279,6 +279,7 @@ Computed from effective Artifact details:
 - displayed Fit
 - raw relevance
 - confidence band and percentage
+- reviewed destination-knowledge confidence and sources
 - matched interests
 - supporting Artifacts
 - explicit preference matches
@@ -288,6 +289,17 @@ Recommendations are not persisted as Library records.
 ### FitGuide
 
 `FitGuide` contains a `SavedDestination` and up to four interests. Its live result sections are transient MapKit results. Saved guide membership persists through Artifact collection titles.
+
+### DestinationKnowledgeCatalog
+
+The bundled `destination-catalog-v1.json` resource has a schema version, catalog version, and review date. Every `DestinationKnowledge` record contains:
+
+- destination name, country, region, and search span
+- a destination-data confidence value capped at 0.95
+- weighted interest strengths from 0 through 1
+- one or more reviewed HTTPS sources with title and review date
+
+Catalog data is read-only at runtime. The loader rejects unsupported schemas, duplicate destinations, invalid ranges, empty strengths, and missing or insecure provenance. `DestinationRecommendation` carries the candidate's knowledge confidence and sources for explanation in Explore.
 
 ## 13. Preference storage outside SwiftData
 

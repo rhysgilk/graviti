@@ -14,8 +14,8 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 
 ## Automated release evidence
 
-- 83 of 83 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
-- 83 of 83 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
+- 91 of 91 tests passed with no failures or skips across the full suite plus the final focused Fit run on an iPhone 16 Pro simulator running iOS 18.6.
+- 91 of 91 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
 - 62 of 62 tests passed with no failures or skips on a physical iPhone 13 Pro Max running iOS 26.3.1.
 - A signed arm64 Release archive of commit `cdcc5b4` completed Xcode's store validation phase. Later Fit Guide and backup v2 changes passed both simulator suites; they have not been externally distributed.
 - `scripts/verify-release-archive.sh` passed every package check: bundle identifiers, matching app and extension versions, iOS 18 minimum, encryption declaration, both privacy manifests, exactly two Sora fonts, no CSV fixtures, nested signatures, and matching App Group entitlements.
@@ -40,7 +40,7 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 | Semantic evidence preserves meaning and provenance | Verified | Focused tests cover user-note priority, landscape and architecture distinctions, specific dishes, exact source records, and decoding enrichment created before semantic evidence was added. |
 | Adaptive geographic resolution works | Verified | Tests cover country collapse, city expansion, state grouping, missing-region fallback, concentration, and label budgets. Automatic and explicit resolution modes were exercised. |
 | Destination Gravity updates correctly | Verified | Live imports changed Home destinations after persistence and relaunch. Orbit builder tests cover stable geographic identity and ranking behavior. |
-| Explore produces useful interest-based recommendations | Verified for local MVP catalog | Diverse fixtures produced varied recommendations and explanations. Each recommendation builds a live Fit Guide grouped by its matched patterns. Destination regions are resolved before category searches and enforced as required, preventing city records and results from another region. Live New York, Kyoto, and Mexico City guides returned relevant local venues; saving a result created a retrievable guide in Explore. |
+| Explore produces useful interest-based recommendations | Verified for local MVP catalog | The schema-versioned 23-destination catalog includes reviewed source links and candidate confidence. Diverse fixtures cover sparse evidence, independent evidence, forest and desert hiking, rocky coast, architecture, dishes, preferences, and exclusions. Candidate confidence limits displayed certainty. Each recommendation builds a live Fit Guide grouped by its matched patterns. Destination regions are resolved before category searches and enforced as required, preventing city records and results from another region. Live New York, Kyoto, and Mexico City guides returned relevant local venues; saving a result created a retrievable guide in Explore. |
 | Recommendation data does not contaminate explicit interest | Verified | Save Destination and Not for Me are persisted separately. Fit tests cover exclusions and avoided interests while Gravity remains based on explicit saves. |
 | Saved media is preserved and browsable | Verified | Photo storage, thumbnails, detail views, OCR provenance, backup round trips, and restored embedded media are covered. |
 | Accessibility requirements are tested | Verified in Simulator | VoiceOver labels and ordering, Dynamic Type, increased contrast, Reduce Motion, right-to-left layout, and large pseudo-localized strings were inspected. Conventional Library and Search access remains available. |

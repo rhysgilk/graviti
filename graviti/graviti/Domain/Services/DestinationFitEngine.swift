@@ -21,6 +21,8 @@ struct DestinationRecommendation: Identifiable {
     let relevancePercent: Int
     let confidence: FitConfidence
     let confidencePercent: Int
+    let knowledgeConfidencePercent: Int
+    let knowledgeSources: [DestinationKnowledgeSource]
     let matchedInterests: [String]
     let supportingArtifacts: [Artifact]
     let explicitMatches: [String]
@@ -29,7 +31,7 @@ struct DestinationRecommendation: Identifiable {
     var scoreLabel: String { confidence == .early ? confidence.displayName : "\(fitPercent) FIT" }
 }
 
-enum RecommendationRegion: String, CaseIterable, Identifiable {
+enum RecommendationRegion: String, Codable, CaseIterable, Identifiable {
     case anywhere
     case asia
     case europe
@@ -68,49 +70,18 @@ struct SavedDestination: Identifiable, Hashable {
 }
 
 enum DestinationFitEngine {
-    private struct Candidate {
-        let name: String
-        let country: String
-        let region: RecommendationRegion
-        var searchSpan: Double = 0.35
-        /// Values from 0...1 describe how characteristic each interest is of this destination.
-        let strengths: [String: Double]
-
-        var id: String { "\(name), \(country)" }
-    }
-
     private struct UserSignal {
         let name: String
         let weight: Double
         let isExplicit: Bool
     }
 
-    private static let candidates: [Candidate] = [
-        Candidate(name: "Uji", country: "Japan", region: .asia, strengths: ["Matcha": 1, "Tea": 1, "Gardens": 0.7, "Architecture": 0.6, "History": 0.7]),
-        Candidate(name: "Kyoto", country: "Japan", region: .asia, strengths: ["Matcha": 0.85, "Tea": 0.9, "Gardens": 1, "Architecture": 0.95, "Museums": 0.65, "History": 0.95]),
-        Candidate(name: "Taipei", country: "Taiwan", region: .asia, strengths: ["Matcha": 0.45, "Tea": 0.95, "Coffee": 0.8, "Desserts": 0.8, "Hiking": 0.55]),
-        Candidate(name: "Seoul", country: "South Korea", region: .asia, strengths: ["Tea": 0.65, "Coffee": 0.9, "Desserts": 0.85, "Architecture": 0.7, "Shopping": 0.9, "History": 0.65]),
-        Candidate(name: "Madeira", country: "Portugal", region: .europe, searchSpan: 1.0, strengths: ["Scenic views": 1, "Hiking": 0.9, "Nature": 0.9, "Gardens": 0.65, "Mountains": 0.75, "Coast & water": 0.85]),
-        Candidate(name: "Norwegian Fjords", country: "Norway", region: .europe, searchSpan: 6.0, strengths: ["Mountains": 1, "Coast & water": 1, "Scenic views": 1, "Hiking": 0.8, "Nature": 0.95]),
-        Candidate(name: "Scottish Highlands", country: "United Kingdom", region: .europe, searchSpan: 5.0, strengths: ["Mountains": 0.9, "History": 0.8, "Coast & water": 0.7, "Hiking": 0.9, "Forests": 0.65]),
-        Candidate(name: "Copenhagen", country: "Denmark", region: .europe, strengths: ["Architecture": 0.95, "Coffee": 0.8, "Museums": 0.85, "Shopping": 0.75, "History": 0.6]),
-        Candidate(name: "Lisbon", country: "Portugal", region: .europe, strengths: ["Scenic views": 0.8, "Architecture": 0.9, "Coffee": 0.75, "Museums": 0.65, "History": 0.8, "Seafood": 0.8]),
-        Candidate(name: "New York City", country: "United States", region: .northAmerica, strengths: ["Matcha": 0.6, "Tea": 0.65, "Coffee": 0.9, "Desserts": 0.9, "Architecture": 0.9, "Museums": 1, "Shopping": 0.95]),
-        Candidate(name: "Mexico City", country: "Mexico", region: .northAmerica, strengths: ["Architecture": 0.95, "Museums": 0.95, "Coffee": 0.75, "Desserts": 0.75, "Shopping": 0.75, "History": 0.9]),
-        Candidate(name: "Vancouver", country: "Canada", region: .northAmerica, strengths: ["Scenic views": 0.9, "Hiking": 0.85, "Nature": 0.9, "Coffee": 0.8, "Mountains": 0.8, "Coast & water": 0.8, "Forests": 0.85]),
-        Candidate(name: "Seattle", country: "United States", region: .northAmerica, strengths: ["Forests": 0.9, "Hiking": 0.85, "Mountains": 0.8, "Coast & water": 0.75, "Coffee": 1, "Scenic views": 0.75]),
-        Candidate(name: "Vermont", country: "United States", region: .northAmerica, searchSpan: 3.0, strengths: ["Forests": 1, "Hiking": 0.85, "Mountains": 0.7, "Nature": 0.9, "History": 0.55]),
-        Candidate(name: "Maine", country: "United States", region: .northAmerica, searchSpan: 4.0, strengths: ["National parks": 0.8, "Coast & water": 0.95, "Seafood": 1, "Forests": 0.95, "History": 0.65, "Hiking": 0.75]),
-        Candidate(name: "California", country: "United States", region: .northAmerica, searchSpan: 9.0, strengths: ["National parks": 1, "Mountains": 0.85, "Coast & water": 0.8, "Forests": 0.55, "Hiking": 0.85, "Architecture": 0.65, "Seafood": 0.7]),
-        Candidate(name: "Alaska", country: "United States", region: .northAmerica, searchSpan: 20.0, strengths: ["National parks": 0.95, "Mountains": 1, "Coast & water": 0.8, "Wildlife": 1, "Hiking": 0.8, "Forests": 0.7]),
-        Candidate(name: "Kauai", country: "United States", region: .northAmerica, searchSpan: 1.0, strengths: ["Scenic views": 1, "Hiking": 0.85, "Nature": 0.95, "Beaches": 1, "Coast & water": 1, "Mountains": 0.75])
-    ]
-
     static func recommendations(
         from profile: InterestProfile,
         artifacts: [Artifact],
         preferences: ExplorePreferences = ExplorePreferences(),
-        limit: Int = 3
+        limit: Int = 3,
+        catalog: DestinationKnowledgeCatalog = DestinationKnowledgeCatalogLoader.bundled
     ) -> [DestinationRecommendation] {
         let signals = userSignals(from: profile, preferences: preferences)
         guard !signals.isEmpty else { return [] }
@@ -119,7 +90,7 @@ enum DestinationFitEngine {
             [place.locality, place.region, place.country].compactMap { $0?.foldedKey }
         })
 
-        return candidates.compactMap { candidate -> DestinationRecommendation? in
+        return catalog.destinations.compactMap { candidate -> DestinationRecommendation? in
             guard !preferences.excludedDestinationIDs.contains(candidate.id) else { return nil }
             guard !savedAreas.contains(candidate.name.foldedKey) else { return nil }
             guard preferences.region == .anywhere || candidate.region == preferences.region else { return nil }
@@ -140,10 +111,11 @@ enum DestinationFitEngine {
             let matchedNames = matches.prefix(4).map { $0.0.name }
             let matchedSet = Set(matchedNames)
             let evidence = artifacts.filter { !Set($0.effectiveInterests).isDisjoint(with: matchedSet) }
-            let confidenceValue = evidenceConfidence(for: evidence)
-            let confidence = confidenceBand(for: confidenceValue)
-            // Shrink uncertain relevance toward a neutral 50 instead of presenting false certainty.
-            let fit = 0.5 + (rawRelevance - 0.5) * confidenceValue
+            let userConfidence = evidenceConfidence(for: evidence)
+            let combinedConfidence = min(userConfidence, candidate.dataConfidence)
+            let confidence = confidenceBand(for: combinedConfidence)
+            // Both personal evidence and reviewed destination knowledge limit certainty.
+            let fit = 0.5 + (rawRelevance - 0.5) * combinedConfidence
 
             return DestinationRecommendation(
                 name: candidate.name,
@@ -151,7 +123,9 @@ enum DestinationFitEngine {
                 fitPercent: Int((fit * 100).rounded()),
                 relevancePercent: Int((rawRelevance * 100).rounded()),
                 confidence: confidence,
-                confidencePercent: Int((confidenceValue * 100).rounded()),
+                confidencePercent: Int((combinedConfidence * 100).rounded()),
+                knowledgeConfidencePercent: Int((candidate.dataConfidence * 100).rounded()),
+                knowledgeSources: candidate.sources,
                 matchedInterests: matchedNames,
                 supportingArtifacts: evidence,
                 explicitMatches: matchedNames.filter { preferences.preferredInterests.contains($0) }
@@ -166,8 +140,11 @@ enum DestinationFitEngine {
         .map { $0 }
     }
 
-    static func savedDestination(for id: String) -> SavedDestination? {
-        candidates.first { $0.id == id }.map {
+    static func savedDestination(
+        for id: String,
+        catalog: DestinationKnowledgeCatalog = DestinationKnowledgeCatalogLoader.bundled
+    ) -> SavedDestination? {
+        catalog.destinations.first { $0.id == id }.map {
             SavedDestination(name: $0.name, country: $0.country, searchSpan: $0.searchSpan)
         }
     }
@@ -175,9 +152,10 @@ enum DestinationFitEngine {
     static func fitGuide(
         for id: String,
         from profile: InterestProfile,
-        preferences: ExplorePreferences = ExplorePreferences()
+        preferences: ExplorePreferences = ExplorePreferences(),
+        catalog: DestinationKnowledgeCatalog = DestinationKnowledgeCatalogLoader.bundled
     ) -> FitGuide? {
-        guard let candidate = candidates.first(where: { $0.id == id }) else { return nil }
+        guard let candidate = catalog.destinations.first(where: { $0.id == id }) else { return nil }
         let signals = userSignals(from: profile, preferences: preferences)
         let matched = signals.compactMap { signal -> (String, Double)? in
             candidate.strengths[signal.name].map { (signal.name, signal.weight * $0) }
@@ -198,7 +176,10 @@ enum DestinationFitEngine {
         var signals = Dictionary(uniqueKeysWithValues: profile.interests.map { pattern in
             let spread = 1 + 0.22 * Double(min(pattern.areaCount, 4))
             let duplicateDiscount = min(1, 0.55 + 0.15 * Double(max(1, pattern.placeCount)))
-            let weight = sqrt(Double(pattern.saveCount)) * spread * duplicateDiscount
+            let collectionDiversity = Set(pattern.artifacts.flatMap(\.sourceCollectionTitles).map(\.foldedKey)).count
+            let collectionDiscount = pattern.saveCount > 2 && collectionDiversity == 1 ? 0.82 : 1
+            let evidenceQuality = averageEvidenceQuality(for: pattern)
+            let weight = sqrt(Double(pattern.saveCount)) * spread * duplicateDiscount * collectionDiscount * evidenceQuality
             return (pattern.name, UserSignal(name: pattern.name, weight: weight, isExplicit: false))
         })
         for interest in preferences.preferredInterests {
@@ -206,6 +187,25 @@ enum DestinationFitEngine {
             signals[interest] = UserSignal(name: interest, weight: (existing?.weight ?? 0) + 2.5, isExplicit: true)
         }
         return Array(signals.values)
+    }
+
+    private static func averageEvidenceQuality(for pattern: InterestPattern) -> Double {
+        let values = pattern.artifacts.map { artifact -> Double in
+            guard let evidence = artifact.enrichment?.interestEvidence?.first(where: { $0.interest == pattern.name }) else {
+                return 1
+            }
+            let sourceWeight: Double = switch evidence.source {
+            case .userNote: 1.18
+            case .originalText: 1.06
+            case .detectedText: 1.0
+            case .mapPlace: 0.94
+            case .collectionTitle: 0.9
+            case .linkMetadata: 0.86
+            }
+            return sourceWeight * max(0.65, evidence.confidence)
+        }
+        guard !values.isEmpty else { return 1 }
+        return values.reduce(0, +) / Double(values.count)
     }
 
     private static func evidenceConfidence(for artifacts: [Artifact]) -> Double {

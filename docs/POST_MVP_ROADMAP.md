@@ -125,6 +125,8 @@ The shipped local implementation preserves broad compatibility tags while adding
 
 ## Milestone 5: Recommendation knowledge and evaluation
 
+**Status: implemented as a versioned reviewed local catalog with deterministic evaluation coverage.**
+
 Move the destination catalog from hardcoded candidate definitions into a versioned data resource with provenance. Expand coverage only when the added destination has reviewed, specific evidence.
 
 Evaluation must include:
@@ -139,6 +141,8 @@ Evaluation must include:
 - diversity, novelty, and serendipity alongside relevance
 
 Displayed Fit remains a score rather than a statistical probability until real feedback supports calibration. Candidate data confidence should limit the score when destination evidence is weak.
+
+The shipped local catalog contains 23 destinations in `destination-catalog-v1.json`, with schema and catalog versions, review dates, per-destination confidence, weighted strengths, and source links. Validation rejects unsupported, duplicate, malformed, or unsourced knowledge. Fit combines personal evidence confidence with the more conservative candidate-data confidence, discounts a single imported collection, and weights user-authored evidence above weaker inferred sources. Deterministic fixtures cover sparse and independent evidence, fine motif generalization, notes changing relevance, avoided and excluded interests, and invalid catalog data. Calibration from later save, dismiss, and visit outcomes remains future work because the displayed value is still a Fit score rather than a probability.
 
 ## Milestone 6: Feedback and learning
 

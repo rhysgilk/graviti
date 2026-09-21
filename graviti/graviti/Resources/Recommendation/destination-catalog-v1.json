@@ -1,0 +1,544 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "2026.09.1",
+  "reviewedAt": "2026-09-20",
+  "destinations": [
+    {
+      "name": "Uji",
+      "country": "Japan",
+      "region": "asia",
+      "searchSpan": 0.35,
+      "dataConfidence": 0.9,
+      "strengths": {
+        "Matcha": 1,
+        "Tea": 1,
+        "Gardens": 0.7,
+        "Architecture": 0.6,
+        "Historic architecture": 0.75,
+        "History": 0.7
+      },
+      "sources": [
+        {
+          "title": "Japan National Tourism Organization: Uji, green tea capital",
+          "url": "https://www.japan.travel/en/uk/inspiration/green-tea-capital-uji/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Kyoto",
+      "country": "Japan",
+      "region": "asia",
+      "searchSpan": 0.35,
+      "dataConfidence": 0.93,
+      "strengths": {
+        "Matcha": 0.85,
+        "Tea": 0.9,
+        "Gardens": 1,
+        "Architecture": 0.95,
+        "Historic architecture": 1,
+        "Museums": 0.65,
+        "History": 0.95
+      },
+      "sources": [
+        {
+          "title": "Kyoto City Official Travel Guide",
+          "url": "https://kyoto.travel/en/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Taipei",
+      "country": "Taiwan",
+      "region": "asia",
+      "searchSpan": 0.35,
+      "dataConfidence": 0.84,
+      "strengths": {
+        "Matcha": 0.45,
+        "Tea": 0.95,
+        "Coffee": 0.8,
+        "Desserts": 0.8,
+        "Hiking": 0.55,
+        "Mountains": 0.45
+      },
+      "sources": [
+        {
+          "title": "Taipei City official travel guide",
+          "url": "https://www.travel.taipei/en",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Seoul",
+      "country": "South Korea",
+      "region": "asia",
+      "searchSpan": 0.35,
+      "dataConfidence": 0.86,
+      "strengths": {
+        "Tea": 0.65,
+        "Coffee": 0.9,
+        "Desserts": 0.85,
+        "Architecture": 0.7,
+        "Historic architecture": 0.75,
+        "Modern architecture": 0.8,
+        "Shopping": 0.9,
+        "History": 0.65
+      },
+      "sources": [
+        {
+          "title": "Seoul Metropolitan Government official travel guide",
+          "url": "https://english.visitseoul.net/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Hanoi",
+      "country": "Vietnam",
+      "region": "asia",
+      "searchSpan": 0.6,
+      "dataConfidence": 0.83,
+      "strengths": {
+        "Pho": 1,
+        "Food": 0.9,
+        "Coffee": 0.9,
+        "History": 0.85,
+        "Historic architecture": 0.8,
+        "Museums": 0.7
+      },
+      "sources": [
+        {
+          "title": "Vietnam Tourism: Hanoi",
+          "url": "https://vietnam.travel/vi/places-to-go/northern-vietnam/ha-noi",
+          "reviewedAt": "2026-09-20"
+        },
+        {
+          "title": "Vietnam Tourism: the story of Vietnamese pho",
+          "url": "https://vietnam.travel/node/125",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Madeira",
+      "country": "Portugal",
+      "region": "europe",
+      "searchSpan": 1,
+      "dataConfidence": 0.9,
+      "strengths": {
+        "Scenic views": 1,
+        "Hiking": 0.9,
+        "Nature": 0.9,
+        "Gardens": 0.65,
+        "Mountains": 0.75,
+        "Coast & water": 0.85,
+        "Rocky coast": 0.85
+      },
+      "sources": [
+        {
+          "title": "Madeira official tourism board",
+          "url": "https://visitmadeira.com/en/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Norwegian Fjords",
+      "country": "Norway",
+      "region": "europe",
+      "searchSpan": 6,
+      "dataConfidence": 0.91,
+      "strengths": {
+        "Mountains": 1,
+        "Coast & water": 1,
+        "Rocky coast": 0.8,
+        "Scenic views": 1,
+        "Hiking": 0.8,
+        "Nature": 0.95
+      },
+      "sources": [
+        {
+          "title": "Norway official travel guide: Fjord Norway",
+          "url": "https://www.visitnorway.com/places-to-go/fjord-norway/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Scottish Highlands",
+      "country": "United Kingdom",
+      "region": "europe",
+      "searchSpan": 5,
+      "dataConfidence": 0.87,
+      "strengths": {
+        "Mountains": 0.9,
+        "History": 0.8,
+        "Historic architecture": 0.7,
+        "Coast & water": 0.7,
+        "Rocky coast": 0.75,
+        "Hiking": 0.9,
+        "Forests": 0.65,
+        "Forest hiking": 0.7
+      },
+      "sources": [
+        {
+          "title": "VisitScotland: Highlands",
+          "url": "https://www.visitscotland.com/places-to-go/highlands",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Copenhagen",
+      "country": "Denmark",
+      "region": "europe",
+      "searchSpan": 0.35,
+      "dataConfidence": 0.89,
+      "strengths": {
+        "Architecture": 0.95,
+        "Modern architecture": 0.95,
+        "Coffee": 0.8,
+        "Museums": 0.85,
+        "Shopping": 0.75,
+        "History": 0.6
+      },
+      "sources": [
+        {
+          "title": "Official guide to Copenhagen",
+          "url": "https://www.visitcopenhagen.com/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Barcelona",
+      "country": "Spain",
+      "region": "europe",
+      "searchSpan": 0.5,
+      "dataConfidence": 0.9,
+      "strengths": {
+        "Architecture": 1,
+        "Modern architecture": 0.95,
+        "Historic architecture": 0.85,
+        "Museums": 0.9,
+        "History": 0.8,
+        "Coast & water": 0.65,
+        "Food": 0.75
+      },
+      "sources": [
+        {
+          "title": "Barcelona official tourism guide",
+          "url": "https://www.barcelonaturisme.com/wv3/en/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Lisbon",
+      "country": "Portugal",
+      "region": "europe",
+      "searchSpan": 0.5,
+      "dataConfidence": 0.88,
+      "strengths": {
+        "Scenic views": 0.8,
+        "Architecture": 0.9,
+        "Historic architecture": 0.9,
+        "Coffee": 0.75,
+        "Museums": 0.65,
+        "History": 0.8,
+        "Seafood": 0.8
+      },
+      "sources": [
+        {
+          "title": "Lisbon official tourism guide",
+          "url": "https://www.visitlisboa.com/en",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "New York City",
+      "country": "United States",
+      "region": "northAmerica",
+      "searchSpan": 0.35,
+      "dataConfidence": 0.93,
+      "strengths": {
+        "Matcha": 0.6,
+        "Tea": 0.65,
+        "Coffee": 0.9,
+        "Desserts": 0.9,
+        "Architecture": 0.9,
+        "Modern architecture": 0.85,
+        "Museums": 1,
+        "Shopping": 0.95,
+        "Pizza": 0.95
+      },
+      "sources": [
+        {
+          "title": "New York City official destination marketing organization",
+          "url": "https://www.nyctourism.com/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Mexico City",
+      "country": "Mexico",
+      "region": "northAmerica",
+      "searchSpan": 0.5,
+      "dataConfidence": 0.91,
+      "strengths": {
+        "Architecture": 0.95,
+        "Historic architecture": 0.9,
+        "Modern architecture": 0.8,
+        "Museums": 0.95,
+        "Coffee": 0.75,
+        "Desserts": 0.75,
+        "Shopping": 0.75,
+        "History": 0.9,
+        "Tacos": 1
+      },
+      "sources": [
+        {
+          "title": "Mexico City government visitor guide",
+          "url": "https://mexicocity.cdmx.gob.mx/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Oaxaca",
+      "country": "Mexico",
+      "region": "northAmerica",
+      "searchSpan": 1,
+      "dataConfidence": 0.87,
+      "strengths": {
+        "Food": 1,
+        "Tacos": 0.9,
+        "History": 0.9,
+        "Historic architecture": 0.9,
+        "Museums": 0.7,
+        "Markets": 0.9
+      },
+      "sources": [
+        {
+          "title": "Visit Mexico: Oaxaca",
+          "url": "https://visitmexico.com/es/estado/20",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Vancouver",
+      "country": "Canada",
+      "region": "northAmerica",
+      "searchSpan": 0.75,
+      "dataConfidence": 0.89,
+      "strengths": {
+        "Scenic views": 0.9,
+        "Hiking": 0.85,
+        "Nature": 0.9,
+        "Coffee": 0.8,
+        "Mountains": 0.8,
+        "Coast & water": 0.8,
+        "Rocky coast": 0.7,
+        "Forests": 0.85,
+        "Forest hiking": 0.85
+      },
+      "sources": [
+        {
+          "title": "Destination Vancouver official visitor guide",
+          "url": "https://www.destinationvancouver.com/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Seattle",
+      "country": "United States",
+      "region": "northAmerica",
+      "searchSpan": 0.75,
+      "dataConfidence": 0.88,
+      "strengths": {
+        "Forests": 0.9,
+        "Forest hiking": 0.9,
+        "Hiking": 0.85,
+        "Mountains": 0.8,
+        "Coast & water": 0.75,
+        "Coffee": 1,
+        "Scenic views": 0.75
+      },
+      "sources": [
+        {
+          "title": "Visit Seattle official destination guide",
+          "url": "https://visitseattle.org/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Olympic Peninsula",
+      "country": "United States",
+      "region": "northAmerica",
+      "searchSpan": 2,
+      "dataConfidence": 0.95,
+      "strengths": {
+        "Forests": 1,
+        "Forest hiking": 1,
+        "Hiking": 0.9,
+        "Mountains": 0.85,
+        "Nature": 1,
+        "National parks": 1,
+        "Coast & water": 0.95,
+        "Rocky coast": 1,
+        "Scenic views": 0.95
+      },
+      "sources": [
+        {
+          "title": "National Park Service: Olympic National Park overview",
+          "url": "https://www.nps.gov/olym/planyourvisit/park-overview-three-parks-in-one.htm",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Vermont",
+      "country": "United States",
+      "region": "northAmerica",
+      "searchSpan": 3,
+      "dataConfidence": 0.85,
+      "strengths": {
+        "Forests": 1,
+        "Forest hiking": 1,
+        "Hiking": 0.85,
+        "Mountains": 0.7,
+        "Nature": 0.9,
+        "History": 0.55
+      },
+      "sources": [
+        {
+          "title": "Vermont Department of Tourism",
+          "url": "https://vermontvacation.com/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Maine",
+      "country": "United States",
+      "region": "northAmerica",
+      "searchSpan": 4,
+      "dataConfidence": 0.9,
+      "strengths": {
+        "National parks": 0.8,
+        "Coast & water": 0.95,
+        "Rocky coast": 0.95,
+        "Seafood": 1,
+        "Forests": 0.95,
+        "Forest hiking": 0.85,
+        "History": 0.65,
+        "Hiking": 0.75
+      },
+      "sources": [
+        {
+          "title": "Maine Office of Tourism",
+          "url": "https://visitmaine.com/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "California",
+      "country": "United States",
+      "region": "northAmerica",
+      "searchSpan": 9,
+      "dataConfidence": 0.86,
+      "strengths": {
+        "National parks": 1,
+        "Mountains": 0.85,
+        "Coast & water": 0.8,
+        "Rocky coast": 0.75,
+        "Beaches": 0.8,
+        "Forests": 0.55,
+        "Hiking": 0.85,
+        "Architecture": 0.65,
+        "Seafood": 0.7
+      },
+      "sources": [
+        {
+          "title": "Visit California official travel guide",
+          "url": "https://www.visitcalifornia.com/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Sedona",
+      "country": "United States",
+      "region": "northAmerica",
+      "searchSpan": 1,
+      "dataConfidence": 0.91,
+      "strengths": {
+        "Desert hiking": 1,
+        "Hiking": 0.95,
+        "Scenic views": 1,
+        "Nature": 0.9,
+        "Mountains": 0.65
+      },
+      "sources": [
+        {
+          "title": "Sedona Chamber of Commerce and Tourism Bureau: hiking",
+          "url": "https://visitsedona.com/things-to-do/hiking/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Alaska",
+      "country": "United States",
+      "region": "northAmerica",
+      "searchSpan": 20,
+      "dataConfidence": 0.88,
+      "strengths": {
+        "National parks": 0.95,
+        "Mountains": 1,
+        "Coast & water": 0.8,
+        "Rocky coast": 0.7,
+        "Wildlife": 1,
+        "Hiking": 0.8,
+        "Forests": 0.7
+      },
+      "sources": [
+        {
+          "title": "Travel Alaska official state guide",
+          "url": "https://www.travelalaska.com/",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "name": "Kauai",
+      "country": "United States",
+      "region": "northAmerica",
+      "searchSpan": 1,
+      "dataConfidence": 0.88,
+      "strengths": {
+        "Scenic views": 1,
+        "Hiking": 0.85,
+        "Nature": 0.95,
+        "Beaches": 1,
+        "Coast & water": 1,
+        "Mountains": 0.75
+      },
+      "sources": [
+        {
+          "title": "Hawaii Tourism Authority: Kauai",
+          "url": "https://www.gohawaii.com/islands/kauai",
+          "reviewedAt": "2026-09-20"
+        }
+      ]
+    }
+  ]
+}

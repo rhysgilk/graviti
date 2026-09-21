@@ -310,7 +310,7 @@ Patterns spanning different places and areas rank above a pile of repeated recor
 
 ### Fit inputs
 
-The deterministic local candidate catalog currently contains destinations in Asia, Europe, and North America. Each candidate has weighted strengths such as matcha, architecture, forests, museums, seafood, or national parks.
+The deterministic local candidate catalog is a bundled schema-versioned JSON resource spanning Asia, Europe, and North America. Each destination has weighted strengths, a conservative reviewed-data confidence value, review date, and one or more HTTPS sources. Invalid, duplicate, unsourced, or unsupported catalog data is rejected.
 
 Fit considers:
 
@@ -328,19 +328,19 @@ Fit considers:
 - source-type diversity
 - note and description richness
 
-Repeated artifacts receive diminishing weight. Explicit preference adds signal but cannot bypass evidence confidence.
+Repeated artifacts receive diminishing weight. Evidence concentrated in one imported collection receives an additional modest discount. Per-interest evidence from a user note or photo description carries more weight than collection-title or link-metadata inference. Explicit preference adds signal but cannot bypass confidence limits.
 
 ### Relevance, confidence, and displayed Fit
 
-Raw relevance is computed separately from evidence confidence. Confidence rises with independent places, areas, source kinds, and rich notes/descriptions and is capped below certainty.
+Raw relevance is computed separately from evidence confidence. Personal evidence confidence rises with independent places, areas, source kinds, and rich notes/descriptions and is capped below certainty. It is combined with destination-knowledge confidence by taking the more conservative value.
 
 The displayed Fit score shrinks relevance toward a neutral 50 when evidence is weak. Sparse evidence is labeled **Early signal** instead of showing an intense percentage. Confidence bands are Early, Developing, and Strong.
 
-The app shows matched patterns, supporting-save count, explicit preference matches, and confidence. **Not for me** persists an exclusion without changing Gravity. **Save destination** persists the recommendation as a retrievable guide without turning it into an explicit saved-place signal.
+The app shows matched patterns, supporting-save count, explicit preference matches, combined confidence, destination-knowledge confidence, and links to the reviewed sources. **Not for me** persists an exclusion without changing Gravity. **Save destination** persists the recommendation as a retrievable guide without turning it into an explicit saved-place signal.
 
 ### Current candidate coverage
 
-The local reviewed catalog includes Uji, Kyoto, Taipei, Seoul, Madeira, the Norwegian Fjords, the Scottish Highlands, Copenhagen, Lisbon, New York City, Mexico City, Vancouver, Seattle, Vermont, Maine, California, Alaska, and Kauai.
+The local reviewed catalog contains 23 destinations: Uji, Kyoto, Taipei, Seoul, Hanoi, Madeira, the Norwegian Fjords, the Scottish Highlands, Copenhagen, Barcelona, Lisbon, New York City, Mexico City, Oaxaca, Vancouver, Seattle, the Olympic Peninsula, Vermont, Maine, California, Sedona, Alaska, and Kauai. Its fine-grained strengths cover examples such as forest hiking, desert hiking, rocky coast, historic and modern architecture, tacos, pizza, and pho while retaining broad compatibility interests.
 
 This catalog is intentionally small. Future expansion should use reviewed destination knowledge while preserving explainability, confidence, and the separation between Gravity and Fit.
 
@@ -454,7 +454,7 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 
 ## 17. Verification summary
 
-The current automated suite has 83 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v2, Gravity Insights, Destination Readiness, and semantic-evidence tests were added.
+The current automated suite has 91 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v2, Gravity Insights, Destination Readiness, semantic-evidence, and destination-catalog tests were added.
 
 Manual and live-service checks include:
 
