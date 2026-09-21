@@ -19,7 +19,7 @@ The local MVP is complete and verified. It requires no account or Graviti server
 - Library browsing by Destinations, Places, Saves, and Map
 - Individual deletion, atomic bulk save deletion, and bulk place-association removal
 - Global local search plus live Apple MapKit place search
-- Versioned JSON backup and restore, including saved image bytes
+- Backward-compatible JSON backup and restore, including saved image bytes and Explore recommendation state
 - Adaptive Gravity Field with country, state/province, and city resolution
 - Direct switching between visible Gravity bubbles and semantic geographic drill-down
 - Decorative white and yellow pulsing stars that respect Reduce Motion
@@ -48,6 +48,7 @@ See [Complete Capability Reference](docs/CAPABILITIES.md) for workflows, data be
 - [Implemented Architecture](docs/ARCHITECTURE.md)
 - [Implemented Data Model](docs/DATA_MODEL.md)
 - [MVP Steering and Roadmap](docs/MVP_STEERING.md)
+- [Post-MVP Roadmap](docs/POST_MVP_ROADMAP.md)
 - [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md)
 - [Privacy Policy](docs/PRIVACY.md)
 - [Optional TestFlight Preparation](docs/TESTFLIGHT.md)
@@ -100,9 +101,9 @@ xcodebuild \
 
 The shared `graviti` scheme includes `gravitiTests`. Run **Product → Test** in Xcode or use an installed simulator destination with `xcodebuild test`.
 
-The current suite contains 67 tests. It covers import parsing and migration, Fit relevance and confidence, region-scoped Fit Guide search behavior, interest profiles, adaptive geographic resolution, deterministic crowded layouts, backup validation and media round trips, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
+The current suite contains 69 tests. It covers import parsing and migration, Fit relevance and confidence, region-scoped Fit Guide search behavior, interest profiles, adaptive geographic resolution, deterministic crowded layouts, backup validation and media round trips, backup v1 compatibility and v2 Explore-state restoration, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
 
-The latest verified runs passed 67 of 67 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
+The latest verified runs passed 69 of 69 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
 
 ## Test data
 
@@ -110,4 +111,4 @@ Debug builds expose a dataset switcher at the bottom of Save. Loading a fixture 
 
 ## Data ownership
 
-Graviti stores its Library locally and has no account, analytics SDK, advertising SDK, or Graviti-operated backend in the MVP. Library → Actions can export and restore a versioned JSON backup containing saved records, generated details, place matches, source collection membership, cached link details, and image bytes. Uninstalling the app removes the local Library unless the user exports a backup first.
+Graviti stores its Library locally and has no account, analytics SDK, advertising SDK, or Graviti-operated backend in the MVP. Library → Actions can export and restore a versioned JSON backup containing saved records, generated details, place matches, source collection membership, cached link details, image bytes, Explore preferences, saved destinations, and Not for Me exclusions. Uninstalling the app removes the local Library unless the user exports a backup first.

@@ -1,11 +1,55 @@
 import Foundation
 
 struct LibraryBackupArchive: Codable {
-    static let currentSchemaVersion = 1
+    static let currentSchemaVersion = 2
+    static let supportedSchemaVersions = 1...2
 
     let schemaVersion: Int
     let exportedAt: Date
     let artifacts: [LibraryBackupEntry]
+    let preferences: LibraryBackupPreferences?
+
+    init(
+        schemaVersion: Int,
+        exportedAt: Date,
+        artifacts: [LibraryBackupEntry],
+        preferences: LibraryBackupPreferences? = nil
+    ) {
+        self.schemaVersion = schemaVersion
+        self.exportedAt = exportedAt
+        self.artifacts = artifacts
+        self.preferences = preferences
+    }
+}
+
+struct LibraryBackupPreferences: Codable, Equatable {
+    let recommendationRegion: String
+    let preferredInterests: [String]
+    let avoidedInterests: [String]
+    let savedDestinationIDs: [String]
+    let excludedDestinationIDs: [String]
+
+    init(
+        recommendationRegion: String,
+        preferredInterests: [String],
+        avoidedInterests: [String],
+        savedDestinationIDs: [String],
+        excludedDestinationIDs: [String]
+    ) {
+        self.recommendationRegion = recommendationRegion
+        self.preferredInterests = Self.normalized(preferredInterests)
+        self.avoidedInterests = Self.normalized(avoidedInterests)
+        self.savedDestinationIDs = Self.normalized(savedDestinationIDs)
+        self.excludedDestinationIDs = Self.normalized(excludedDestinationIDs)
+    }
+
+    private static func normalized(_ values: [String]) -> [String] {
+        var seen = Set<String>()
+        return values
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && seen.insert($0).inserted }
+            .sorted()
+    }
 }
 
 struct LibraryBackupEntry: Codable {
@@ -17,11 +61,13 @@ struct LibraryBackupEntry: Codable {
 struct LibraryRestoreSummary {
     let imported: Int
     let duplicates: Int
+    let preferences: LibraryBackupPreferences?
 }
 
 enum LibraryBackupService {
     static func encode(
         _ artifacts: [Artifact],
+        preferences: LibraryBackupPreferences? = nil,
         mediaLoader: (String) throws -> Data = { key in
             try Data(contentsOf: SharedMediaStore.url(for: key), options: .mappedIfSafe)
         }
@@ -45,7 +91,8 @@ enum LibraryBackupService {
         let archive = LibraryBackupArchive(
             schemaVersion: LibraryBackupArchive.currentSchemaVersion,
             exportedAt: .now,
-            artifacts: entries
+            artifacts: entries,
+            preferences: preferences
         )
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .secondsSince1970
@@ -63,9 +110,34 @@ enum LibraryBackupService {
         } catch {
             throw LibraryBackupError.invalidFile
         }
-        guard archive.schemaVersion == LibraryBackupArchive.currentSchemaVersion,
+        guard LibraryBackupArchive.supportedSchemaVersions.contains(archive.schemaVersion),
               archive.artifacts.count <= 100_000 else {
             throw LibraryBackupError.unsupportedVersion
+        }
+        if archive.schemaVersion == 1, archive.preferences != nil {
+            throw LibraryBackupError.invalidFile
+        }
+        let normalizedPreferences = archive.preferences.map {
+            LibraryBackupPreferences(
+                recommendationRegion: $0.recommendationRegion,
+                preferredInterests: $0.preferredInterests,
+                avoidedInterests: $0.avoidedInterests,
+                savedDestinationIDs: $0.savedDestinationIDs,
+                excludedDestinationIDs: $0.excludedDestinationIDs
+            )
+        }
+        if let preferences = archive.preferences, let normalizedPreferences {
+            guard RecommendationRegion(rawValue: preferences.recommendationRegion) != nil,
+                  preferences.preferredInterests.count <= 100,
+                  preferences.avoidedInterests.count <= 100,
+                  preferences.savedDestinationIDs.count <= 1_000,
+                  preferences.excludedDestinationIDs.count <= 1_000,
+                  allValuesAreSafe(normalizedPreferences.preferredInterests),
+                  allValuesAreSafe(normalizedPreferences.avoidedInterests),
+                  allValuesAreSafe(normalizedPreferences.savedDestinationIDs),
+                  allValuesAreSafe(normalizedPreferences.excludedDestinationIDs) else {
+                throw LibraryBackupError.invalidFile
+            }
         }
         guard Set(archive.artifacts.map { $0.artifact.id }).count == archive.artifacts.count else {
             throw LibraryBackupError.invalidFile
@@ -80,7 +152,16 @@ enum LibraryBackupService {
                 throw LibraryBackupError.invalidMedia
             }
         }
-        return archive
+        return LibraryBackupArchive(
+            schemaVersion: archive.schemaVersion,
+            exportedAt: archive.exportedAt,
+            artifacts: archive.artifacts,
+            preferences: normalizedPreferences
+        )
+    }
+
+    private static func allValuesAreSafe(_ values: [String]) -> Bool {
+        values.allSatisfy { !$0.isEmpty && $0.count <= 200 }
     }
 }
 

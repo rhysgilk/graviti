@@ -135,6 +135,26 @@ final class ArtifactLibraryTests: XCTestCase {
         XCTAssertEqual(persisted.count, 1)
         XCTAssertEqual(persisted[0].sourceCollectionTitles, ["New York City Fit Guide · Museums"])
     }
+
+    func testBackupRestoreReturnsExplorePreferencesAlongsideArtifacts() async throws {
+        let preferences = LibraryBackupPreferences(
+            recommendationRegion: RecommendationRegion.europe.rawValue,
+            preferredInterests: ["Architecture", "Museums"],
+            avoidedInterests: ["Beaches"],
+            savedDestinationIDs: ["Copenhagen, Denmark"],
+            excludedDestinationIDs: ["Madeira, Portugal"]
+        )
+        let source = Artifact(kind: .manual, originalText: "Historic architecture")
+        let encoded = try LibraryBackupService.encode([source], preferences: preferences)
+        let library = ArtifactLibrary(repository: PreviewArtifactRepository())
+
+        let summary = try await library.restoreBackup(encoded)
+
+        XCTAssertEqual(summary.imported, 1)
+        XCTAssertEqual(summary.duplicates, 0)
+        XCTAssertEqual(summary.preferences, preferences)
+        XCTAssertEqual(library.artifacts.map(\.id), [source.id])
+    }
 }
 
 private enum TestInboxError: LocalizedError {

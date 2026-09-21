@@ -29,16 +29,25 @@ final class LibraryBackupServiceTests: XCTestCase {
         )
         let media = Data([0xFF, 0xD8, 0xFF])
 
-        let encoded = try LibraryBackupService.encode([artifact]) { key in
+        let preferences = LibraryBackupPreferences(
+            recommendationRegion: RecommendationRegion.asia.rawValue,
+            preferredInterests: ["Tea", "Matcha", "Tea"],
+            avoidedInterests: ["Nightlife"],
+            savedDestinationIDs: ["Kyoto, Japan"],
+            excludedDestinationIDs: ["Seoul, South Korea"]
+        )
+        let encoded = try LibraryBackupService.encode([artifact], preferences: preferences) { key in
             XCTAssertEqual(key, "photo.jpg")
             return media
         }
         let decoded = try LibraryBackupService.decode(encoded)
 
-        XCTAssertEqual(decoded.schemaVersion, 1)
+        XCTAssertEqual(decoded.schemaVersion, 2)
         XCTAssertEqual(decoded.artifacts.first?.artifact, artifact)
         XCTAssertEqual(decoded.artifacts.first?.mediaData, media)
         XCTAssertEqual(decoded.artifacts.first?.mediaFileExtension, "jpg")
+        XCTAssertEqual(decoded.preferences, preferences)
+        XCTAssertEqual(decoded.preferences?.preferredInterests, ["Matcha", "Tea"])
     }
 
     func testDecodeAcceptsVersionOneBackupWithoutCollectionContext() throws {
@@ -58,12 +67,15 @@ final class LibraryBackupServiceTests: XCTestCase {
         entry["artifact"] = artifactJSON
         entries[0] = entry
         root["artifacts"] = entries
+        root["schemaVersion"] = 1
+        root.removeValue(forKey: "preferences")
 
         let legacyData = try JSONSerialization.data(withJSONObject: root)
         let decoded = try LibraryBackupService.decode(legacyData)
 
         XCTAssertNil(decoded.artifacts.first?.artifact.sourceCollectionTitle)
         XCTAssertTrue(decoded.artifacts.first?.artifact.sourceCollectionTitles.isEmpty == true)
+        XCTAssertNil(decoded.preferences)
     }
 
     func testDecodeRejectsUnsupportedSchema() throws {
@@ -81,5 +93,23 @@ final class LibraryBackupServiceTests: XCTestCase {
         encoder.dateEncodingStrategy = .secondsSince1970
 
         XCTAssertThrowsError(try LibraryBackupService.decode(encoder.encode(archive)))
+    }
+
+    func testDecodeRejectsPreferencesAttachedToVersionOneArchive() throws {
+        let preferences = LibraryBackupPreferences(
+            recommendationRegion: RecommendationRegion.anywhere.rawValue,
+            preferredInterests: ["Museums"],
+            avoidedInterests: [],
+            savedDestinationIDs: [],
+            excludedDestinationIDs: []
+        )
+        let archive = LibraryBackupArchive(
+            schemaVersion: 1,
+            exportedAt: .now,
+            artifacts: [],
+            preferences: preferences
+        )
+
+        XCTAssertThrowsError(try LibraryBackupService.decode(JSONEncoder().encode(archive)))
     }
 }

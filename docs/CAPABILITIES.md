@@ -338,7 +338,7 @@ Saving a suggestion records collection membership such as `Mexico City Fit Guide
 
 ## 12. Backup, restore, and deletion
 
-The versioned JSON backup includes every Artifact field and embeds local image bytes. Current safeguards include:
+Backup schema version 2 includes every Artifact field, embeds local image bytes, and preserves the Explore recommendation region, preferred and avoided interests, saved destinations, and Not for Me exclusions. Version 1 archives remain restorable. Current safeguards include:
 
 - schema-version check
 - 500 MB maximum archive input
@@ -346,6 +346,7 @@ The versioned JSON backup includes every Artifact field and embeds local image b
 - duplicate Artifact ID rejection
 - 50 MB maximum per embedded image
 - media metadata consistency checks
+- bounded and normalized Explore preference values
 - second-based date encoding
 - pretty printed, sorted output
 
@@ -420,13 +421,12 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 - Generated enrichment is deterministic and vocabulary based; it is not a general AI understanding service.
 - Fit uses a small reviewed offline destination catalog rather than worldwide candidate coverage.
 - Fit Guide ordering follows Apple Maps relevance. Graviti cannot directly rank by a MapKit review score.
-- Save Destination and Not for Me are stored in app preferences; they are not currently part of the JSON Library backup.
 - No account, cloud sync, collaboration, social profiles, public recommendations, itinerary builder, booking, or reservation features are included.
 - Video files and live social-platform media ingestion are not implemented; ordinary public links can still be saved and previewed when metadata is available.
 
 ## 17. Verification summary
 
-The current automated suite has 67 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide tests were added.
+The current automated suite has 69 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide and backup v2 tests were added.
 
 Manual and live-service checks include:
 

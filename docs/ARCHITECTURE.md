@@ -280,9 +280,9 @@ Guide persistence uses source collection titles on Artifacts rather than a separ
 
 ## 15. Backup architecture
 
-`LibraryBackupService` serializes a schema-versioned archive with full Artifacts and optional image bytes.
+`LibraryBackupService` serializes a schema-versioned archive with full Artifacts, optional image bytes, and a snapshot of Explore recommendation preferences. Schema version 2 adds region, preferred and avoided interests, saved destinations, and Not for Me exclusions while retaining version 1 decode compatibility.
 
-Decode validates total size, schema, count, unique IDs, and media consistency before returning an archive. Restore skips existing Artifact IDs and cleans up newly written media if repository insertion fails.
+Decode validates total size, schema, count, unique IDs, media consistency, preference bounds, and the recommendation region before returning a normalized archive. Restore skips existing Artifact IDs, applies preferences only when the archive contains them, and cleans up newly written media if repository insertion fails.
 
 ## 16. Accessibility, localization, and resources
 

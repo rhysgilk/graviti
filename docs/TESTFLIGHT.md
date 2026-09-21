@@ -37,13 +37,13 @@ This beta stores its Library on the device. Graviti does not require an account 
 - Destination recommendations use a small reviewed offline catalog during the MVP beta.
 - Fit Guide ordering follows Apple Maps relevance; MapKit does not provide Graviti with a review score to display or sort directly.
 - Some imported or shared items may require manual place matching.
-- Explore preferences, Save Destination, and Not for Me are stored locally in app settings and are not included in backup schema version 1. Places saved inside Fit Guides keep their guide membership in the backup.
+- Backup schema version 2 includes Explore preferences, Save Destination, and Not for Me. Older version 1 backups still restore their Library content but do not change current Explore settings. Places saved inside Fit Guides keep their guide membership in either version.
 
 ## Latest simulator validation
 
 Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 67 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing and migration, Fit scoring, region-scoped Fit Guide search and fallback behavior, Fit Guide grouping and persistence, backup restore, offline save preservation and recovery, safe map URL generation, and deterministic ten-destination Gravity Field layout.
+- All 69 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing and migration, Fit scoring, region-scoped Fit Guide search and fallback behavior, Fit Guide grouping and persistence, backup v1 compatibility and v2 Explore-state restore, offline save preservation and recovery, safe map URL generation, and deterministic ten-destination Gravity Field layout.
 - Clean signed Debug and Release archive builds completed. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.

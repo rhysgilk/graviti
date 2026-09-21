@@ -2,7 +2,7 @@
 
 **Audit date:** September 20, 2026
 
-**Simulator-validated app commit:** `2c0a0fd`
+**Simulator validation baseline:** `v1.0-local-mvp` plus the backup v2 maintenance change documented here
 
 **Signed archive validation commit:** `cdcc5b4`
 
@@ -14,10 +14,10 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 
 ## Automated release evidence
 
-- 67 of 67 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
-- 67 of 67 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
+- 69 of 69 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
+- 69 of 69 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
 - 62 of 62 tests passed with no failures or skips on a physical iPhone 13 Pro Max running iOS 26.3.1.
-- A signed arm64 Release archive of commit `cdcc5b4` completed Xcode's store validation phase. The later `2c0a0fd` change affects MapKit query scoping and passed both simulator suites.
+- A signed arm64 Release archive of commit `cdcc5b4` completed Xcode's store validation phase. Later Fit Guide and backup v2 changes passed both simulator suites; they have not been externally distributed.
 - `scripts/verify-release-archive.sh` passed every package check: bundle identifiers, matching app and extension versions, iOS 18 minimum, encryption declaration, both privacy manifests, exactly two Sora fonts, no CSV fixtures, nested signatures, and matching App Group entitlements.
 - The only archive warning is expected: the available seven-day Apple Development profile is suitable for device testing but not TestFlight distribution.
 
@@ -25,7 +25,7 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 
 | Requirement | Status | Evidence |
 | --- | --- | --- |
-| Clear local-only data promise and reliable backup/restore | Verified | Onboarding and Library Actions expose the promise. Backup tests cover rich records, embedded media, schema rejection, and duplicate-ID rejection. |
+| Clear local-only data promise and reliable backup/restore | Verified | Onboarding and Library Actions expose the promise. Backup tests cover rich records, embedded media, schema rejection, duplicate-ID rejection, version 1 compatibility, and version 2 Explore-state restoration. |
 | A new user understands Graviti without a tutorial | Verified | Onboarding introduces saving, organization, Gravity, and local ownership. The primary tabs expose conventional alternatives to the spatial Home view, and preliminary physical-device testing passed. |
 | Capture inside and outside the app | Verified | Link, note, photo, place, CSV, `.webloc`, Apple guide, and Google list capture are implemented. A live Safari Share Extension save was completed and reopened in Library. |
 | Saves appear immediately | Verified | Capture preserves the source before background work. Live link, Share Extension, Apple guide, and Google list checks showed immediate Library records. |

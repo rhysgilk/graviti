@@ -157,8 +157,8 @@ final class ArtifactLibrary: ObservableObject {
         }
     }
 
-    func backupData() throws -> Data {
-        try LibraryBackupService.encode(artifacts)
+    func backupData(preferences: LibraryBackupPreferences? = nil) throws -> Data {
+        try LibraryBackupService.encode(artifacts, preferences: preferences)
     }
 
     func restoreBackup(_ data: Data) async throws -> LibraryRestoreSummary {
@@ -191,7 +191,8 @@ final class ArtifactLibrary: ObservableObject {
         }
         return LibraryRestoreSummary(
             imported: restoredArtifacts.count,
-            duplicates: archive.artifacts.count - additions.count
+            duplicates: archive.artifacts.count - additions.count,
+            preferences: archive.preferences
         )
     }
 

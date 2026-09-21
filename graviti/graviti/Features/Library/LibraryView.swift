@@ -5,6 +5,11 @@ import UniformTypeIdentifiers
 struct LibraryView: View {
     @ObservedObject var library: ArtifactLibrary
     @AppStorage("library.mode") private var modeRawValue = LibraryMode.destinations.rawValue
+    @AppStorage("explore.region") private var exploreRegionRaw = RecommendationRegion.anywhere.rawValue
+    @AppStorage("explore.preferredInterests") private var preferredInterestsRaw = ""
+    @AppStorage("explore.avoidedInterests") private var avoidedInterestsRaw = ""
+    @AppStorage("explore.savedDestinations") private var savedDestinationsRaw = ""
+    @AppStorage("explore.excludedDestinations") private var excludedDestinationsRaw = ""
     @State private var selectedMapPlace: SavedPlace?
     @State private var query = ""
     @State private var showsNeedsReviewOnly = false
@@ -174,7 +179,7 @@ struct LibraryView: View {
 
     private func exportBackup() {
         do {
-            backupDocument = LibraryBackupDocument(data: try library.backupData())
+            backupDocument = LibraryBackupDocument(data: try library.backupData(preferences: backupPreferences))
             isExportingBackup = true
         } catch {
             backupStatus = LibraryBackupStatus(message: error.localizedDescription)
@@ -190,11 +195,17 @@ struct LibraryView: View {
             Task {
                 do {
                     let summary = try await library.restoreBackup(data)
+                    if let preferences = summary.preferences {
+                        restore(preferences)
+                    }
+                    let itemSummary = GravitiCopy.restoreSummary(
+                        imported: summary.imported,
+                        duplicates: summary.duplicates
+                    )
                     backupStatus = LibraryBackupStatus(
-                        message: GravitiCopy.restoreSummary(
-                            imported: summary.imported,
-                            duplicates: summary.duplicates
-                        )
+                        message: summary.preferences == nil
+                            ? itemSummary
+                            : "\(itemSummary) \(String(localized: "Your Explore preferences were restored."))"
                     )
                 } catch {
                     backupStatus = LibraryBackupStatus(message: error.localizedDescription)
@@ -203,6 +214,32 @@ struct LibraryView: View {
         } catch {
             backupStatus = LibraryBackupStatus(message: error.localizedDescription)
         }
+    }
+
+    private var backupPreferences: LibraryBackupPreferences {
+        LibraryBackupPreferences(
+            recommendationRegion: (RecommendationRegion(rawValue: exploreRegionRaw) ?? .anywhere).rawValue,
+            preferredInterests: Self.decodePreferenceSet(preferredInterestsRaw),
+            avoidedInterests: Self.decodePreferenceSet(avoidedInterestsRaw),
+            savedDestinationIDs: Self.decodePreferenceSet(savedDestinationsRaw),
+            excludedDestinationIDs: Self.decodePreferenceSet(excludedDestinationsRaw)
+        )
+    }
+
+    private func restore(_ preferences: LibraryBackupPreferences) {
+        exploreRegionRaw = preferences.recommendationRegion
+        preferredInterestsRaw = Self.encodePreferenceSet(preferences.preferredInterests)
+        avoidedInterestsRaw = Self.encodePreferenceSet(preferences.avoidedInterests)
+        savedDestinationsRaw = Self.encodePreferenceSet(preferences.savedDestinationIDs)
+        excludedDestinationsRaw = Self.encodePreferenceSet(preferences.excludedDestinationIDs)
+    }
+
+    private static func decodePreferenceSet(_ raw: String) -> [String] {
+        raw.split(separator: "|").map(String.init)
+    }
+
+    private static func encodePreferenceSet(_ values: [String]) -> String {
+        values.sorted().joined(separator: "|")
     }
 
     private var reviewFilter: some View {

@@ -25,11 +25,11 @@ Graviti does not require an account and does not synchronize the Library to a Gr
 
 ## Backups
 
-A person can export a versioned JSON backup through Library → Actions. The backup includes Artifact records, place matches, generated and edited details, source collection history, cached link details, and embedded saved image bytes.
+A person can export a versioned JSON backup through Library → Actions. The backup includes Artifact records, place matches, generated and edited details, source collection history, cached link details, embedded saved image bytes, Explore preferences, saved destinations, and Not for Me exclusions.
 
 The backup leaves Graviti only when the person chooses an export destination through the system file interface. Graviti does not upload exported backups.
 
-Recommendation preferences stored in app settings, including Save Destination and Not for Me, are not included in backup schema version 1. Saved places inside Fit Guides retain their guide membership because that membership belongs to the Artifact record.
+Current exports use backup schema version 2. Graviti can also restore older version 1 backups, which do not contain Explore preferences. Saved places inside Fit Guides retain their guide membership because that membership belongs to the Artifact record.
 
 Deleting Graviti removes its local Library and App Group media. Export a backup before uninstalling if the Library should be retained.
 

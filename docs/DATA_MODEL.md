@@ -6,7 +6,7 @@
 
 **Storage:** SwiftData domain record plus App Group image files
 
-**Backup schema:** Version 1 JSON
+**Backup schema:** Version 2 JSON, with version 1 restore compatibility
 
 This document describes persisted and derived values in the current app. Future normalized server entities are listed separately.
 
@@ -296,16 +296,17 @@ The following values use `UserDefaults` through `@AppStorage`:
 | `explore.excludedDestinations` | Not for me IDs |
 | `debug.dogfoodArtifactIDs` | Debug-only fixture cleanup |
 
-These preferences are local and are not part of backup schema version 1. Artifact-based Fit Guide memberships are backed up.
+The Explore region, preferred and avoided interests, saved destinations, and Not for Me exclusions are included in backup schema version 2. Display and debug preferences remain device-specific. Artifact-based Fit Guide memberships are stored on Artifacts and are also backed up.
 
 ## 14. Backup schema
 
 `LibraryBackupArchive`:
 
 ```text
-schemaVersion: Int = 1
+schemaVersion: Int = 2
 exportedAt: Date
 artifacts: [LibraryBackupEntry]
+preferences: LibraryBackupPreferences?
 ```
 
 `LibraryBackupEntry`:
@@ -316,7 +317,17 @@ mediaData: Data?
 mediaFileExtension: String?
 ```
 
-Dates encode as seconds since 1970. JSON is pretty printed and sorted.
+`LibraryBackupPreferences`:
+
+```text
+recommendationRegion: String
+preferredInterests: [String]
+avoidedInterests: [String]
+savedDestinationIDs: [String]
+excludedDestinationIDs: [String]
+```
+
+Dates encode as seconds since 1970. JSON is pretty printed and sorted. Preference values are bounded, trimmed, deduplicated, and sorted during restore. Version 1 archives decode without preferences and leave current Explore settings unchanged.
 
 Restore identity is `Artifact.id`. Existing IDs are skipped; place identity alone does not suppress restoration of a separate source Artifact.
 
