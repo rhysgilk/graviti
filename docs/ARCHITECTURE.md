@@ -242,6 +242,10 @@ Gravity is deterministic and based on explicit saved artifacts. Nodes rank by Gr
 
 Insights do not change Gravity or Fit. `HomeView` presents up to four in a carousel, focuses the associated destination, and links to the destination's saved evidence.
 
+`DestinationReadinessBuilder` evaluates the Artifacts belonging to one geographic node. It counts canonical places once, measures category and interest breadth, recognizes subarea spread for countries and states/provinces, and includes recent distinct places as a small supporting signal. Gated thresholds prevent raw save volume or one category from producing a strong band. The builder returns an understandable readiness band, its evidence counts, and guidance for the next band.
+
+Readiness is computed on demand for the selected destination and remains independent from Gravity and Fit.
+
 ## 12. Search
 
 `LibrarySearchEngine` is pure and synchronous. It searches cached local fields and builds grouped results.

@@ -7,6 +7,24 @@ enum GravitiCopy {
             : String(localized: "\(count) destinations")
     }
 
+    static func distinctPlaces(_ count: Int) -> String {
+        count == 1
+            ? String(localized: "1 distinct place")
+            : String(localized: "\(count) distinct places")
+    }
+
+    static func experienceTypes(_ count: Int) -> String {
+        count == 1
+            ? String(localized: "1 experience type")
+            : String(localized: "\(count) experience types")
+    }
+
+    static func interests(_ count: Int) -> String {
+        count == 1
+            ? String(localized: "1 interest")
+            : String(localized: "\(count) interests")
+    }
+
     static func savedItems(_ count: Int) -> String {
         count == 1
             ? String(localized: "1 saved item")

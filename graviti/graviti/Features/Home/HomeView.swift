@@ -201,6 +201,10 @@ struct HomeView: View {
         if let selectedItem {
             DestinationSelectionCard(
                 node: selectedItem.node,
+                readiness: DestinationReadinessBuilder.build(
+                    for: selectedItem.node,
+                    artifacts: library.artifacts
+                ),
                 onClose: clearPresentation,
                 onOpen: DestinationOrbitBuilder.children(of: selectedItem.node, from: library.artifacts).isEmpty
                     ? nil : { open(selectedItem) },

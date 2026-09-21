@@ -4761,6 +4761,356 @@
         }
       }
     },
+    "Still taking shape" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún tomando forma"
+          }
+        }
+      }
+    },
+    "Strong weekend" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buen plan para un fin de semana"
+          }
+        }
+      }
+    },
+    "Ready for 4–5 days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo para 4–5 días"
+          }
+        }
+      }
+    },
+    "You have varied reasons to spend several days here, spread across different areas." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tienes motivos variados para pasar varios días aquí, repartidos entre distintas zonas."
+          }
+        }
+      }
+    },
+    "You have varied reasons to spend several days here." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tienes motivos variados para pasar varios días aquí."
+          }
+        }
+      }
+    },
+    "Add another kind of experience and %lld more distinct places to support a longer trip." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade otro tipo de experiencia y %1$lld lugares distintos más para preparar un viaje más largo."
+          }
+        }
+      }
+    },
+    "Add %lld more distinct places to support a longer trip." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade %1$lld lugares distintos más para preparar un viaje más largo."
+          }
+        }
+      }
+    },
+    "Add another kind of experience to support a longer trip." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade otro tipo de experiencia para preparar un viaje más largo."
+          }
+        }
+      }
+    },
+    "Add %lld more distinct places and broaden the mix of experiences to support a weekend." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade %1$lld lugares distintos más y amplía la variedad de experiencias para preparar un fin de semana."
+          }
+        }
+      }
+    },
+    "Add %lld more distinct places to support a weekend." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade %1$lld lugares distintos más para preparar un fin de semana."
+          }
+        }
+      }
+    },
+    "Broaden the mix of experiences to support a weekend." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amplía la variedad de experiencias para preparar un fin de semana."
+          }
+        }
+      }
+    },
+    "1 distinct place" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 lugar distinto"
+          }
+        }
+      }
+    },
+    "%lld distinct places" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld lugares distintos"
+          }
+        }
+      }
+    },
+    "1 experience type" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 tipo de experiencia"
+          }
+        }
+      }
+    },
+    "%lld experience types" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld tipos de experiencia"
+          }
+        }
+      }
+    },
+    "1 interest" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 interés"
+          }
+        }
+      }
+    },
+    "%lld interests" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld intereses"
+          }
+        }
+      }
+    },
+    "%@ Fit Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guía Fit de %1$@"
+          }
+        }
+      }
+    },
+    "Build my %@ Fit Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear mi guía Fit de %1$@"
+          }
+        }
+      }
+    },
+    "Built from your patterns" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creada a partir de tus patrones"
+          }
+        }
+      }
+    },
+    "Connect to the internet to load live place suggestions. Places already saved in this guide remain available." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conéctate a internet para cargar sugerencias de lugares. Los lugares ya guardados en esta guía siguen disponibles."
+          }
+        }
+      }
+    },
+    "Finding places for your patterns…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando lugares para tus patrones…"
+          }
+        }
+      }
+    },
+    "No suggestions found" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron sugerencias"
+          }
+        }
+      }
+    },
+    "Opens the Apple Maps listing with current ratings and details" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la ficha de Apple Maps con valoraciones y detalles actuales"
+          }
+        }
+      }
+    },
+    "Save %@ in this Fit Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar %1$@ en esta guía Fit"
+          }
+        }
+      }
+    },
+    "Saved %@ in %@." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se guardó %1$@ en %2$@."
+          }
+        }
+      }
+    },
+    "Saved in this Fit Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardado en esta guía Fit"
+          }
+        }
+      }
+    },
+    "Saved in this guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardado en esta guía"
+          }
+        }
+      }
+    },
+    "Saved place" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lugar guardado"
+          }
+        }
+      }
+    },
+    "Suggestions follow live Apple Maps relevance. Open any result in Maps to check current ratings, hours, and details." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las sugerencias siguen la relevancia actual de Apple Maps. Abre cualquier resultado en Mapas para consultar valoraciones, horarios y detalles."
+          }
+        }
+      }
+    },
+    "Suggestions unavailable" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugerencias no disponibles"
+          }
+        }
+      }
+    },
+    "Try again" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intentar de nuevo"
+          }
+        }
+      }
+    },
+    "Try again later or search for the destination from the Search tab." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inténtalo de nuevo más tarde o busca el destino desde la pestaña Buscar."
+          }
+        }
+      }
+    },
+    "Your Fit Guides" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus guías Fit"
+          }
+        }
+      }
+    },
+    "Trip readiness" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparación del viaje"
+          }
+        }
+      }
+    },
     "·" : {
       "comment" : "A period used to separate different pieces of information in a list.",
       "isCommentAutoGenerated" : true,

@@ -86,6 +86,8 @@ The shipped local implementation uses a four-card maximum and deterministic evid
 
 ## Milestone 3: Destination Readiness
 
+**Status: implemented and covered by automated tests.**
+
 Readiness should answer whether a person has enough varied reasons to turn saved interest into a plausible trip. It is separate from Gravity and Fit.
 
 Possible inputs:
@@ -99,6 +101,8 @@ Possible inputs:
 - optional future trip-length preference
 
 Initial output should use understandable bands such as **Still taking shape**, **Strong weekend**, or **Ready for a 4–5 day trip**. The explanation should show what is present and what would make the destination more complete. It must not become an itinerary or booking feature.
+
+The shipped local implementation uses distinct canonical places, category and interest breadth, subarea spread, and recent distinct places. Multiple saves attached to one place count once toward place readiness. Stronger bands require both independent places and category variety. The selected-destination card shows the band, its evidence counts, and the next evidence needed; it does not alter Gravity or Fit.
 
 ## Milestone 4: Richer semantic understanding
 

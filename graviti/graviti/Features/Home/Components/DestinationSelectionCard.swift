@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DestinationSelectionCard: View {
     let node: OrbitNode
+    let readiness: DestinationReadiness
     let onClose: () -> Void
     let onOpen: (() -> Void)?
     let onViewSaves: () -> Void
@@ -47,6 +48,28 @@ struct DestinationSelectionCard: View {
             }
             .font(.subheadline.weight(.medium))
             .foregroundStyle(.white.opacity(0.82))
+
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text("Trip readiness")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.62))
+                    Spacer(minLength: 0)
+                    Text(readiness.band.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(GravitiColors.signalMint)
+                }
+
+                Text(readiness.evidenceSummary)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.82))
+
+                Text(readiness.guidance)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.68))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .accessibilityElement(children: .combine)
 
             Button(action: onViewSaves) {
                 HStack {

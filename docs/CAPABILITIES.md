@@ -280,6 +280,18 @@ The deterministic insight builder can surface:
 
 At most four insights appear. Counts, time windows, and interest names stay visible so the result can be interpreted rather than presented as an unexplained conclusion.
 
+### Destination Readiness
+
+Selecting a destination shows a separate readiness band alongside Gravity:
+
+- **Still taking shape**
+- **Strong weekend**
+- **Ready for 4–5 days**
+
+Readiness uses distinct canonical places, experience-category variety, interest variety, geographic spread within broader destinations, and recent evidence. It discounts multiple Artifacts attached to one place by counting that place once. Stronger bands require both a minimum number of places and multiple experience categories, so a large collection of one repeated type cannot imply a complete trip on its own.
+
+The destination card shows the place, experience, and interest counts behind the band, followed by a concrete next step. Readiness does not change Gravity or Fit and does not attempt to build an itinerary.
+
 ## 10. Interests, Fit, and recommendations
 
 ### Interest profile
@@ -440,7 +452,7 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 
 ## 17. Verification summary
 
-The current automated suite has 74 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v2, and Gravity Insights tests were added.
+The current automated suite has 78 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v2, Gravity Insights, and Destination Readiness tests were added.
 
 Manual and live-service checks include:
 
