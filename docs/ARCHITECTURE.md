@@ -219,7 +219,9 @@ Collection import planning can:
 
 `LinkMetadataFetcher` uses an ephemeral URL session and follows safe public HTTP(S) redirects. It blocks private, loopback, link-local, and otherwise unsafe targets and bounds response and image sizes.
 
-`ArtifactEnricher` is deterministic. It uses MapKit POI types and text evidence to generate a summary, broad category, interest tags, provenance, confidence, and timestamp. User details remain in a separate value and override generated values.
+`ArtifactEnricher` is deterministic. It evaluates each semantic input separately, with user notes and photo descriptions weighted above original text, OCR, collection names, link metadata, and provider metadata. It generates a summary, broad category, fine-grained interest tags, provenance, confidence, and timestamp. Per-interest evidence retains its exact source and confidence. User details remain in a separate value and override generated values.
+
+The vocabulary keeps broad tags used by the recommendation catalog while adding compatible finer motifs, including forest or desert hiking, rocky coast, historic or modern architecture, and specific dishes. This lets existing Fit behavior continue while preserving more meaning for later recommendation expansion.
 
 ## 11. Geography and Gravity
 

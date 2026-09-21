@@ -16,6 +16,7 @@ The local MVP is complete and verified. It requires no account or Graviti server
 - Google Takeout Saved CSV and Apple/Google `.webloc` import
 - Immediate local persistence followed by resumable place resolution, OCR, link preview fetching, and enrichment
 - Editable descriptions, categories, interests, notes, place matches, and source collection history
+- Fine-grained semantic interests with per-interest source provenance and confidence
 - Library browsing by Destinations, Places, Saves, and Map
 - Individual deletion, atomic bulk save deletion, and bulk place-association removal
 - Global local search plus live Apple MapKit place search
@@ -103,9 +104,9 @@ xcodebuild \
 
 The shared `graviti` scheme includes `gravitiTests`. Run **Product → Test** in Xcode or use an installed simulator destination with `xcodebuild test`.
 
-The current suite contains 78 tests. It covers import parsing and migration, Fit relevance and confidence, region-scoped Fit Guide search behavior, interest profiles, adaptive geographic resolution, deterministic crowded layouts, Gravity Insights, Destination Readiness, backup validation and media round trips, backup v1 compatibility and v2 Explore-state restoration, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
+The current suite contains 83 tests. It covers import parsing and migration, Fit relevance and confidence, region-scoped Fit Guide search behavior, fine-grained semantic evidence, interest profiles, adaptive geographic resolution, deterministic crowded layouts, Gravity Insights, Destination Readiness, backup validation and media round trips, backup v1 compatibility and v2 Explore-state restoration, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
 
-The latest verified runs passed 78 of 78 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
+The latest verified runs passed 83 of 83 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
 
 ## Test data
 

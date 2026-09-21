@@ -21,7 +21,10 @@ final class LibraryBackupServiceTests: XCTestCase {
             enrichment: ArtifactEnrichment(
                 summary: "A rocky coastal national park.", category: .sceneryAndNature,
                 interests: ["Coast & water", "National parks"], source: .detectedText,
-                confidence: 0.8, generatedAt: timestamp
+                confidence: 0.8, generatedAt: timestamp,
+                interestEvidence: [
+                    ArtifactInterestEvidence(interest: "Rocky coast", source: .userNote, confidence: 1)
+                ]
             ),
             enrichmentState: .processed,
             processingState: .processed,

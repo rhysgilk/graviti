@@ -131,6 +131,26 @@ struct SavedArtifactDetailView: View {
                         Text(detailsProvenance)
                             .font(.caption)
                             .foregroundStyle(.white.opacity(0.55))
+                        if current.userDetails == nil,
+                           let evidence = current.enrichment?.interestEvidence,
+                           !evidence.isEmpty {
+                            DisclosureGroup("Why these interests") {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ForEach(evidence) { item in
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(InterestDisplayName.localized(item.interest))
+                                                .font(.caption.weight(.semibold))
+                                            Text("\(item.source.displayName) · \(Int((item.confidence * 100).rounded()))% confidence")
+                                                .font(.caption2)
+                                                .foregroundStyle(.white.opacity(0.58))
+                                        }
+                                    }
+                                }
+                                .padding(.top, 6)
+                            }
+                            .font(.caption.weight(.semibold))
+                            .tint(GravitiColors.signalMint)
+                        }
                         if current.enrichment != nil {
                             Button(isRefreshingDetails ? "Refreshing…" : "Refresh suggestions") {
                                 isRefreshingDetails = true

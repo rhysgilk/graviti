@@ -24,6 +24,34 @@ enum ExperienceCategory: String, Codable, CaseIterable {
     }
 }
 
+enum ArtifactEvidenceSource: String, Codable, Hashable {
+    case userNote
+    case originalText
+    case detectedText
+    case collectionTitle
+    case linkMetadata
+    case mapPlace
+
+    var displayName: String {
+        switch self {
+        case .userNote: String(localized: "Your note or photo description")
+        case .originalText: String(localized: "Original saved text")
+        case .detectedText: String(localized: "Detected image text")
+        case .collectionTitle: String(localized: "Source collection name")
+        case .linkMetadata: String(localized: "Saved link details")
+        case .mapPlace: String(localized: "Apple Maps place category")
+        }
+    }
+}
+
+struct ArtifactInterestEvidence: Codable, Hashable, Identifiable {
+    let interest: String
+    let source: ArtifactEvidenceSource
+    let confidence: Double
+
+    var id: String { "\(interest)|\(source.rawValue)" }
+}
+
 struct ArtifactEnrichment: Codable, Hashable {
     enum Source: String, Codable {
         case mapKit
@@ -53,4 +81,23 @@ struct ArtifactEnrichment: Codable, Hashable {
     let source: Source
     let confidence: Double
     let generatedAt: Date
+    let interestEvidence: [ArtifactInterestEvidence]?
+
+    init(
+        summary: String?,
+        category: ExperienceCategory?,
+        interests: [String],
+        source: Source,
+        confidence: Double,
+        generatedAt: Date,
+        interestEvidence: [ArtifactInterestEvidence]? = nil
+    ) {
+        self.summary = summary
+        self.category = category
+        self.interests = interests
+        self.source = source
+        self.confidence = confidence
+        self.generatedAt = generatedAt
+        self.interestEvidence = interestEvidence
+    }
 }

@@ -178,7 +178,9 @@ Broad categories are:
 - Stay
 - Place/other
 
-The vocabulary recognizes signals such as matcha, tea, coffee, desserts, seafood, scenic views, hiking, forests, mountains, national parks, nature, beaches, coast and water, architecture, history, museums, gardens, shopping, and wildlife.
+The vocabulary recognizes signals such as matcha, tea, coffee, desserts, seafood, scenic views, hiking, forests, mountains, national parks, nature, beaches, coast and water, architecture, history, museums, gardens, shopping, and wildlife. It also preserves finer distinctions such as forest versus desert hiking, rocky coast versus beach, historic versus modern architecture, and specific dishes including ramen, sushi, tacos, pizza, pasta, pho, dim sum, and barbecue.
+
+Each inferred interest can retain its exact evidence source and confidence. Sources distinguish the user's note or photo description, original saved text, detected image text, source collection name, cached link metadata, and Apple Maps place category. User-authored notes and photo descriptions receive the strongest weight. Saved Item detail exposes this information under **Why these interests**.
 
 ### User corrections
 
@@ -452,7 +454,7 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 
 ## 17. Verification summary
 
-The current automated suite has 78 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v2, Gravity Insights, and Destination Readiness tests were added.
+The current automated suite has 83 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v2, Gravity Insights, Destination Readiness, and semantic-evidence tests were added.
 
 Manual and live-service checks include:
 

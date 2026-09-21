@@ -34,6 +34,18 @@ enum InterestDisplayName {
         case "Gardens": localized("Gardens")
         case "Shopping": localized("Shopping")
         case "Nature": localized("Nature")
+        case "Forest hiking": localized("Forest hiking")
+        case "Desert hiking": localized("Desert hiking")
+        case "Rocky coast": localized("Rocky coast")
+        case "Historic architecture": localized("Historic architecture")
+        case "Modern architecture": localized("Modern architecture")
+        case "Sushi": localized("Sushi")
+        case "Tacos": localized("Tacos")
+        case "Pizza": localized("Pizza")
+        case "Pasta": localized("Pasta")
+        case "Pho": localized("Pho")
+        case "Dim sum": localized("Dim sum")
+        case "Barbecue": localized("Barbecue")
         default: value
         }
     }

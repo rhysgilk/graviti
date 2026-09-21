@@ -106,6 +106,8 @@ The shipped local implementation uses distinct canonical places, category and in
 
 ## Milestone 4: Richer semantic understanding
 
+**Status: implemented as an expanded deterministic local baseline and covered by automated tests.**
+
 The deterministic vocabulary is a solid local baseline. The next system should preserve finer distinctions and explain its evidence.
 
 Requirements:
@@ -118,6 +120,8 @@ Requirements:
 - never overwrite a user correction
 - fail safely and resume after interruption
 - prefer on-device or privacy-preserving processing when practical
+
+The shipped local implementation preserves broad compatibility tags while adding forest and desert hiking, rocky coast, historic and modern architecture, and specific dish tags. Every inferred interest can record whether it came from a user note or photo description, original text, OCR, a collection name, link metadata, or Apple Maps, together with source confidence. User-authored descriptions carry the highest weight, Saved Item detail exposes the evidence, older records decode without the new optional field, and user corrections continue to override generated values.
 
 ## Milestone 5: Recommendation knowledge and evaluation
 

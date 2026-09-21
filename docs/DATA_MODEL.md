@@ -149,6 +149,15 @@ This is cached evidence. It never replaces `sourceURL` or user-authored text.
 - provenance source
 - confidence from 0 through 1
 - generation date
+- optional per-interest evidence records
+
+Each `ArtifactInterestEvidence` record contains:
+
+- the inferred interest
+- one exact `ArtifactEvidenceSource`
+- source-specific confidence from 0 through 1
+
+Evidence sources distinguish user note or photo description, original saved text, detected image text, source collection name, cached link metadata, and Apple Maps place category. The field is optional so records and backups created before semantic provenance was added continue to decode.
 
 Provenance values distinguish:
 

@@ -130,7 +130,10 @@ final class SwiftDataArtifactRepositoryTests: XCTestCase {
                 interests: ["Coast & water", "Hiking", "History"],
                 source: .mapKitAndDetectedText,
                 confidence: 0.9,
-                generatedAt: date
+                generatedAt: date,
+                interestEvidence: [
+                    ArtifactInterestEvidence(interest: "Rocky coast", source: .userNote, confidence: 1)
+                ]
             ),
             enrichmentState: .processed,
             userDetails: ArtifactUserDetails(

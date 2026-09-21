@@ -43,7 +43,7 @@ This beta stores its Library on the device. Graviti does not require an account 
 
 Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 78 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing and migration, Fit scoring, region-scoped Fit Guide search and fallback behavior, Fit Guide grouping and persistence, backup v1 compatibility and v2 Explore-state restore, offline save preservation and recovery, safe map URL generation, deterministic ten-destination Gravity Field layout, evidence-based Gravity Insights, and varied-evidence Destination Readiness.
+- All 83 automated tests passed on iOS 26.2 and iOS 18.6, including import parsing and migration, Fit scoring, region-scoped Fit Guide search and fallback behavior, Fit Guide grouping and persistence, backup v1 compatibility and v2 Explore-state restore, offline save preservation and recovery, safe map URL generation, deterministic ten-destination Gravity Field layout, evidence-based Gravity Insights, varied-evidence Destination Readiness, and fine-grained semantic provenance.
 - Clean signed Debug and Release archive builds completed. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
