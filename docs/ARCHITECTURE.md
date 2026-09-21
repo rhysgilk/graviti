@@ -238,6 +238,10 @@ Gravity is deterministic and based on explicit saved artifacts. Nodes rank by Gr
 
 `OrbitLayoutEngine` produces deterministic bounded positions with collision checks. Visual drift is a view modifier and is disabled by Reduce Motion.
 
+`HomeInsightBuilder` derives a small ordered set of explanations from the visible destination nodes and their supporting Artifacts. It uses capture timestamps, canonical place IDs, geographic membership, and effective interests to detect recent momentum, meaningful child-area splits, recurring cross-destination interests, and quiet destinations. Thresholds require multiple saves or places before stronger language appears. If no rule has enough evidence, it returns a conservative field-leader summary.
+
+Insights do not change Gravity or Fit. `HomeView` presents up to four in a carousel, focuses the associated destination, and links to the destination's saved evidence.
+
 ## 12. Search
 
 `LibrarySearchEngine` is pure and synchronous. It searches cached local fields and builds grouped results.

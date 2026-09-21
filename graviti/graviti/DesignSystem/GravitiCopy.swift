@@ -1,6 +1,12 @@
 import Foundation
 
 enum GravitiCopy {
+    static func destinationCount(_ count: Int) -> String {
+        count == 1
+            ? String(localized: "1 destination")
+            : String(localized: "\(count) destinations")
+    }
+
     static func savedItems(_ count: Int) -> String {
         count == 1
             ? String(localized: "1 saved item")
@@ -29,6 +35,23 @@ enum GravitiCopy {
         saveCount == 1
             ? String(localized: "1 save at \(placeCount) places")
             : String(localized: "\(saveCount) saves at \(placeCount) places")
+    }
+
+    static func recentSaves(_ saveCount: Int, placeCount: Int, dayCount: Int) -> String {
+        String(localized: "\(saveCount) saves at \(placeCount) places in the last \(dayCount) days")
+    }
+
+    static func geographicSplit(_ names: [String]) -> String {
+        let joined = ListFormatter.localizedString(byJoining: names)
+        return String(localized: "\(joined) now have enough Gravity to stand on their own")
+    }
+
+    static func savesAcrossDestinations(_ saveCount: Int, destinationCount: Int) -> String {
+        String(localized: "\(saveCount) saves across \(destinationCount) destinations")
+    }
+
+    static func noNewSaves(monthCount: Int) -> String {
+        String(localized: "No new saves in \(monthCount) months")
     }
 
     static func sharedImportNotice(_ count: Int) -> String {

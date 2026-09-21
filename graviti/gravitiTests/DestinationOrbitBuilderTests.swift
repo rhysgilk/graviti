@@ -110,7 +110,10 @@ final class DestinationOrbitBuilderTests: XCTestCase {
         XCTAssertEqual(nodes.count, 10)
         XCTAssertEqual(nodes.first?.name, "City 11")
         XCTAssertFalse(nodes.contains { $0.name == "City 0" || $0.name == "City 1" })
-        XCTAssertEqual(HomeInsight(nodes: nodes)?.leadingDestination.name, "City 11")
+        XCTAssertEqual(
+            HomeInsightBuilder.build(nodes: nodes, artifacts: artifacts).first?.destination.name,
+            "City 11"
+        )
     }
 
     private func artifact(_ id: String, city: String, region: String?, country: String) -> Artifact {

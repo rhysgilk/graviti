@@ -40,6 +40,8 @@ Geographic concentration is useful evidence for Gravity. It cannot be the sole e
 
 ## Milestone 1: Current design source of truth
 
+**Owner:** user-managed ChatGPT/Figma workflow. Codex will audit the result after the user reports that the Figma update is complete; no Figma write work is part of the current app implementation stream.
+
 The implementation is ahead of the existing Figma exploration. Create and maintain a new page named **05 — Current MVP / V1.0**. Preserve earlier pages as product history.
 
 The current page should represent:
@@ -66,6 +68,8 @@ Connect the highest-value reusable SwiftUI components first:
 
 ## Milestone 2: Gravity Insights
 
+**Status: implemented and covered by automated tests.**
+
 Home should explain change over time as well as total strength. Insights must derive from actual Artifact timestamps and current geographic organization.
 
 Candidate insight types:
@@ -77,6 +81,8 @@ Candidate insight types:
 - a new interest family appearing across more than one place or region
 
 Each insight should expose the saves and patterns that support it. Sparse or correlated evidence should produce cautious language.
+
+The shipped local implementation uses a four-card maximum and deterministic evidence thresholds. It covers recent 30-day momentum, meaningful country-to-child-area splits, recurring interests across destinations, destinations quiet for at least four months, and a conservative leader fallback. Each card shows its evidence summary, focuses the related Gravity destination, and links to the supporting destination Library.
 
 ## Milestone 3: Destination Readiness
 

@@ -2,19 +2,23 @@ import SwiftUI
 
 struct HomeInsightCard: View {
     let insight: HomeInsight
+    let position: Int
+    let total: Int
     let onClose: () -> Void
+    let onPrevious: () -> Void
+    let onNext: () -> Void
     let onViewDestination: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("\(insight.destinationCount) destinations")
+                    Text(insight.eyebrow)
                         .font(.caption.weight(.semibold))
                         .tracking(1.2)
                         .foregroundStyle(GravitiColors.signalMint)
 
-                    Text("\(insight.leadingDestination.name) leads your field")
+                    Text(insight.title)
                         .font(.custom("Sora-SemiBold", size: 19, relativeTo: .headline))
                         .foregroundStyle(.white)
                         .fixedSize(horizontal: false, vertical: true)
@@ -34,15 +38,20 @@ struct HomeInsightCard: View {
                 .accessibilityLabel("Close field insight")
             }
 
+            Text(insight.detail)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white.opacity(0.82))
+                .fixedSize(horizontal: false, vertical: true)
+
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 12) {
-                    statistics.fixedSize(horizontal: true, vertical: false)
+                    navigation
                     Spacer(minLength: 0)
                     viewButton
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    statistics
+                    navigation
                     viewButton
                 }
             }
@@ -59,10 +68,30 @@ struct HomeInsightCard: View {
         }
     }
 
-    private var statistics: some View {
-        Text("\(Int(insight.leadingDestination.gravity)) Gravity · \(GravitiCopy.savedItems(insight.leadingDestination.saveCount))")
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(.white.opacity(0.82))
+    @ViewBuilder
+    private var navigation: some View {
+        if total > 1 {
+            HStack(spacing: 4) {
+                Button(action: onPrevious) {
+                    Image(systemName: "chevron.backward")
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("Previous insight")
+
+                Text("\(position) of \(total)")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.65))
+                    .frame(minWidth: 44)
+
+                Button(action: onNext) {
+                    Image(systemName: "chevron.forward")
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("Next insight")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.white)
+        }
     }
 
     private var viewButton: some View {
@@ -75,6 +104,6 @@ struct HomeInsightCard: View {
                 .background(GravitiColors.iris.opacity(0.45), in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("View \(insight.leadingDestination.name)")
+        .accessibilityLabel("View \(insight.destination.name)")
     }
 }

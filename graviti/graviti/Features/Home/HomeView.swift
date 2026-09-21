@@ -15,6 +15,7 @@ struct HomeView: View {
     @State private var presentation: HomePresentation = .field
     @State private var fieldPath: [OrbitItem] = []
     @State private var presentedDestination: OrbitNode?
+    @State private var insightIndex = 0
     @AppStorage("orbit.resolutionMode") private var resolutionModeRawValue = OrbitResolutionMode.automatic.rawValue
     @AccessibilityFocusState private var isDetailFocused: Bool
     @AccessibilityFocusState private var isInsightFocused: Bool
@@ -49,8 +50,13 @@ struct HomeView: View {
         }
     }
 
-    private var homeInsight: HomeInsight? {
-        HomeInsight(nodes: orbitItems.map(\.node))
+    private var homeInsights: [HomeInsight] {
+        HomeInsightBuilder.build(nodes: orbitItems.map(\.node), artifacts: library.artifacts)
+    }
+
+    private var activeInsight: HomeInsight? {
+        guard !homeInsights.isEmpty else { return nil }
+        return homeInsights[min(insightIndex, homeInsights.count - 1)]
     }
 
     var body: some View {
@@ -92,8 +98,8 @@ struct HomeView: View {
 
                 ForEach(items) { item in
                     let isSelected = selectedNodeID == item.id
-                    let isInsightLeader = presentation == .insight && item.id == homeInsight?.leadingDestination.id
-                    let isFocusedPlanet = isSelected || isInsightLeader
+                    let isInsightDestination = presentation == .insight && item.id == activeInsight?.destination.id
+                    let isFocusedPlanet = isSelected || isInsightDestination
                     let diameter = layout.diameter(for: item)
 
                     Button {
@@ -122,7 +128,7 @@ struct HomeView: View {
                     .zIndex(isFocusedPlanet ? 1 : 0)
                     .accessibilityLabel("\(item.node.name), \(item.node.level.displayName), Gravity \(Int(item.node.gravity)), \(GravitiCopy.savedItems(item.node.saveCount))")
                     .accessibilityHint(isSelected ? "Closes destination" : "Opens destination")
-                    .accessibilityValue(isSelected ? "Selected" : (isInsightLeader ? "Leading destination" : ""))
+                    .accessibilityValue(isSelected ? "Selected" : (isInsightDestination ? "Insight destination" : ""))
                     .accessibilitySortPriority(item.node.gravity)
                     .accessibilityHidden(reduceMotion && isFocusedPlanet)
                 }
@@ -155,6 +161,9 @@ struct HomeView: View {
             fieldPath.removeAll()
             clearPresentation()
         }
+        .onChange(of: homeInsights.map(\.id)) { _, _ in
+            insightIndex = 0
+        }
         .sheet(item: $presentedDestination) { node in
             NavigationStack {
                 DestinationLibraryDetailView(node: node, library: library)
@@ -176,15 +185,15 @@ struct HomeView: View {
         currentItems.first { $0.id == selectedNodeID }
     }
 
-    private var insightLeaderItem: OrbitItem? {
-        guard fieldPath.isEmpty, let leaderID = homeInsight?.leadingDestination.id else {
+    private var insightDestinationItem: OrbitItem? {
+        guard fieldPath.isEmpty, let destinationID = activeInsight?.destination.id else {
             return nil
         }
-        return orbitItems.first { $0.id == leaderID }
+        return orbitItems.first { $0.id == destinationID }
     }
 
     private var focusedItem: OrbitItem? {
-        selectedItem ?? (presentation == .insight ? insightLeaderItem : nil)
+        selectedItem ?? (presentation == .insight ? insightDestinationItem : nil)
     }
 
     @ViewBuilder
@@ -200,12 +209,16 @@ struct HomeView: View {
             .accessibilityElement(children: .contain)
             .accessibilityFocused($isDetailFocused)
             .transition(cardTransition)
-        } else if presentation == .insight, let insight = homeInsight,
-                  let leader = insightLeaderItem {
+        } else if presentation == .insight, let insight = activeInsight,
+                  let destination = insightDestinationItem {
             HomeInsightCard(
                 insight: insight,
+                position: insightIndex + 1,
+                total: homeInsights.count,
                 onClose: clearPresentation,
-                onViewDestination: { select(leader) }
+                onPrevious: previousInsight,
+                onNext: nextInsight,
+                onViewDestination: { select(destination) }
             )
             .accessibilityElement(children: .contain)
             .accessibilityFocused($isInsightFocused)
@@ -242,8 +255,19 @@ struct HomeView: View {
     }
 
     private func showInsight() {
-        guard fieldPath.isEmpty, homeInsight != nil else { return }
+        guard fieldPath.isEmpty, !homeInsights.isEmpty else { return }
+        if presentation != .insight { insightIndex = 0 }
         presentation = presentation == .insight ? .field : .insight
+    }
+
+    private func previousInsight() {
+        guard !homeInsights.isEmpty else { return }
+        insightIndex = (insightIndex - 1 + homeInsights.count) % homeInsights.count
+    }
+
+    private func nextInsight() {
+        guard !homeInsights.isEmpty else { return }
+        insightIndex = (insightIndex + 1) % homeInsights.count
     }
 
     private func open(_ item: OrbitItem) {
@@ -281,13 +305,13 @@ struct HomeView: View {
                     HStack(spacing: 8) {
                         resolutionMenu
 
-                        if homeInsight != nil {
+                        if !homeInsights.isEmpty {
                             Button(action: showInsight) {
                                 Group {
                                     if dynamicTypeSize.isAccessibilitySize {
                                         Image(systemName: "chart.bar.xaxis")
                                     } else {
-                                        Label("Insight", systemImage: "chart.bar.xaxis")
+                                        Label(homeInsights.count == 1 ? "Insight" : "Insights", systemImage: "chart.bar.xaxis")
                                     }
                                 }
                                     .font(.subheadline.weight(.medium))

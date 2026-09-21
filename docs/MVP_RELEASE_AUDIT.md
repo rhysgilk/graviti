@@ -14,8 +14,8 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 
 ## Automated release evidence
 
-- 69 of 69 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
-- 69 of 69 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
+- 74 of 74 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
+- 74 of 74 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
 - 62 of 62 tests passed with no failures or skips on a physical iPhone 13 Pro Max running iOS 26.3.1.
 - A signed arm64 Release archive of commit `cdcc5b4` completed Xcode's store validation phase. Later Fit Guide and backup v2 changes passed both simulator suites; they have not been externally distributed.
 - `scripts/verify-release-archive.sh` passed every package check: bundle identifiers, matching app and extension versions, iOS 18 minimum, encryption declaration, both privacy manifests, exactly two Sora fonts, no CSV fixtures, nested signatures, and matching App Group entitlements.
@@ -35,6 +35,7 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 | Duplicates can be reconciled | Verified | Stable URL and place identity prevent repeated imports. Reimporting the Apple guide avoided all 19 duplicates while backfilling collection context; Google reimport reports duplicates and refreshes eligible older records without replacing user-selected matches. Bulk repeated-place cleanup preserves source saves. |
 | Library supports Destinations, Places, Saves, and Map | Verified | All four modes were exercised with varied and crowded datasets; the last mode persists. |
 | Gravity Field handles sparse and large libraries | Verified | Deterministic layout tests cover empty through ten-destination fields. A 30-save crowded library remained readable within the ten-label budget. |
+| Gravity Insights remain evidence based | Verified | Focused tests cover recent momentum, geographic splits, interests recurring across destinations, quiet destinations, and the conservative sparse-library fallback. |
 | Adaptive geographic resolution works | Verified | Tests cover country collapse, city expansion, state grouping, missing-region fallback, concentration, and label budgets. Automatic and explicit resolution modes were exercised. |
 | Destination Gravity updates correctly | Verified | Live imports changed Home destinations after persistence and relaunch. Orbit builder tests cover stable geographic identity and ranking behavior. |
 | Explore produces useful interest-based recommendations | Verified for local MVP catalog | Diverse fixtures produced varied recommendations and explanations. Each recommendation builds a live Fit Guide grouped by its matched patterns. Destination regions are resolved before category searches and enforced as required, preventing city records and results from another region. Live New York, Kyoto, and Mexico City guides returned relevant local venues; saving a result created a retrievable guide in Explore. |

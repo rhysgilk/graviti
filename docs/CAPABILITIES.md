@@ -266,6 +266,20 @@ White and bright yellow star shapes pulse subtly behind the planets. They are de
 
 The small Home wordmark animates both colored dots above the two `i` characters while keeping their centers fixed.
 
+### Gravity Insights
+
+The Insights control opens a browsable carousel derived from the current Library. Each card focuses its supporting destination in the Gravity Field and can open that destination's saved evidence.
+
+The deterministic insight builder can surface:
+
+- recent momentum when a destination receives at least three saves across at least two places in 30 days and clearly exceeds the prior 30-day period
+- a country coming into focus when at least two visible child destinations have meaningful independent evidence
+- an interest recurring across at least three saves and two destinations without one destination dominating the evidence
+- a meaningful destination that has received no new saves for at least four months
+- a conservative field-leader summary when the Library does not support a stronger conclusion
+
+At most four insights appear. Counts, time windows, and interest names stay visible so the result can be interpreted rather than presented as an unexplained conclusion.
+
 ## 10. Interests, Fit, and recommendations
 
 ### Interest profile
@@ -426,7 +440,7 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 
 ## 17. Verification summary
 
-The current automated suite has 69 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide and backup v2 tests were added.
+The current automated suite has 74 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v2, and Gravity Insights tests were added.
 
 Manual and live-service checks include:
 
