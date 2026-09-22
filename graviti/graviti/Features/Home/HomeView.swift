@@ -16,6 +16,7 @@ struct HomeView: View {
     @State private var fieldPath: [OrbitItem] = []
     @State private var presentedDestination: OrbitNode?
     @State private var insightIndex = 0
+    @State private var showingAbout = false
     @AppStorage("orbit.resolutionMode") private var resolutionModeRawValue = OrbitResolutionMode.automatic.rawValue
     @AccessibilityFocusState private var isDetailFocused: Bool
     @AccessibilityFocusState private var isInsightFocused: Bool
@@ -174,6 +175,9 @@ struct HomeView: View {
                     }
             }
         }
+        .sheet(isPresented: $showingAbout) {
+            AboutGravitiView(library: library)
+        }
     }
 
     private var selectedNodeID: UUID? {
@@ -307,6 +311,15 @@ struct HomeView: View {
                     Spacer()
 
                     HStack(spacing: 8) {
+                        Button { showingAbout = true } label: {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 17, weight: .medium))
+                                .frame(width: 44, height: 44)
+                                .background(.white.opacity(0.08), in: Circle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("About Graviti")
+
                         resolutionMenu
 
                         if !homeInsights.isEmpty {

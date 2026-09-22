@@ -2,7 +2,7 @@
 
 **Status:** Implemented local MVP
 
-**Last reviewed:** September 20, 2026
+**Last reviewed:** September 21, 2026
 
 **Minimum OS:** iOS 18.0
 
@@ -227,6 +227,12 @@ Library Actions provides:
 
 The last selected Library mode persists. New users start in Destinations.
 
+### About, support, and diagnostics
+
+The gear button on Home opens **About Graviti**. This surface states the product purpose, local-storage promise, backup behavior, network boundaries, and installed app version and build.
+
+**Send feedback** opens the public GitHub issue form with a Graviti feedback title. The screen warns people that the tracker is public. **Copy diagnostics** writes an aggregate report to the clipboard only after an explicit tap. The report includes app and OS versions, device family, backup and destination-catalog versions, and counts for saves, distinct places, photos, review items, and processing states. It excludes saved names, links, notes, media, coordinates, and identifiers.
+
 ## 8. Search
 
 One query searches the local Library across:
@@ -408,6 +414,8 @@ Network access occurs when the user invokes or has saved content eligible for:
 
 Apple Vision OCR runs on device. Graviti has no account system, Graviti-operated backend, advertising SDK, analytics SDK, or crash-reporting SDK in the local MVP.
 
+Diagnostics are computed locally and copied only when the person taps **Copy diagnostics**. Graviti does not transmit the report. Opening feedback or the privacy policy leaves the app through an explicit external link.
+
 Uninstalling removes the app's local Library. Export a backup first if the data should be retained.
 
 ## 14. Accessibility, localization, and visual behavior
@@ -456,7 +464,7 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 
 ## 17. Verification summary
 
-The current automated suite has 95 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v3, visited-feedback, Gravity Insights, Destination Readiness, semantic-evidence, and destination-catalog tests were added.
+The current automated suite has 97 tests and passes on iOS 18.6 and iOS 26.2 simulators. It includes focused checks that diagnostics use aggregate counts and omit saved content and identifiers. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v3, visited-feedback, Gravity Insights, Destination Readiness, semantic-evidence, destination-catalog, and diagnostics tests were added.
 
 Manual and live-service checks include:
 

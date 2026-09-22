@@ -5484,6 +5484,146 @@
           }
         }
       }
+    },
+    "About Graviti" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de Graviti"
+          }
+        }
+      }
+    },
+    "Your Library stays on this device. Graviti has no account, advertising SDK, analytics SDK, or Graviti-operated sync server." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu Biblioteca permanece en este dispositivo. Graviti no tiene cuentas, SDK de publicidad, SDK de analítica ni un servidor de sincronización operado por Graviti."
+          }
+        }
+      }
+    },
+    "Backups are yours" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus copias de seguridad te pertenecen"
+          }
+        }
+      }
+    },
+    "Library Actions can export a versioned backup with saved media and recommendation preferences. Deleting the app removes local data unless you export a backup first." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las acciones de la Biblioteca pueden exportar una copia de seguridad versionada con archivos guardados y preferencias de recomendación. Al eliminar la app se borran los datos locales, a menos que exportes primero una copia de seguridad."
+          }
+        }
+      }
+    },
+    "When the app connects" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuándo se conecta la app"
+          }
+        }
+      }
+    },
+    "Apple MapKit powers place search and Fit Guide suggestions. Public map collections and saved webpages are contacted only for features you invoke or eligible links you save. Photo text recognition runs on device." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple MapKit permite buscar lugares y obtener sugerencias de las guías de Fit. Las colecciones públicas de mapas y las páginas web guardadas solo se consultan para funciones que usas o enlaces compatibles que guardas. El reconocimiento de texto en fotos se ejecuta en el dispositivo."
+          }
+        }
+      }
+    },
+    "Save what pulls you. Graviti turns a private collection of travel inspiration into patterns, destination Fit, and places you can act on." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda lo que te atrae. Graviti convierte una colección privada de inspiración para viajar en patrones, Fit de destinos y lugares que puedes aprovechar."
+          }
+        }
+      }
+    },
+    "Feedback & support" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentarios y ayuda"
+          }
+        }
+      }
+    },
+    "Feedback opens the public GitHub issue tracker. Do not include private or sensitive information. Diagnostics contain aggregate counts and app details only." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los comentarios abren el registro público de incidencias de GitHub. No incluyas información privada ni confidencial. Los diagnósticos solo contienen recuentos agregados y datos de la app."
+          }
+        }
+      }
+    },
+    "Copies app and aggregate status details without saved content" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia datos de la app y del estado agregado sin contenido guardado"
+          }
+        }
+      }
+    },
+    "Send feedback" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar comentarios"
+          }
+        }
+      }
+    },
+    "Diagnostics copied" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnósticos copiados"
+          }
+        }
+      }
+    },
+    "Copy diagnostics" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar diagnósticos"
+          }
+        }
+      }
+    },
+    "View privacy policy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver la política de privacidad"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

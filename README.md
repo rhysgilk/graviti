@@ -30,6 +30,7 @@ The local MVP is complete and verified. It requires no account or Graviti server
 - Fit Guides with region-bound live suggestions grouped by the patterns behind a recommendation
 - Persistent Fit Guide membership without duplicating an existing saved place, plus a searchable guide library
 - Sora typography, Spanish localization, Dynamic Type, VoiceOver, increased contrast, RTL inspection, and conventional alternatives to the spatial UI
+- A Home-level About surface with the local-data promise, network boundaries, version details, public feedback route, and aggregate-only diagnostics
 - Debug-only focused and crowded dogfood datasets
 
 See [Complete Capability Reference](docs/CAPABILITIES.md) for workflows, data behavior, network use, limitations, and verification details.
@@ -104,9 +105,9 @@ xcodebuild \
 
 The shared `graviti` scheme includes `gravitiTests`. Run **Product → Test** in Xcode or use an installed simulator destination with `xcodebuild test`.
 
-The current suite contains 95 tests. It covers import parsing and migration, Fit relevance and confidence, reversible visited feedback, versioned destination-catalog validation and motif generalization, region-scoped Fit Guide search behavior, fine-grained semantic evidence, interest profiles, adaptive geographic resolution, deterministic crowded layouts, Gravity Insights, Destination Readiness, backup validation and media round trips, backup v1 and v2 compatibility and v3 Explore-state restoration, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
+The current suite contains 97 tests. It covers import parsing and migration, Fit relevance and confidence, reversible visited feedback, versioned destination-catalog validation and motif generalization, region-scoped Fit Guide search behavior, fine-grained semantic evidence, interest profiles, adaptive geographic resolution, deterministic crowded layouts, Gravity Insights, Destination Readiness, backup validation and media round trips, backup v1 and v2 compatibility and v3 Explore-state restoration, privacy-safe diagnostics, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
 
-The latest verified runs passed all 95 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
+The latest verified runs passed all 97 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
 
 ## Test data
 

@@ -453,6 +453,8 @@ Where practical, extraction and processing should occur locally.
 
 Graviti does not require continuous background location access. Location permission is requested only when a feature such as Near Me needs it.
 
+Home provides an About surface that explains local storage, backup behavior, network use, support, and the installed version. Feedback opens a clearly identified public support tracker. A user can explicitly copy an aggregate diagnostics report containing app, device, catalog, and processing counts; it must exclude saved content, coordinates, media, and record identifiers and must never be sent automatically.
+
 ## 28. Offline Behavior
 
 Users must be able to access their existing Library during poor or absent connectivity.

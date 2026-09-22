@@ -2,7 +2,7 @@
 
 Graviti is a private, local-first travel-interest library.
 
-_Effective September 20, 2026._
+_Effective September 21, 2026._
 
 ## Data stored on the device
 
@@ -68,6 +68,12 @@ Graviti has no:
 - Graviti-operated data collection backend
 
 The app and Share Extension privacy manifests declare no collected data and no tracking.
+
+## Support diagnostics
+
+Home → About Graviti can create a diagnostics report when a person taps **Copy diagnostics**. The report contains the app version and build, OS version, device family, backup and destination-catalog versions, and aggregate counts for saved items, distinct places, photos, items needing review, and processing states.
+
+The report excludes saved names, links, notes, media, coordinates, and record identifiers. It is computed on device, copied to the clipboard only after the explicit action, and is never automatically uploaded or transmitted by Graviti. The feedback link opens GitHub's public issue form, so the app warns people not to include private or sensitive information.
 
 ## Control and deletion
 

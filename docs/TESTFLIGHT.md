@@ -23,6 +23,7 @@ Graviti is a private travel-interest library. Save places, links, notes, screens
 - Build Fit Guides for New York City and then at least one international destination such as Kyoto or Mexico City. Confirm every result is a real place within the selected destination, sections follow the matched patterns, and the destination itself is not returned as a venue.
 - Save a place from two different Fit Guides or imported collections and confirm one canonical place retains both source memberships.
 - Open Browse all Fit Guides, search by a destination, pattern, and saved place name, and confirm older guides remain retrievable when they are absent from current Fit recommendations.
+- Open About Graviti from the Home gear. Confirm the data, backup, and network explanations are readable; copy diagnostics and verify that it contains aggregate counts without saved names, links, notes, coordinates, media, or identifiers.
 - Export a backup, add another item, restore the backup, and confirm existing records are not duplicated.
 - Test Dynamic Type, VoiceOver, Reduce Motion, airplane mode, and relaunch after force quitting.
 
@@ -43,9 +44,9 @@ This beta stores its Library on the device. Graviti does not require an account 
 
 ## Latest simulator validation
 
-Validated on September 20, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
+Validated on September 21, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 95 automated tests passed on iOS 18.6 and iOS 26.2 simulators. Coverage includes import parsing and migration, Fit scoring, destination-catalog validation and motif generalization, region-scoped Fit Guide search and fallback behavior, Fit Guide grouping and persistence, backup v1 and v2 compatibility and v3 Explore-state restore, offline save preservation and recovery, safe map URL generation, deterministic ten-destination Gravity Field layout, evidence-based Gravity Insights, varied-evidence Destination Readiness, and fine-grained semantic provenance.
+- All 97 automated tests passed on iOS 18.6 and iOS 26.2 simulators. Coverage includes import parsing and migration, Fit scoring, destination-catalog validation and motif generalization, region-scoped Fit Guide search and fallback behavior, Fit Guide grouping and persistence, backup v1 and v2 compatibility and v3 Explore-state restore, aggregate-only diagnostics privacy, offline save preservation and recovery, safe map URL generation, deterministic ten-destination Gravity Field layout, evidence-based Gravity Insights, varied-evidence Destination Readiness, and fine-grained semantic provenance.
 - Clean signed Debug and Release archive builds completed. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.

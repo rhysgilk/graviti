@@ -43,6 +43,7 @@ SwiftUI App
 ├── DestinationOrbitBuilder and OrbitLayoutEngine
 ├── InterestProfileBuilder and DestinationFitEngine
 ├── FitGuideSearchEngine
+├── AppDiagnosticsReport
 └── App Group
     ├── SharedArtifactInbox JSON envelopes
     └── MediaAssets image files
@@ -248,6 +249,12 @@ Insights do not change Gravity or Fit. `HomeView` presents up to four in a carou
 
 Readiness is computed on demand for the selected destination and remains independent from Gravity and Fit.
 
+### About and diagnostics
+
+`HomeView` presents `AboutGravitiView` from its gear button. The sheet contains the product purpose, local-data and backup promises, network boundaries, app version, the public support route, and the privacy-policy link.
+
+`AppDiagnosticsReport` is a pure value builder. It accepts the in-memory Artifact collection plus app and device metadata and emits aggregate counts for support. It never serializes Artifact names, text, URLs, media, coordinates, or identifiers. Clipboard access occurs only in `AboutGravitiView` after the user taps **Copy diagnostics**; no diagnostics transport or telemetry service exists.
+
 ## 12. Search
 
 `LibrarySearchEngine` is pure and synchronous. It searches cached local fields and builds grouped results.
@@ -316,10 +323,11 @@ The Gravity Field exposes a logical accessibility order, combined labels, persis
 - file imports use security-scoped access
 - media keys reject path traversal
 - backups are user-initiated exports
+- diagnostics are aggregate-only, remain local, and reach the clipboard only after an explicit action
 
 ## 18. Tests and packaging
 
-The `gravitiTests` target contains deterministic unit and integration tests for domain services, repositories, import parsers, backup behavior, OCR, link safety, search, place resolution, Fit, catalog validation, motif generalization, Fit Guides, and layout.
+The `gravitiTests` target contains deterministic unit and integration tests for domain services, repositories, import parsers, backup behavior, aggregate-only diagnostics, OCR, link safety, search, place resolution, Fit, catalog validation, motif generalization, Fit Guides, and layout.
 
 Release scripts:
 

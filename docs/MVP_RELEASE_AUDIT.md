@@ -2,7 +2,7 @@
 
 **Audit date:** September 21, 2026
 
-**Simulator validation baseline:** `v1.0-local-mvp` plus destination-catalog, Fit Guide, backup v3, and visited-feedback maintenance documented here
+**Simulator validation baseline:** `v1.0-local-mvp` plus destination-catalog, Fit Guide, backup v3, visited-feedback, and private diagnostics maintenance documented here
 
 **Signed archive validation commit:** `cdcc5b4`
 
@@ -14,10 +14,10 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 
 ## Automated release evidence
 
-- 95 of 95 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
-- 95 of 95 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
+- 97 of 97 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
+- 97 of 97 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
 - 62 of 62 tests passed with no failures or skips on a physical iPhone 13 Pro Max running iOS 26.3.1.
-- A signed arm64 Release archive of commit `cdcc5b4` completed Xcode's store validation phase. Later Fit Guide, destination-catalog, backup v3, and visited-feedback changes passed both simulator suites; they have not been externally distributed.
+- A signed arm64 Release archive of commit `cdcc5b4` completed Xcode's store validation phase. Later Fit Guide, destination-catalog, backup v3, visited-feedback, and aggregate-diagnostics changes passed both simulator suites; they have not been externally distributed.
 - `scripts/verify-release-archive.sh` passed every package check: bundle identifiers, matching app and extension versions, iOS 18 minimum, encryption declaration, both privacy manifests, exactly two Sora fonts, no CSV fixtures, nested signatures, and matching App Group entitlements.
 - The only archive warning is expected: the available seven-day Apple Development profile is suitable for device testing but not TestFlight distribution.
 
@@ -46,6 +46,7 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 | Accessibility requirements are tested | Verified in Simulator | VoiceOver labels and ordering, Dynamic Type, increased contrast, Reduce Motion, right-to-left layout, and large pseudo-localized strings were inspected. Conventional Library and Search access remains available. |
 | Localization architecture functions | Verified | String catalogs cover the app and Share Extension. Spanish Home, Explore, Library, canonical interests, counts, accessibility labels, and selection copy were inspected. |
 | Core Library data remains accessible offline | Verified | SwiftData is authoritative. Tests confirm failed network lookup preserves the original save and resumes later. Backup export remains explicit and local. |
+| Support diagnostics preserve saved-content privacy | Verified | Home exposes the local-data promise and public feedback route. Focused tests verify that copied diagnostics contain aggregate state counts and omit saved names, links, notes, coordinates, media, and identifiers. |
 | Substantial real-world dogfooding is complete | Verified for internal beta | Focused datasets, a 30-save stress library, live MapKit search, the supplied Google list, the supplied Apple guide, web metadata, Share Extension capture, force quit, and relaunch were exercised. |
 | Major crashes and data-loss bugs are resolved | Verified to current coverage | Both runtime suites pass; batch deletion is atomic; persistence, backup, migration, retry, and force-quit checks pass. No known crash or data-loss defect remains open. |
 | Repository documentation matches the implementation | Verified | README links to a complete capability reference. Architecture and data-model documents describe the actual SwiftData/App Group system and separate future server, sync, AI, and social direction from shipped behavior. |
