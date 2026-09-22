@@ -321,6 +321,8 @@ Fit considers:
 - region selection
 - avoided interests
 - excluded destinations
+- destinations marked visited and liked or visited and did not fit
+- conservative secondary interest signals from destinations marked visited and liked
 - whether the destination is already represented in the Library
 - evidence count
 - distinct places
@@ -336,7 +338,7 @@ Raw relevance is computed separately from evidence confidence. Personal evidence
 
 The displayed Fit score shrinks relevance toward a neutral 50 when evidence is weak. Sparse evidence is labeled **Early signal** instead of showing an intense percentage. Confidence bands are Early, Developing, and Strong.
 
-The app shows matched patterns, supporting-save count, explicit preference matches, combined confidence, destination-knowledge confidence, and links to the reviewed sources. **Not for me** persists an exclusion without changing Gravity. **Save destination** persists the recommendation as a retrievable guide without turning it into an explicit saved-place signal.
+The app shows matched patterns, supporting-save count, explicit preference matches, visited-and-liked matches, combined confidence, destination-knowledge confidence, and links to the reviewed sources. **Not for me** persists an exclusion without changing Gravity. **Save destination** persists the recommendation as a retrievable guide without turning it into an explicit saved-place signal. **Loved it** and **Didn’t fit** record reversible trip feedback, exclude that already-visited destination, and remain separate from the Library and Gravity. Loved destinations contribute only a small, confidence-limited secondary signal based on their reviewed catalog strengths. Trip feedback can be removed in Tune Explore so the destination may appear again.
 
 ### Current candidate coverage
 
@@ -366,7 +368,7 @@ Saving a suggestion records collection membership such as `Mexico City Fit Guide
 
 ## 12. Backup, restore, and deletion
 
-Backup schema version 2 includes every Artifact field, embeds local image bytes, and preserves the Explore recommendation region, preferred and avoided interests, saved destinations, and Not for Me exclusions. Version 1 archives remain restorable. Current safeguards include:
+Backup schema version 3 includes every Artifact field, embeds local image bytes, and preserves the Explore recommendation region, preferred and avoided interests, saved destinations, Not for Me exclusions, and both visited-feedback states. Version 1 and version 2 archives remain restorable; missing newer preference fields decode as empty. Current safeguards include:
 
 - schema-version check
 - 500 MB maximum archive input
@@ -454,7 +456,7 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 
 ## 17. Verification summary
 
-The current automated suite has 91 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v2, Gravity Insights, Destination Readiness, semantic-evidence, and destination-catalog tests were added.
+The current automated suite has 95 tests and passes on iOS 18.6 and iOS 26.2 simulators. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v3, visited-feedback, Gravity Insights, Destination Readiness, semantic-evidence, and destination-catalog tests were added.
 
 Manual and live-service checks include:
 

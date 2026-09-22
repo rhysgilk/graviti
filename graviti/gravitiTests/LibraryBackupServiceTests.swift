@@ -37,7 +37,9 @@ final class LibraryBackupServiceTests: XCTestCase {
             preferredInterests: ["Tea", "Matcha", "Tea"],
             avoidedInterests: ["Nightlife"],
             savedDestinationIDs: ["Kyoto, Japan"],
-            excludedDestinationIDs: ["Seoul, South Korea"]
+            excludedDestinationIDs: ["Seoul, South Korea"],
+            visitedLikedDestinationIDs: ["Uji, Japan"],
+            visitedNotFitDestinationIDs: ["Taipei, Taiwan"]
         )
         let encoded = try LibraryBackupService.encode([artifact], preferences: preferences) { key in
             XCTAssertEqual(key, "photo.jpg")
@@ -45,12 +47,14 @@ final class LibraryBackupServiceTests: XCTestCase {
         }
         let decoded = try LibraryBackupService.decode(encoded)
 
-        XCTAssertEqual(decoded.schemaVersion, 2)
+        XCTAssertEqual(decoded.schemaVersion, 3)
         XCTAssertEqual(decoded.artifacts.first?.artifact, artifact)
         XCTAssertEqual(decoded.artifacts.first?.mediaData, media)
         XCTAssertEqual(decoded.artifacts.first?.mediaFileExtension, "jpg")
         XCTAssertEqual(decoded.preferences, preferences)
         XCTAssertEqual(decoded.preferences?.preferredInterests, ["Matcha", "Tea"])
+        XCTAssertEqual(decoded.preferences?.visitedLikedDestinationIDs, ["Uji, Japan"])
+        XCTAssertEqual(decoded.preferences?.visitedNotFitDestinationIDs, ["Taipei, Taiwan"])
     }
 
     func testDecodeAcceptsVersionOneBackupWithoutCollectionContext() throws {
@@ -79,6 +83,49 @@ final class LibraryBackupServiceTests: XCTestCase {
         XCTAssertNil(decoded.artifacts.first?.artifact.sourceCollectionTitle)
         XCTAssertTrue(decoded.artifacts.first?.artifact.sourceCollectionTitles.isEmpty == true)
         XCTAssertNil(decoded.preferences)
+    }
+
+    func testDecodeAcceptsVersionTwoPreferencesWithoutTripFeedback() throws {
+        let preferences = LibraryBackupPreferences(
+            recommendationRegion: RecommendationRegion.europe.rawValue,
+            preferredInterests: ["Museums"],
+            avoidedInterests: [],
+            savedDestinationIDs: ["Copenhagen, Denmark"],
+            excludedDestinationIDs: []
+        )
+        let encoded = try LibraryBackupService.encode([], preferences: preferences)
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        var preferencesJSON = try XCTUnwrap(root["preferences"] as? [String: Any])
+        preferencesJSON.removeValue(forKey: "visitedLikedDestinationIDs")
+        preferencesJSON.removeValue(forKey: "visitedNotFitDestinationIDs")
+        root["preferences"] = preferencesJSON
+        root["schemaVersion"] = 2
+
+        let decoded = try LibraryBackupService.decode(JSONSerialization.data(withJSONObject: root))
+
+        XCTAssertEqual(decoded.schemaVersion, 2)
+        XCTAssertEqual(decoded.preferences?.preferredInterests, ["Museums"])
+        XCTAssertEqual(decoded.preferences?.visitedLikedDestinationIDs, [])
+        XCTAssertEqual(decoded.preferences?.visitedNotFitDestinationIDs, [])
+    }
+
+    func testDecodeRejectsTripFeedbackAttachedToVersionTwoArchive() throws {
+        let preferences = LibraryBackupPreferences(
+            recommendationRegion: RecommendationRegion.anywhere.rawValue,
+            preferredInterests: [],
+            avoidedInterests: [],
+            savedDestinationIDs: [],
+            excludedDestinationIDs: [],
+            visitedLikedDestinationIDs: ["Kyoto, Japan"]
+        )
+        let archive = LibraryBackupArchive(
+            schemaVersion: 2,
+            exportedAt: .now,
+            artifacts: [],
+            preferences: preferences
+        )
+
+        XCTAssertThrowsError(try LibraryBackupService.decode(JSONEncoder().encode(archive)))
     }
 
     func testDecodeRejectsUnsupportedSchema() throws {

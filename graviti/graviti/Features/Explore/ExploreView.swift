@@ -8,6 +8,8 @@ struct ExploreView: View {
     @AppStorage("explore.avoidedInterests") private var avoidedRaw = ""
     @AppStorage("explore.savedDestinations") private var savedDestinationsRaw = ""
     @AppStorage("explore.excludedDestinations") private var excludedDestinationsRaw = ""
+    @AppStorage("explore.visitedLikedDestinations") private var visitedLikedRaw = ""
+    @AppStorage("explore.visitedNotFitDestinations") private var visitedNotFitRaw = ""
     @State private var showingPreferences = false
 
     private var profile: InterestProfile {
@@ -23,12 +25,16 @@ struct ExploreView: View {
             region: RecommendationRegion(rawValue: regionRaw) ?? .anywhere,
             preferredInterests: Self.decode(preferredRaw),
             avoidedInterests: Self.decode(avoidedRaw),
-            excludedDestinationIDs: excludedDestinationIDs
+            excludedDestinationIDs: excludedDestinationIDs,
+            visitedLikedDestinationIDs: visitedLikedDestinationIDs,
+            visitedNotFitDestinationIDs: visitedNotFitDestinationIDs
         )
     }
 
     private var savedDestinationIDs: Set<String> { Self.decode(savedDestinationsRaw) }
     private var excludedDestinationIDs: Set<String> { Self.decode(excludedDestinationsRaw) }
+    private var visitedLikedDestinationIDs: Set<String> { Self.decode(visitedLikedRaw) }
+    private var visitedNotFitDestinationIDs: Set<String> { Self.decode(visitedNotFitRaw) }
 
     private var savedGuides: [FitGuide] {
         var guides = [FitGuide]()
@@ -137,7 +143,9 @@ struct ExploreView: View {
                                         isSaved: savedDestinationIDs.contains(recommendation.id),
                                         library: library,
                                         onSave: { saveDestination(recommendation) },
-                                        onNotForMe: { excludeDestination(recommendation) }
+                                        onNotForMe: { excludeDestination(recommendation) },
+                                        onVisitedLiked: { markVisitedLiked(recommendation) },
+                                        onVisitedNotFit: { markVisitedNotFit(recommendation) }
                                     )
                                 } label: {
                                     recommendationRow(recommendation)
@@ -207,7 +215,9 @@ struct ExploreView: View {
                 ExplorePreferencesView(
                     regionRaw: $regionRaw,
                     preferredRaw: $preferredRaw,
-                    avoidedRaw: $avoidedRaw
+                    avoidedRaw: $avoidedRaw,
+                    visitedLikedRaw: $visitedLikedRaw,
+                    visitedNotFitRaw: $visitedNotFitRaw
                 )
             }
         }
@@ -215,7 +225,9 @@ struct ExploreView: View {
 
     private var preferenceSummary: String {
         let region = preferences.region.displayName
-        let selected = preferences.preferredInterests.count + preferences.avoidedInterests.count
+        let selected = preferences.preferredInterests.count
+            + preferences.avoidedInterests.count
+            + preferences.visitedDestinationIDs.count
         return selected == 0 && preferences.region == .anywhere
             ? String(localized: "Anywhere · Based on your saves")
             : "\(region) · \(GravitiCopy.preferences(selected))"
@@ -306,6 +318,27 @@ struct ExploreView: View {
         excludedDestinationsRaw = Self.encode(excluded)
     }
 
+    private func markVisitedLiked(_ recommendation: DestinationRecommendation) {
+        var liked = visitedLikedDestinationIDs
+        var notFit = visitedNotFitDestinationIDs
+        var excluded = excludedDestinationIDs
+        liked.insert(recommendation.id)
+        notFit.remove(recommendation.id)
+        excluded.remove(recommendation.id)
+        visitedLikedRaw = Self.encode(liked)
+        visitedNotFitRaw = Self.encode(notFit)
+        excludedDestinationsRaw = Self.encode(excluded)
+    }
+
+    private func markVisitedNotFit(_ recommendation: DestinationRecommendation) {
+        var liked = visitedLikedDestinationIDs
+        var notFit = visitedNotFitDestinationIDs
+        liked.remove(recommendation.id)
+        notFit.insert(recommendation.id)
+        visitedLikedRaw = Self.encode(liked)
+        visitedNotFitRaw = Self.encode(notFit)
+    }
+
     private static func encode(_ values: Set<String>) -> String {
         values.sorted().joined(separator: "|")
     }
@@ -318,6 +351,8 @@ private struct DestinationRecommendationView: View {
     @ObservedObject var library: ArtifactLibrary
     let onSave: () -> Void
     let onNotForMe: () -> Void
+    let onVisitedLiked: () -> Void
+    let onVisitedNotFit: () -> Void
 
     var body: some View {
         ScrollView {
@@ -346,9 +381,11 @@ private struct DestinationRecommendationView: View {
                         Label(InterestDisplayName.localized(interest), systemImage: "sparkles")
                             .foregroundStyle(GravitiColors.signalMint)
                     }
-                    Text("Based on \(recommendation.supportingArtifacts.count) of your saved items across the Library.")
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.68))
+                    if !recommendation.supportingArtifacts.isEmpty {
+                        Text("Based on \(recommendation.supportingArtifacts.count) of your saved items across the Library.")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.68))
+                    }
                     if recommendation.confidence == .early {
                         Text("This is an early signal. More detailed saves from distinct places will make it more reliable.")
                             .font(.subheadline)
@@ -356,6 +393,11 @@ private struct DestinationRecommendationView: View {
                     }
                     if !recommendation.explicitMatches.isEmpty {
                         Text("Also matches what you asked for: \(recommendation.explicitMatches.joined(separator: ", ")).")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.68))
+                    }
+                    if !recommendation.visitedLikedMatches.isEmpty {
+                        Text("Your visited-and-liked feedback also supports: \(recommendation.visitedLikedMatches.map { InterestDisplayName.localized($0) }.joined(separator: ", ")).")
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.68))
                     }
@@ -414,6 +456,36 @@ private struct DestinationRecommendationView: View {
                 }
                 .disabled(isSaved)
 
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Already visited?")
+                        .font(.headline)
+                    Text("Your answer tunes future Fit suggestions without adding anything to your Library or changing Gravity.")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.68))
+                    HStack(spacing: 10) {
+                        Button {
+                            onVisitedLiked()
+                            dismiss()
+                        } label: {
+                            Label("Loved it", systemImage: "hand.thumbsup.fill")
+                                .frame(maxWidth: .infinity, minHeight: 46)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(GravitiColors.iris)
+
+                        Button {
+                            onVisitedNotFit()
+                            dismiss()
+                        } label: {
+                            Label("Didn't fit", systemImage: "hand.thumbsdown.fill")
+                                .frame(maxWidth: .infinity, minHeight: 46)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+                .padding(18)
+                .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
+
                 Button(role: .destructive) {
                     onNotForMe()
                     dismiss()
@@ -437,11 +509,16 @@ private struct ExplorePreferencesView: View {
     @Binding var regionRaw: String
     @Binding var preferredRaw: String
     @Binding var avoidedRaw: String
+    @Binding var visitedLikedRaw: String
+    @Binding var visitedNotFitRaw: String
 
     private let interests = ["Matcha", "Tea", "Coffee", "Desserts", "Seafood", "Scenic views", "Hiking", "Forests", "Mountains", "National parks", "Nature", "Beaches", "Coast & water", "Architecture", "History", "Museums", "Gardens", "Shopping", "Wildlife"]
 
     private var preferred: Set<String> { decode(preferredRaw) }
     private var avoided: Set<String> { decode(avoidedRaw) }
+    private var visitedLiked: Set<String> { decode(visitedLikedRaw) }
+    private var visitedNotFit: Set<String> { decode(visitedNotFitRaw) }
+    private var visitedIDs: [String] { visitedLiked.union(visitedNotFit).sorted() }
 
     var body: some View {
         NavigationStack {
@@ -465,6 +542,33 @@ private struct ExplorePreferencesView: View {
                         selectionRow(interest, selected: avoided.contains(interest)) {
                             toggleAvoided(interest)
                         }
+                    }
+                }
+                if !visitedIDs.isEmpty {
+                    Section {
+                        ForEach(visitedIDs, id: \.self) { id in
+                            Button {
+                                removeVisitedFeedback(id)
+                            } label: {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        Text(destinationName(for: id))
+                                            .foregroundStyle(.primary)
+                                        Text(visitedLiked.contains(id) ? "Visited · Loved it" : "Visited · Didn't fit")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .accessibilityLabel("Remove trip feedback for \(destinationName(for: id))")
+                        }
+                    } header: {
+                        Text("Trip feedback")
+                    } footer: {
+                        Text("Removing feedback lets the destination appear in Fit again.")
                     }
                 }
                 Section {
@@ -532,6 +636,19 @@ private struct ExplorePreferencesView: View {
 
     private func encode(_ values: Set<String>) -> String {
         values.sorted().joined(separator: "|")
+    }
+
+    private func destinationName(for id: String) -> String {
+        DestinationFitEngine.savedDestination(for: id)?.name ?? id
+    }
+
+    private func removeVisitedFeedback(_ id: String) {
+        var liked = visitedLiked
+        var notFit = visitedNotFit
+        liked.remove(id)
+        notFit.remove(id)
+        visitedLikedRaw = encode(liked)
+        visitedNotFitRaw = encode(notFit)
     }
 }
 

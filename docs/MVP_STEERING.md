@@ -29,7 +29,8 @@ Use explainable sub-scores before combining them:
 - **Evidence diversity:** independent saves, distinct places, source types, geographic areas, and interest families. Ten copies of one venue are weaker evidence than ten distinct saves across several contexts.
 - **Cross-area consistency:** patterns repeated across different saved areas generalize better than a pattern concentrated in one locality.
 - **Novelty and serendipity:** reward useful extensions of known interests without allowing novelty to overwhelm relevance.
-- **Negative evidence:** persisted “Not for me” feedback and avoided interests reduce future Fit. They never change Gravity.
+- **Negative evidence:** persisted “Not for me,” visited-and-did-not-fit feedback, and avoided interests reduce or exclude future Fit. They never change Gravity.
+- **Positive trip feedback:** a liked destination may contribute a conservative secondary trait signal, but it must remain separate from explicit saved evidence and cannot create Gravity.
 - **Candidate data confidence:** a recommendation is limited when Graviti has weak knowledge of what the destination offers, even if the user profile is strong.
 
 Existing saves in or near a candidate destination may contribute modestly, but must not dominate. Gravity describes demonstrated concentration; Fit predicts suitability elsewhere.
@@ -106,7 +107,8 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 ### Recommendation depth and calibration
 
 - [x] Expand the reviewed destination catalog and represent destination knowledge with sourced, versioned evidence rather than unreviewed generated claims.
-- [ ] Add more contextual constraints only when the app has trustworthy data for them: season, budget, trip length, transit, accessibility, travel time, climate, and visited places.
+- [x] Add reversible visited-and-liked and visited-and-did-not-fit feedback without mutating Library history or Gravity.
+- [ ] Add more contextual constraints only when the app has trustworthy data for them: season, budget, trip length, transit, accessibility, travel time, and climate.
 - [ ] Build a held-out evaluation set and calibrate Fit bands against later save, dismiss, and visit feedback before treating any displayed score as a probability.
 - [ ] Surface the contribution of relevance, evidence confidence, preference match, novelty, and negative feedback without overwhelming the main recommendation card.
 - [x] Keep confidence conservative for small or highly correlated libraries even after the candidate catalog grows.
@@ -121,7 +123,8 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 ### Data ownership and portability
 
 - [x] Include saved-destination, Not for Me, and Explore preference state in backward-compatible backup schema version 2.
-- [ ] If account sync is added, make it opt-in and provide an explicit migration path from the existing SwiftData Library and version 1 or 2 backups.
+- [x] Add both visited-feedback states in backup schema version 3 while retaining version 1 and 2 restore compatibility.
+- [ ] If account sync is added, make it opt-in and provide an explicit migration path from the existing SwiftData Library and version 1, 2, or 3 backups.
 - [ ] Define conflict handling that preserves original Artifacts, collection memberships, and user corrections across devices.
 
 ### Social boundary

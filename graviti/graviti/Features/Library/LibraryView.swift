@@ -10,6 +10,8 @@ struct LibraryView: View {
     @AppStorage("explore.avoidedInterests") private var avoidedInterestsRaw = ""
     @AppStorage("explore.savedDestinations") private var savedDestinationsRaw = ""
     @AppStorage("explore.excludedDestinations") private var excludedDestinationsRaw = ""
+    @AppStorage("explore.visitedLikedDestinations") private var visitedLikedDestinationsRaw = ""
+    @AppStorage("explore.visitedNotFitDestinations") private var visitedNotFitDestinationsRaw = ""
     @State private var selectedMapPlace: SavedPlace?
     @State private var query = ""
     @State private var showsNeedsReviewOnly = false
@@ -222,7 +224,9 @@ struct LibraryView: View {
             preferredInterests: Self.decodePreferenceSet(preferredInterestsRaw),
             avoidedInterests: Self.decodePreferenceSet(avoidedInterestsRaw),
             savedDestinationIDs: Self.decodePreferenceSet(savedDestinationsRaw),
-            excludedDestinationIDs: Self.decodePreferenceSet(excludedDestinationsRaw)
+            excludedDestinationIDs: Self.decodePreferenceSet(excludedDestinationsRaw),
+            visitedLikedDestinationIDs: Self.decodePreferenceSet(visitedLikedDestinationsRaw),
+            visitedNotFitDestinationIDs: Self.decodePreferenceSet(visitedNotFitDestinationsRaw)
         )
     }
 
@@ -232,6 +236,8 @@ struct LibraryView: View {
         avoidedInterestsRaw = Self.encodePreferenceSet(preferences.avoidedInterests)
         savedDestinationsRaw = Self.encodePreferenceSet(preferences.savedDestinationIDs)
         excludedDestinationsRaw = Self.encodePreferenceSet(preferences.excludedDestinationIDs)
+        visitedLikedDestinationsRaw = Self.encodePreferenceSet(preferences.visitedLikedDestinationIDs)
+        visitedNotFitDestinationsRaw = Self.encodePreferenceSet(preferences.visitedNotFitDestinationIDs)
     }
 
     private static func decodePreferenceSet(_ raw: String) -> [String] {

@@ -1,8 +1,8 @@
 # Graviti MVP Release Audit
 
-**Audit date:** September 20, 2026
+**Audit date:** September 21, 2026
 
-**Simulator validation baseline:** `v1.0-local-mvp` plus the backup v2 maintenance change documented here
+**Simulator validation baseline:** `v1.0-local-mvp` plus destination-catalog, Fit Guide, backup v3, and visited-feedback maintenance documented here
 
 **Signed archive validation commit:** `cdcc5b4`
 
@@ -14,10 +14,10 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 
 ## Automated release evidence
 
-- 91 of 91 tests passed with no failures or skips across the full suite plus the final focused Fit run on an iPhone 16 Pro simulator running iOS 18.6.
-- 91 of 91 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
+- 95 of 95 tests passed with no failures or skips on an iPhone 16 Pro simulator running iOS 18.6.
+- 95 of 95 tests passed with no failures or skips on an iPhone 17 Pro simulator running iOS 26.2.
 - 62 of 62 tests passed with no failures or skips on a physical iPhone 13 Pro Max running iOS 26.3.1.
-- A signed arm64 Release archive of commit `cdcc5b4` completed Xcode's store validation phase. Later Fit Guide and backup v2 changes passed both simulator suites; they have not been externally distributed.
+- A signed arm64 Release archive of commit `cdcc5b4` completed Xcode's store validation phase. Later Fit Guide, destination-catalog, backup v3, and visited-feedback changes passed both simulator suites; they have not been externally distributed.
 - `scripts/verify-release-archive.sh` passed every package check: bundle identifiers, matching app and extension versions, iOS 18 minimum, encryption declaration, both privacy manifests, exactly two Sora fonts, no CSV fixtures, nested signatures, and matching App Group entitlements.
 - The only archive warning is expected: the available seven-day Apple Development profile is suitable for device testing but not TestFlight distribution.
 
@@ -25,7 +25,7 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 
 | Requirement | Status | Evidence |
 | --- | --- | --- |
-| Clear local-only data promise and reliable backup/restore | Verified | Onboarding and Library Actions expose the promise. Backup tests cover rich records, embedded media, schema rejection, duplicate-ID rejection, version 1 compatibility, and version 2 Explore-state restoration. |
+| Clear local-only data promise and reliable backup/restore | Verified | Onboarding and Library Actions expose the promise. Backup tests cover rich records, embedded media, schema rejection, duplicate-ID rejection, version 1 and version 2 compatibility, and version 3 Explore-state restoration including both visited outcomes. |
 | A new user understands Graviti without a tutorial | Verified | Onboarding introduces saving, organization, Gravity, and local ownership. The primary tabs expose conventional alternatives to the spatial Home view, and preliminary physical-device testing passed. |
 | Capture inside and outside the app | Verified | Link, note, photo, place, CSV, `.webloc`, Apple guide, and Google list capture are implemented. A live Safari Share Extension save was completed and reopened in Library. |
 | Saves appear immediately | Verified | Capture preserves the source before background work. Live link, Share Extension, Apple guide, and Google list checks showed immediate Library records. |
@@ -41,7 +41,7 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 | Adaptive geographic resolution works | Verified | Tests cover country collapse, city expansion, state grouping, missing-region fallback, concentration, and label budgets. Automatic and explicit resolution modes were exercised. |
 | Destination Gravity updates correctly | Verified | Live imports changed Home destinations after persistence and relaunch. Orbit builder tests cover stable geographic identity and ranking behavior. |
 | Explore produces useful interest-based recommendations | Verified for local MVP catalog | The schema-versioned 23-destination catalog includes reviewed source links and candidate confidence. Diverse fixtures cover sparse evidence, independent evidence, forest and desert hiking, rocky coast, architecture, dishes, preferences, and exclusions. Candidate confidence limits displayed certainty. Each recommendation builds a live Fit Guide grouped by its matched patterns. Destination regions are resolved before category searches and enforced as required, preventing city records and results from another region. Live New York, Kyoto, and Mexico City guides returned relevant local venues; saving a result created a retrievable guide in Explore. |
-| Recommendation data does not contaminate explicit interest | Verified | Save Destination and Not for Me are persisted separately. Fit tests cover exclusions and avoided interests while Gravity remains based on explicit saves. |
+| Recommendation data does not contaminate explicit interest | Verified | Save Destination, Not for Me, and both visited outcomes are persisted separately. Fit tests verify that visited destinations are excluded, liked visits add only conservative reviewed traits, did-not-fit visits invent no interests, and Gravity remains based on explicit saves. |
 | Saved media is preserved and browsable | Verified | Photo storage, thumbnails, detail views, OCR provenance, backup round trips, and restored embedded media are covered. |
 | Accessibility requirements are tested | Verified in Simulator | VoiceOver labels and ordering, Dynamic Type, increased contrast, Reduce Motion, right-to-left layout, and large pseudo-localized strings were inspected. Conventional Library and Search access remains available. |
 | Localization architecture functions | Verified | String catalogs cover the app and Share Extension. Spanish Home, Explore, Library, canonical interests, counts, accessibility labels, and selection copy were inspected. |

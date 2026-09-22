@@ -5344,6 +5344,106 @@
           }
         }
       }
+    },
+    "Already visited?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Ya lo visitaste?"
+          }
+        }
+      }
+    },
+    "Didn't fit" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No encajó"
+          }
+        }
+      }
+    },
+    "Loved it" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me encantó"
+          }
+        }
+      }
+    },
+    "Remove trip feedback for %@" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar comentarios del viaje para %1$@"
+          }
+        }
+      }
+    },
+    "Removing feedback lets the destination appear in Fit again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al eliminar estos comentarios, el destino podrá volver a aparecer en Fit."
+          }
+        }
+      }
+    },
+    "Trip feedback" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentarios del viaje"
+          }
+        }
+      }
+    },
+    "Visited · Didn't fit" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visitado · No encajó"
+          }
+        }
+      }
+    },
+    "Visited · Loved it" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visitado · Me encantó"
+          }
+        }
+      }
+    },
+    "Your answer tunes future Fit suggestions without adding anything to your Library or changing Gravity." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu respuesta ajusta futuras sugerencias de Fit sin añadir nada a tu Biblioteca ni cambiar la Gravedad."
+          }
+        }
+      }
+    },
+    "Your visited-and-liked feedback also supports: %@." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus comentarios sobre destinos visitados que te gustaron también respaldan: %1$@."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

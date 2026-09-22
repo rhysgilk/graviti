@@ -6,7 +6,7 @@
 
 **Storage:** SwiftData domain record plus App Group image files
 
-**Backup schema:** Version 2 JSON, with version 1 restore compatibility
+**Backup schema:** Version 3 JSON, with version 1 and version 2 restore compatibility
 
 This document describes persisted and derived values in the current app. Future normalized server entities are listed separately.
 
@@ -283,6 +283,7 @@ Computed from effective Artifact details:
 - matched interests
 - supporting Artifacts
 - explicit preference matches
+- reviewed traits supported by visited-and-liked feedback
 
 Recommendations are not persisted as Library records.
 
@@ -315,16 +316,18 @@ The following values use `UserDefaults` through `@AppStorage`:
 | `explore.avoidedInterests` | pipe-delimited interest IDs |
 | `explore.savedDestinations` | saved recommendation IDs |
 | `explore.excludedDestinations` | Not for me IDs |
+| `explore.visitedLikedDestinations` | IDs marked visited and liked |
+| `explore.visitedNotFitDestinations` | IDs marked visited and did not fit |
 | `debug.dogfoodArtifactIDs` | Debug-only fixture cleanup |
 
-The Explore region, preferred and avoided interests, saved destinations, and Not for Me exclusions are included in backup schema version 2. Display and debug preferences remain device-specific. Artifact-based Fit Guide memberships are stored on Artifacts and are also backed up.
+The Explore region, preferred and avoided interests, saved destinations, Not for Me exclusions, and both visited-feedback sets are included in backup schema version 3. Version 2 contains the same preference snapshot without visited feedback. Display and debug preferences remain device-specific. Artifact-based Fit Guide memberships are stored on Artifacts and are also backed up.
 
 ## 14. Backup schema
 
 `LibraryBackupArchive`:
 
 ```text
-schemaVersion: Int = 2
+schemaVersion: Int = 3
 exportedAt: Date
 artifacts: [LibraryBackupEntry]
 preferences: LibraryBackupPreferences?
@@ -346,9 +349,11 @@ preferredInterests: [String]
 avoidedInterests: [String]
 savedDestinationIDs: [String]
 excludedDestinationIDs: [String]
+visitedLikedDestinationIDs: [String]
+visitedNotFitDestinationIDs: [String]
 ```
 
-Dates encode as seconds since 1970. JSON is pretty printed and sorted. Preference values are bounded, trimmed, deduplicated, and sorted during restore. Version 1 archives decode without preferences and leave current Explore settings unchanged.
+Dates encode as seconds since 1970. JSON is pretty printed and sorted. Preference values are bounded, trimmed, deduplicated, and sorted during restore. Version 1 archives decode without preferences and leave current Explore settings unchanged. Version 2 preference snapshots decode with empty visited-feedback sets.
 
 Restore identity is `Artifact.id`. Existing IDs are skipped; place identity alone does not suppress restoration of a separate source Artifact.
 

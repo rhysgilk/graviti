@@ -244,12 +244,13 @@ MVP recommendations use:
 - an Anywhere, Asia, Europe, or North America filter
 - avoided interests
 - persisted Save Destination and Not for Me actions
+- reversible visited-and-liked and visited-and-did-not-fit feedback
 
 Recommendations should not constantly over-explain themselves.
 
 Recommendation synthesis must look across the full Library. Repeated interests such as scenery, matcha, architecture, or hiking across many saved destinations should influence Fit for new destinations that match those interests. The app should explain a recommendation using the underlying pattern and supporting saves, even when the recommended destination has little or no explicit Gravity yet.
 
-The offline implementation uses a small schema-versioned destination-interest JSON catalog with deterministic weights, conservative candidate confidence, review dates, and source links. It excludes destinations already represented in the Library, separates raw relevance from evidence confidence, combines personal and candidate confidence using the more conservative value, shrinks uncertain scores toward 50, labels sparse results as Early signal, and exposes matched interests, supporting-save count, and destination provenance. Catalog coverage may expand or move to a reviewed service without changing the separation between recommendations and explicit Gravity.
+The offline implementation uses a small schema-versioned destination-interest JSON catalog with deterministic weights, conservative candidate confidence, review dates, and source links. It excludes destinations already represented in the Library or marked visited, uses liked visits as conservative secondary evidence, separates raw relevance from evidence confidence, combines personal and candidate confidence using the more conservative value, shrinks uncertain scores toward 50, labels sparse results as Early signal, and exposes matched interests, supporting-save count, and destination provenance. Catalog coverage may expand or move to a reviewed service without changing the separation between recommendations and explicit Gravity.
 
 Every Fit recommendation leads to an actionable **Fit Guide**. The guide resolves the destination first, constrains live Apple MapKit queries to that region, searches for specific places within the destination for each contributing pattern, retries empty narrow categories with a broader term, groups results by pattern, and lets the user save individual results. Saved results retain Fit Guide and pattern membership in the Library and backup so the user can return from Explore and continue planning. The app sends users to the Maps listing for current ratings, hours, and details; it does not invent or display a review score that MapKit does not provide.
 
@@ -269,7 +270,7 @@ Explore begins with:
 
 Explore also keeps saved Fit Guides visible. A recommendation is useful only when the user can move from the destination level to concrete experiences, save those experiences, and retrieve the resulting guide later.
 
-Current controls let users select a broad region, choose preferred interests, and choose interests to avoid. Save Destination retains a recommendation in Your Fit Guides; Not for Me excludes that destination from later results. More detailed travel-time, transportation, budget, season, accessibility, and visited-place constraints remain future work.
+Current controls let users select a broad region, choose preferred interests, and choose interests to avoid. Save Destination retains a recommendation in Your Fit Guides; Not for Me excludes that destination from later results. A recommendation can be marked **Loved it** or **Didn’t fit** after a visit. Both outcomes remove the already-visited destination from future results; only the liked outcome contributes a small reviewed-trait signal. Tune Explore lists trip feedback and lets the user remove it. More detailed travel-time, transportation, budget, season, accessibility, and climate constraints remain future work.
 
 ## 16. Gravity Field
 

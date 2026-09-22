@@ -242,6 +242,70 @@ final class DestinationFitEngineTests: XCTestCase {
         XCTAssertGreaterThan(independentResult.relevancePercent, correlatedResult.relevancePercent)
     }
 
+    func testVisitedLikedFeedbackAddsConservativeSignalsAndHidesVisitedDestination() throws {
+        let source = DestinationKnowledgeSource(
+            title: "Reviewed source",
+            url: try XCTUnwrap(URL(string: "https://example.com/source")),
+            reviewedAt: "2026-09-21"
+        )
+        let catalog = DestinationKnowledgeCatalog(
+            schemaVersion: 1,
+            catalogVersion: "feedback-test",
+            reviewedAt: "2026-09-21",
+            destinations: [
+                DestinationKnowledge(
+                    name: "Visited tea city", country: "Test", region: .anywhere,
+                    searchSpan: 1, dataConfidence: 0.9,
+                    strengths: ["Tea": 1, "Gardens": 0.9], sources: [source]
+                ),
+                DestinationKnowledge(
+                    name: "New tea city", country: "Test", region: .anywhere,
+                    searchSpan: 1, dataConfidence: 0.9,
+                    strengths: ["Tea": 0.95, "Gardens": 0.85], sources: [source]
+                ),
+                DestinationKnowledge(
+                    name: "Museum city", country: "Test", region: .anywhere,
+                    searchSpan: 1, dataConfidence: 0.9,
+                    strengths: ["Museums": 1], sources: [source]
+                )
+            ]
+        )
+        let preferences = ExplorePreferences(
+            visitedLikedDestinationIDs: ["Visited tea city, Test"]
+        )
+
+        let results = DestinationFitEngine.recommendations(
+            from: InterestProfile(interests: [], categories: []),
+            artifacts: [],
+            preferences: preferences,
+            limit: 10,
+            catalog: catalog
+        )
+
+        let recommendation = try XCTUnwrap(results.first)
+        XCTAssertEqual(recommendation.name, "New tea city")
+        XCTAssertFalse(results.contains { $0.name == "Visited tea city" })
+        XCTAssertEqual(Set(recommendation.visitedLikedMatches), Set(["Tea", "Gardens"]))
+        XCTAssertEqual(recommendation.confidence, .early)
+        XCTAssertLessThan(recommendation.fitPercent, 70)
+        XCTAssertTrue(recommendation.supportingArtifacts.isEmpty)
+    }
+
+    func testVisitedNotFitFeedbackExcludesDestinationWithoutInventingInterests() {
+        let preferences = ExplorePreferences(
+            visitedNotFitDestinationIDs: ["Kyoto, Japan"]
+        )
+
+        let results = DestinationFitEngine.recommendations(
+            from: InterestProfile(interests: [], categories: []),
+            artifacts: [],
+            preferences: preferences,
+            limit: 10
+        )
+
+        XCTAssertTrue(results.isEmpty)
+    }
+
     private func recommendations(_ artifacts: [Artifact], limit: Int = 3) -> [DestinationRecommendation] {
         DestinationFitEngine.recommendations(from: InterestProfileBuilder.build(from: artifacts), artifacts: artifacts, limit: limit)
     }

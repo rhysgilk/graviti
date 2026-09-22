@@ -266,6 +266,8 @@ The engine calculates:
 - destination specificity
 - match breadth
 - explicit preference boost
+- conservative reviewed-strength signals from destinations marked visited and liked
+- exclusion of every destination marked visited, regardless of outcome
 - raw relevance
 - evidence confidence from artifact, place, area, source-kind, and rich-text counts
 - source-quality weighting that favors a user note or photo description over collection names and link metadata
@@ -273,7 +275,7 @@ The engine calculates:
 - candidate knowledge confidence that caps combined confidence
 - confidence-shrunk displayed Fit
 
-The recommendation retains supporting Artifacts and destination sources so the detail screen can explain personal evidence and link to the reviewed knowledge provenance. Explore state does not mutate the explicit Library or Gravity.
+The recommendation retains supporting Artifacts, visited-liked matches, and destination sources so the detail screen can explain personal evidence and link to the reviewed knowledge provenance. Visited feedback is stored in dedicated Explore preference sets. It does not create Artifacts, alter Gravity, or rewrite explicit interests. A not-fit visit contributes no positive interest signal; a liked visit contributes a capped secondary signal and a modest confidence contribution.
 
 ## 14. Fit Guide architecture
 
@@ -293,7 +295,7 @@ Guide persistence uses source collection titles on Artifacts rather than a separ
 
 ## 15. Backup architecture
 
-`LibraryBackupService` serializes a schema-versioned archive with full Artifacts, optional image bytes, and a snapshot of Explore recommendation preferences. Schema version 2 adds region, preferred and avoided interests, saved destinations, and Not for Me exclusions while retaining version 1 decode compatibility.
+`LibraryBackupService` serializes a schema-versioned archive with full Artifacts, optional image bytes, and a snapshot of Explore recommendation preferences. Schema version 2 added region, preferred and avoided interests, saved destinations, and Not for Me exclusions. Schema version 3 adds visited-and-liked and visited-and-did-not-fit destination IDs. Versions 1 and 2 remain decode compatible.
 
 Decode validates total size, schema, count, unique IDs, media consistency, preference bounds, and the recommendation region before returning a normalized archive. Restore skips existing Artifact IDs, applies preferences only when the archive contains them, and cleans up newly written media if repository insertion fails.
 

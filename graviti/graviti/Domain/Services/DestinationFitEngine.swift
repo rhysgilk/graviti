@@ -26,6 +26,7 @@ struct DestinationRecommendation: Identifiable {
     let matchedInterests: [String]
     let supportingArtifacts: [Artifact]
     let explicitMatches: [String]
+    let visitedLikedMatches: [String]
 
     var id: String { "\(name), \(country)" }
     var scoreLabel: String { confidence == .early ? confidence.displayName : "\(fitPercent) FIT" }
@@ -53,6 +54,12 @@ struct ExplorePreferences: Equatable {
     var preferredInterests: Set<String> = []
     var avoidedInterests: Set<String> = []
     var excludedDestinationIDs: Set<String> = []
+    var visitedLikedDestinationIDs: Set<String> = []
+    var visitedNotFitDestinationIDs: Set<String> = []
+
+    var visitedDestinationIDs: Set<String> {
+        visitedLikedDestinationIDs.union(visitedNotFitDestinationIDs)
+    }
 }
 
 struct SavedDestination: Identifiable, Hashable {
@@ -74,6 +81,7 @@ enum DestinationFitEngine {
         let name: String
         let weight: Double
         let isExplicit: Bool
+        let isVisitedLiked: Bool
     }
 
     static func recommendations(
@@ -83,7 +91,7 @@ enum DestinationFitEngine {
         limit: Int = 3,
         catalog: DestinationKnowledgeCatalog = DestinationKnowledgeCatalogLoader.bundled
     ) -> [DestinationRecommendation] {
-        let signals = userSignals(from: profile, preferences: preferences)
+        let signals = userSignals(from: profile, preferences: preferences, catalog: catalog)
         guard !signals.isEmpty else { return [] }
         let totalSignalWeight = signals.reduce(0) { $0 + $1.weight }
         let savedAreas = Set(artifacts.compactMap(\.place).flatMap { place in
@@ -92,6 +100,7 @@ enum DestinationFitEngine {
 
         return catalog.destinations.compactMap { candidate -> DestinationRecommendation? in
             guard !preferences.excludedDestinationIDs.contains(candidate.id) else { return nil }
+            guard !preferences.visitedDestinationIDs.contains(candidate.id) else { return nil }
             guard !savedAreas.contains(candidate.name.foldedKey) else { return nil }
             guard preferences.region == .anywhere || candidate.region == preferences.region else { return nil }
             guard Set(candidate.strengths.keys).isDisjoint(with: preferences.avoidedInterests) else { return nil }
@@ -111,7 +120,13 @@ enum DestinationFitEngine {
             let matchedNames = matches.prefix(4).map { $0.0.name }
             let matchedSet = Set(matchedNames)
             let evidence = artifacts.filter { !Set($0.effectiveInterests).isDisjoint(with: matchedSet) }
-            let userConfidence = evidenceConfidence(for: evidence)
+            let visitedLikedMatches = matchedNames.filter { name in
+                matches.contains { $0.0.name == name && $0.0.isVisitedLiked }
+            }
+            let userConfidence = evidenceConfidence(
+                for: evidence,
+                visitedLikedMatchCount: visitedLikedMatches.count
+            )
             let combinedConfidence = min(userConfidence, candidate.dataConfidence)
             let confidence = confidenceBand(for: combinedConfidence)
             // Both personal evidence and reviewed destination knowledge limit certainty.
@@ -128,7 +143,8 @@ enum DestinationFitEngine {
                 knowledgeSources: candidate.sources,
                 matchedInterests: matchedNames,
                 supportingArtifacts: evidence,
-                explicitMatches: matchedNames.filter { preferences.preferredInterests.contains($0) }
+                explicitMatches: matchedNames.filter { preferences.preferredInterests.contains($0) },
+                visitedLikedMatches: visitedLikedMatches
             )
         }
         .sorted {
@@ -156,7 +172,7 @@ enum DestinationFitEngine {
         catalog: DestinationKnowledgeCatalog = DestinationKnowledgeCatalogLoader.bundled
     ) -> FitGuide? {
         guard let candidate = catalog.destinations.first(where: { $0.id == id }) else { return nil }
-        let signals = userSignals(from: profile, preferences: preferences)
+        let signals = userSignals(from: profile, preferences: preferences, catalog: catalog)
         let matched = signals.compactMap { signal -> (String, Double)? in
             candidate.strengths[signal.name].map { (signal.name, signal.weight * $0) }
         }
@@ -172,7 +188,11 @@ enum DestinationFitEngine {
         )
     }
 
-    private static func userSignals(from profile: InterestProfile, preferences: ExplorePreferences) -> [UserSignal] {
+    private static func userSignals(
+        from profile: InterestProfile,
+        preferences: ExplorePreferences,
+        catalog: DestinationKnowledgeCatalog
+    ) -> [UserSignal] {
         var signals = Dictionary(uniqueKeysWithValues: profile.interests.map { pattern in
             let spread = 1 + 0.22 * Double(min(pattern.areaCount, 4))
             let duplicateDiscount = min(1, 0.55 + 0.15 * Double(max(1, pattern.placeCount)))
@@ -180,11 +200,39 @@ enum DestinationFitEngine {
             let collectionDiscount = pattern.saveCount > 2 && collectionDiversity == 1 ? 0.82 : 1
             let evidenceQuality = averageEvidenceQuality(for: pattern)
             let weight = sqrt(Double(pattern.saveCount)) * spread * duplicateDiscount * collectionDiscount * evidenceQuality
-            return (pattern.name, UserSignal(name: pattern.name, weight: weight, isExplicit: false))
+            return (pattern.name, UserSignal(
+                name: pattern.name,
+                weight: weight,
+                isExplicit: false,
+                isVisitedLiked: false
+            ))
         })
         for interest in preferences.preferredInterests {
             let existing = signals[interest]
-            signals[interest] = UserSignal(name: interest, weight: (existing?.weight ?? 0) + 2.5, isExplicit: true)
+            signals[interest] = UserSignal(
+                name: interest,
+                weight: (existing?.weight ?? 0) + 2.5,
+                isExplicit: true,
+                isVisitedLiked: existing?.isVisitedLiked ?? false
+            )
+        }
+        for destinationID in preferences.visitedLikedDestinationIDs.sorted() {
+            guard let destination = catalog.destinations.first(where: { $0.id == destinationID }) else { continue }
+            for (interest, strength) in destination.strengths
+                .filter({ $0.value >= 0.65 })
+                .sorted(by: {
+                    if $0.value != $1.value { return $0.value > $1.value }
+                    return $0.key < $1.key
+                })
+                .prefix(4) {
+                let existing = signals[interest]
+                signals[interest] = UserSignal(
+                    name: interest,
+                    weight: min(2, (existing?.weight ?? 0) + 0.8 * strength),
+                    isExplicit: existing?.isExplicit ?? false,
+                    isVisitedLiked: true
+                )
+            }
         }
         return Array(signals.values)
     }
@@ -208,8 +256,14 @@ enum DestinationFitEngine {
         return values.reduce(0, +) / Double(values.count)
     }
 
-    private static func evidenceConfidence(for artifacts: [Artifact]) -> Double {
-        guard !artifacts.isEmpty else { return 0.18 }
+    private static func evidenceConfidence(
+        for artifacts: [Artifact],
+        visitedLikedMatchCount: Int = 0
+    ) -> Double {
+        let feedbackConfidence = visitedLikedMatchCount == 0
+            ? 0.18
+            : min(0.42, 0.26 + 0.05 * Double(visitedLikedMatchCount))
+        guard !artifacts.isEmpty else { return feedbackConfidence }
         let places = Set(artifacts.compactMap { $0.place?.id })
         let areas = Set(artifacts.compactMap { artifact -> String? in
             guard let place = artifact.place else { return nil }
@@ -230,7 +284,7 @@ enum DestinationFitEngine {
             Double(min(richEvidence, 5)) * 0.35
         let base = 1 - exp(-effectiveEvidence / 7)
         let independence = min(1, 0.62 + 0.13 * Double(min(places.count, 3)) + 0.08 * Double(min(areas.count, 3)))
-        return min(0.94, max(0.18, base * independence))
+        return min(0.94, max(feedbackConfidence, base * independence))
     }
 
     private static func confidenceBand(for value: Double) -> FitConfidence {

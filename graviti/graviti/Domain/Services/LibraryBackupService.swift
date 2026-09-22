@@ -1,8 +1,8 @@
 import Foundation
 
 struct LibraryBackupArchive: Codable {
-    static let currentSchemaVersion = 2
-    static let supportedSchemaVersions = 1...2
+    static let currentSchemaVersion = 3
+    static let supportedSchemaVersions = 1...3
 
     let schemaVersion: Int
     let exportedAt: Date
@@ -28,19 +28,51 @@ struct LibraryBackupPreferences: Codable, Equatable {
     let avoidedInterests: [String]
     let savedDestinationIDs: [String]
     let excludedDestinationIDs: [String]
+    let visitedLikedDestinationIDs: [String]
+    let visitedNotFitDestinationIDs: [String]
 
     init(
         recommendationRegion: String,
         preferredInterests: [String],
         avoidedInterests: [String],
         savedDestinationIDs: [String],
-        excludedDestinationIDs: [String]
+        excludedDestinationIDs: [String],
+        visitedLikedDestinationIDs: [String] = [],
+        visitedNotFitDestinationIDs: [String] = []
     ) {
         self.recommendationRegion = recommendationRegion
         self.preferredInterests = Self.normalized(preferredInterests)
         self.avoidedInterests = Self.normalized(avoidedInterests)
         self.savedDestinationIDs = Self.normalized(savedDestinationIDs)
         self.excludedDestinationIDs = Self.normalized(excludedDestinationIDs)
+        let notFit = Self.normalized(visitedNotFitDestinationIDs)
+        let notFitSet = Set(notFit)
+        self.visitedLikedDestinationIDs = Self.normalized(visitedLikedDestinationIDs)
+            .filter { !notFitSet.contains($0) }
+        self.visitedNotFitDestinationIDs = notFit
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case recommendationRegion
+        case preferredInterests
+        case avoidedInterests
+        case savedDestinationIDs
+        case excludedDestinationIDs
+        case visitedLikedDestinationIDs
+        case visitedNotFitDestinationIDs
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            recommendationRegion: try container.decode(String.self, forKey: .recommendationRegion),
+            preferredInterests: try container.decode([String].self, forKey: .preferredInterests),
+            avoidedInterests: try container.decode([String].self, forKey: .avoidedInterests),
+            savedDestinationIDs: try container.decode([String].self, forKey: .savedDestinationIDs),
+            excludedDestinationIDs: try container.decode([String].self, forKey: .excludedDestinationIDs),
+            visitedLikedDestinationIDs: try container.decodeIfPresent([String].self, forKey: .visitedLikedDestinationIDs) ?? [],
+            visitedNotFitDestinationIDs: try container.decodeIfPresent([String].self, forKey: .visitedNotFitDestinationIDs) ?? []
+        )
     }
 
     private static func normalized(_ values: [String]) -> [String] {
@@ -123,8 +155,15 @@ enum LibraryBackupService {
                 preferredInterests: $0.preferredInterests,
                 avoidedInterests: $0.avoidedInterests,
                 savedDestinationIDs: $0.savedDestinationIDs,
-                excludedDestinationIDs: $0.excludedDestinationIDs
+                excludedDestinationIDs: $0.excludedDestinationIDs,
+                visitedLikedDestinationIDs: $0.visitedLikedDestinationIDs,
+                visitedNotFitDestinationIDs: $0.visitedNotFitDestinationIDs
             )
+        }
+        if archive.schemaVersion < 3,
+           let preferences = normalizedPreferences,
+           !preferences.visitedLikedDestinationIDs.isEmpty || !preferences.visitedNotFitDestinationIDs.isEmpty {
+            throw LibraryBackupError.invalidFile
         }
         if let preferences = archive.preferences, let normalizedPreferences {
             guard RecommendationRegion(rawValue: preferences.recommendationRegion) != nil,
@@ -132,10 +171,14 @@ enum LibraryBackupService {
                   preferences.avoidedInterests.count <= 100,
                   preferences.savedDestinationIDs.count <= 1_000,
                   preferences.excludedDestinationIDs.count <= 1_000,
+                  preferences.visitedLikedDestinationIDs.count <= 1_000,
+                  preferences.visitedNotFitDestinationIDs.count <= 1_000,
                   allValuesAreSafe(normalizedPreferences.preferredInterests),
                   allValuesAreSafe(normalizedPreferences.avoidedInterests),
                   allValuesAreSafe(normalizedPreferences.savedDestinationIDs),
-                  allValuesAreSafe(normalizedPreferences.excludedDestinationIDs) else {
+                  allValuesAreSafe(normalizedPreferences.excludedDestinationIDs),
+                  allValuesAreSafe(normalizedPreferences.visitedLikedDestinationIDs),
+                  allValuesAreSafe(normalizedPreferences.visitedNotFitDestinationIDs) else {
                 throw LibraryBackupError.invalidFile
             }
         }
