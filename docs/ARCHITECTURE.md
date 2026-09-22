@@ -175,6 +175,8 @@ Cancellation returns an active job to `pending`. A transient failure can retry o
 
 `unavailable` means the inputs were insufficient; it is different from a processing error.
 
+The UI mirrors these states without hiding persisted content. Saved Item detail exposes place and link-metadata retry actions, collection imports retain their wrapper Artifact and report partial counts, and Fit Guide loading leaves persisted guide membership visible. `ArtifactLibrary.retryLinkMetadata` resets only the metadata state before running the bounded fetch again.
+
 ## 8. Place resolution
 
 `MapPlaceResolver` expands supported short links with a bounded HEAD request. It extracts name, query, and coordinate hints, then asks `PlaceSearchProviding` for candidates.

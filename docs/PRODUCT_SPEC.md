@@ -465,6 +465,8 @@ Network-dependent discovery and processing may wait for connectivity.
 
 A failed network request must never make an existing save appear lost.
 
+Network waits must identify what is happening and confirm when the original save is already preserved. Recoverable place, preview, collection-import, and Fit Guide failures should expose retry or refresh. Partial collection imports must report skipped entries while keeping successfully imported places and the saved collection available.
+
 ## 29. MVP Technical Direction
 
 Initial direction:

@@ -20,6 +20,12 @@ struct ImportSummaryCard: View {
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.65))
             }
+
+            if summary.skipped > 0 {
+                Label("Some entries could not be imported. Open the saved guide or list in Library to refresh it later.", systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(GravitiColors.opportunityCoral)
+            }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)

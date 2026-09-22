@@ -1,6 +1,6 @@
 # Graviti MVP Release Audit
 
-**Audit date:** September 21, 2026
+**Audit date:** September 22, 2026
 
 **Simulator validation baseline:** `v1.0-local-mvp` plus destination-catalog, Fit Guide, backup v3, visited-feedback, and private diagnostics maintenance documented here
 
@@ -46,6 +46,7 @@ The complete implemented feature inventory, data behavior, limitations, and netw
 | Accessibility requirements are tested | Verified in Simulator | VoiceOver labels and ordering, Dynamic Type, increased contrast, Reduce Motion, right-to-left layout, and large pseudo-localized strings were inspected. Conventional Library and Search access remains available. |
 | Localization architecture functions | Verified | String catalogs cover the app and Share Extension. Spanish Home, Explore, Library, canonical interests, counts, accessibility labels, and selection copy were inspected. |
 | Core Library data remains accessible offline | Verified | SwiftData is authoritative. Tests confirm failed network lookup preserves the original save and resumes later. Backup export remains explicit and local. |
+| Network and partial-result states preserve user work | Verified to current coverage | Place lookup, link preview, collection import, and Fit Guide surfaces state what remains saved and expose retry or refresh paths. Import summaries retain successful results and identify skipped entries. |
 | Support diagnostics preserve saved-content privacy | Verified | Home exposes the local-data promise and public feedback route. Focused tests verify that copied diagnostics contain aggregate state counts and omit saved names, links, notes, coordinates, media, and identifiers. |
 | Substantial real-world dogfooding is complete | Verified for internal beta | Focused datasets, a 30-save stress library, live MapKit search, the supplied Google list, the supplied Apple guide, web metadata, Share Extension capture, force quit, and relaunch were exercised. |
 | Major crashes and data-loss bugs are resolved | Verified to current coverage | Both runtime suites pass; batch deletion is atomic; persistence, backup, migration, retry, and force-quit checks pass. No known crash or data-loss defect remains open. |

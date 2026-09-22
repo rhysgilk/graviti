@@ -5624,6 +5624,96 @@
           }
         }
       }
+    },
+    "Some entries could not be imported. Check your connection and refresh this collection again later." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas entradas no se pudieron importar. Comprueba la conexión y vuelve a actualizar esta colección más tarde."
+          }
+        }
+      }
+    },
+    "Preview unavailable" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vista previa no disponible"
+          }
+        }
+      }
+    },
+    "Retry" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
+          }
+        }
+      }
+    },
+    "Some entries could not be imported. Open the saved guide or list in Library to refresh it later." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas entradas no se pudieron importar. Abre la guía o lista guardada en Biblioteca para actualizarla más tarde."
+          }
+        }
+      }
+    },
+    "The collection link is already saved. Keep Graviti open while it finds the places; partial results will be reported." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace de la colección ya está guardado. Mantén Graviti abierto mientras busca los lugares; se informarán los resultados parciales."
+          }
+        }
+      }
+    },
+    "The saved link is still available. Check your connection and try the preview again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace guardado sigue disponible. Comprueba la conexión y vuelve a intentar la vista previa."
+          }
+        }
+      }
+    },
+    "This uses live Apple Maps data and may take a moment on slower connections. Saved guide places stay available." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto usa datos en vivo de Apple Maps y puede tardar un poco con conexiones lentas. Los lugares guardados en la guía seguirán disponibles."
+          }
+        }
+      }
+    },
+    "Your save is already safe. Place matching will continue when a connection is available." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu elemento ya está guardado. La búsqueda de coincidencias continuará cuando haya conexión."
+          }
+        }
+      }
+    },
+    "Your save is still in the Library. Check your connection and try the lookup again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu elemento sigue en la Biblioteca. Comprueba la conexión y vuelve a intentar la búsqueda."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

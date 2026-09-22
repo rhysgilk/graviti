@@ -91,6 +91,18 @@ final class ArtifactLibrary: ObservableObject {
         }
     }
 
+    func retryLinkMetadata(_ id: UUID) async {
+        guard let artifact = artifacts.first(where: { $0.id == id }),
+              artifact.kind == .url,
+              artifact.sourceURL != nil else { return }
+        do {
+            try await update(artifact.withLinkMetadata(artifact.linkMetadata, state: .pending))
+            await fetchLinkMetadata(id)
+        } catch {
+            loadError = error.localizedDescription
+        }
+    }
+
     func saveEditedDetails(_ details: ArtifactUserDetails?, note: String?, for id: UUID) async throws {
         guard let artifact = artifacts.first(where: { $0.id == id }) else { return }
         try await update(artifact.withEditedDetails(details, note: note))

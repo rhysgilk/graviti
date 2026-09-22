@@ -56,7 +56,12 @@ struct FitGuideView: View {
                 Section {
                     HStack(spacing: 12) {
                         ProgressView()
-                        Text("Finding places for your patterns…")
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Finding places for your patterns…")
+                            Text("This uses live Apple Maps data and may take a moment on slower connections. Saved guide places stay available.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             } else if let errorMessage {
@@ -75,6 +80,7 @@ struct FitGuideView: View {
                         systemImage: "mappin.slash",
                         description: Text("Try again later or search for the destination from the Search tab.")
                     )
+                    Button("Try again") { Task { await load() } }
                 }
             } else {
                 ForEach(sections) { section in

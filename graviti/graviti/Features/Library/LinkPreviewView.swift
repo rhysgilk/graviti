@@ -5,9 +5,11 @@ import UIKit
 struct LinkPreviewView: View {
     let url: URL
     let cachedMetadata: ArtifactLinkMetadata?
+    let onRetry: () async -> Void
 
     @State private var metadata: LPLinkMetadata?
     @State private var didFinishLoading = false
+    @State private var attempt = 0
 
     var body: some View {
         Group {
@@ -23,7 +25,7 @@ struct LinkPreviewView: View {
                 fallback
             }
         }
-        .task(id: url) {
+        .task(id: "\(url.absoluteString)#\(attempt)") {
             metadata = nil
             didFinishLoading = false
             defer { didFinishLoading = true }
@@ -41,15 +43,20 @@ struct LinkPreviewView: View {
 
     private var fallback: some View {
         HStack(spacing: 14) {
-            Image(systemName: didFinishLoading ? "link" : "link.badge.plus")
+            Image(systemName: didFinishLoading ? "wifi.exclamationmark" : "link.badge.plus")
                 .font(.title2)
                 .foregroundStyle(GravitiColors.signalMint)
                 .frame(width: 48, height: 48)
                 .background(GravitiColors.appBackground, in: RoundedRectangle(cornerRadius: 12))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(didFinishLoading ? "Saved link" : "Loading link preview…")
+                Text(didFinishLoading ? "Preview unavailable" : "Loading link preview…")
                     .font(.headline)
+                if didFinishLoading {
+                    Text("The saved link is still available. Check your connection and try the preview again.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 if let host = url.host(percentEncoded: false) {
                     Text(host.replacingOccurrences(of: "www.", with: ""))
                         .font(.subheadline)
@@ -59,12 +66,18 @@ struct LinkPreviewView: View {
             Spacer(minLength: 0)
             if !didFinishLoading {
                 ProgressView()
+            } else {
+                Button("Retry") {
+                    attempt += 1
+                    Task { await onRetry() }
+                }
+                .font(.caption.weight(.semibold))
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, minHeight: 88, alignment: .leading)
         .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .contain)
     }
 
     private func accessibilityLabel(for metadata: LPLinkMetadata) -> String {

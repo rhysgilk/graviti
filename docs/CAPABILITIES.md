@@ -2,7 +2,7 @@
 
 **Status:** Implemented local MVP
 
-**Last reviewed:** September 21, 2026
+**Last reviewed:** September 22, 2026
 
 **Minimum OS:** iOS 18.0
 
@@ -146,6 +146,8 @@ Capture and interpretation have separate lifecycles. Each eligible artifact can 
 4. generated description, category, and interest enrichment
 
 Interrupted, transiently failed, and in-progress work resumes on launch or foreground activation. An offline or provider failure leaves the original save visible.
+
+Network-dependent surfaces explain this preservation directly. Place matching states say when the original save is already safe and offer manual matching or retry after failure. Link previews show an unavailable state and retry action while retaining the saved URL. Fit Guides keep saved guide places visible during a live search, explain that slow connections can take longer, and allow retry after an error or empty response. Collection imports show active progress, report partial results, and direct the user to refresh the saved guide or list later when some entries fail.
 
 ### Generated details
 
@@ -453,6 +455,7 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 - Data does not sync between devices.
 - Deleting the app deletes the local Library unless a backup was exported.
 - Map search, place resolution, collection imports, Fit Guide suggestions, and web previews require connectivity.
+- Slow or interrupted network work preserves the original save and exposes retry or refresh where applicable; a provider can still remain unavailable.
 - Google shared-list import depends on a public Google response format that may change.
 - Apple and Google collection links must be publicly accessible.
 - Ambiguous place matches require user review.

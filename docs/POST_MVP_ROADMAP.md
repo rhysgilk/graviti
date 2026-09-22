@@ -170,7 +170,7 @@ Use current provider data only through permitted APIs. Do not scrape, invent, or
 
 - [x] Add an in-app About surface that states local storage, backup behavior, network boundaries, version, and support information.
 - [x] Add a Send Feedback action and an optional Copy Diagnostics report that contains aggregate status only and excludes saved content and identifiers.
-- Make slow-network and partial-import states explicit for map resolution, list importing, Fit Guide search, and web previews.
+- [x] Make slow-network and partial-import states explicit for map resolution, list importing, Fit Guide search, and web previews, with preserved-content messaging and retry or refresh paths.
 - Add migration tests whenever persisted records or backup schemas change.
 - Add focused snapshot or visual regression coverage for the Gravity Field and highest-risk reusable states when the maintenance cost is justified.
 

@@ -20,6 +20,7 @@ struct SaveView: View {
     @State private var showingMapsLinkImporter = false
     @State private var importMessage: String?
     @State private var importSummary: SaveImportSummary?
+    @State private var isImportingCollection = false
     @FocusState private var focusedField: SaveField?
 #if DEBUG
     @AppStorage("debug.dogfoodArtifactIDs") private var dogfoodArtifactIDs = ""
@@ -146,9 +147,22 @@ struct SaveView: View {
                     }
 
                     if let importMessage {
-                        Text(importMessage)
-                            .font(.subheadline)
-                            .foregroundStyle(GravitiColors.signalMint)
+                        HStack(alignment: .top, spacing: 10) {
+                            if isImportingCollection {
+                                ProgressView()
+                                    .tint(.white)
+                            }
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(importMessage)
+                                    .font(.subheadline.weight(.semibold))
+                                if isImportingCollection {
+                                    Text("The collection link is already saved. Keep Graviti open while it finds the places; partial results will be reported.")
+                                        .font(.caption)
+                                        .foregroundStyle(.white.opacity(0.62))
+                                }
+                            }
+                        }
+                        .foregroundStyle(isImportingCollection ? .white : GravitiColors.signalMint)
                     }
 
                     VStack(alignment: .leading, spacing: 12) {
@@ -358,6 +372,8 @@ struct SaveView: View {
     private func importMapCollectionIfNeeded(_ url: String) async {
         guard let provider = MapLinkMetadata.provider(for: url) else { return }
         importSummary = nil
+        isImportingCollection = true
+        defer { isImportingCollection = false }
 
         switch provider {
         case .apple:

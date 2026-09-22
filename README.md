@@ -15,6 +15,7 @@ The local MVP is complete and verified. It requires no account or Graviti server
 - Direct import from public Apple Maps guide links and shared Google Maps list links
 - Google Takeout Saved CSV and Apple/Google `.webloc` import
 - Immediate local persistence followed by resumable place resolution, OCR, link preview fetching, and enrichment
+- Explicit slow-connection, retry, and partial-result states that keep the original save or guide available
 - Editable descriptions, categories, interests, notes, place matches, and source collection history
 - Fine-grained semantic interests with per-interest source provenance and confidence
 - Library browsing by Destinations, Places, Saves, and Map

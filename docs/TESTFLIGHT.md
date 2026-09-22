@@ -24,6 +24,7 @@ Graviti is a private travel-interest library. Save places, links, notes, screens
 - Save a place from two different Fit Guides or imported collections and confirm one canonical place retains both source memberships.
 - Open Browse all Fit Guides, search by a destination, pattern, and saved place name, and confirm older guides remain retrievable when they are absent from current Fit recommendations.
 - Open About Graviti from the Home gear. Confirm the data, backup, and network explanations are readable; copy diagnostics and verify that it contains aggregate counts without saved names, links, notes, coordinates, media, or identifiers.
+- With a slow or unavailable connection, confirm place matching says the save is safe, link previews offer Retry, Fit Guides retain saved places and offer Try again, and a partial collection import reports skipped entries with a later refresh path.
 - Export a backup, add another item, restore the backup, and confirm existing records are not duplicated.
 - Test Dynamic Type, VoiceOver, Reduce Motion, airplane mode, and relaunch after force quitting.
 
@@ -44,7 +45,7 @@ This beta stores its Library on the device. Graviti does not require an account 
 
 ## Latest simulator validation
 
-Validated on September 21, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
+Validated on September 22, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
 - All 97 automated tests passed on iOS 18.6 and iOS 26.2 simulators. Coverage includes import parsing and migration, Fit scoring, destination-catalog validation and motif generalization, region-scoped Fit Guide search and fallback behavior, Fit Guide grouping and persistence, backup v1 and v2 compatibility and v3 Explore-state restore, aggregate-only diagnostics privacy, offline save preservation and recovery, safe map URL generation, deterministic ten-destination Gravity Field layout, evidence-based Gravity Insights, varied-evidence Destination Readiness, and fine-grained semantic provenance.
 - Clean signed Debug and Release archive builds completed. The app and Share Extension generated the same App Group entitlement.

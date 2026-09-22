@@ -8,6 +8,7 @@ struct SavedArtifactDetailView: View {
     @State private var actionError: String?
     @State private var isImportingCollection = false
     @State private var collectionImportMessage: String?
+    @State private var collectionImportFailed = false
     @State private var showingDeleteConfirmation = false
     @State private var isDeleting = false
     @State private var isRefreshingDetails = false
@@ -32,7 +33,9 @@ struct SavedArtifactDetailView: View {
 
                 if let sourceURL = current.sourceURL {
                     if let url = openableURL(sourceURL) {
-                        LinkPreviewView(url: url, cachedMetadata: current.linkMetadata)
+                        LinkPreviewView(url: url, cachedMetadata: current.linkMetadata) {
+                            await library.retryLinkMetadata(current.id)
+                        }
                     }
 
                     Text(sourceURL)
@@ -64,7 +67,7 @@ struct SavedArtifactDetailView: View {
                         if let collectionImportMessage {
                             Text(collectionImportMessage)
                                 .font(.subheadline)
-                                .foregroundStyle(GravitiColors.signalMint)
+                                .foregroundStyle(collectionImportFailed ? GravitiColors.opportunityCoral : GravitiColors.signalMint)
                         }
                     }
 
@@ -288,14 +291,27 @@ struct SavedArtifactDetailView: View {
     private var placeStatus: some View {
         switch current.processingState {
         case .saved, .processing:
-            Label("Finding this place", systemImage: "hourglass")
-                .foregroundStyle(.white.opacity(0.68))
+            HStack(alignment: .top, spacing: 10) {
+                ProgressView()
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Finding this place")
+                        .font(.subheadline.weight(.semibold))
+                    Text("Your save is already safe. Place matching will continue when a connection is available.")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.62))
+                }
+            }
         case .needsReview, .failed:
             VStack(alignment: .leading, spacing: 10) {
                 Text(current.processingState == .needsReview
                      ? "Choose the matching place"
                      : "Place lookup didn't finish")
                     .font(.headline)
+                if current.processingState == .failed {
+                    Text("Your save is still in the Library. Check your connection and try the lookup again.")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.62))
+                }
                 Button("Find matching place") { showingPlaceReview = true }
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity, minHeight: 48)
@@ -358,6 +374,7 @@ struct SavedArtifactDetailView: View {
     private func importCollectionPlaces(from sourceURL: String, provider: MapLinkMetadata.Provider) async {
         isImportingCollection = true
         collectionImportMessage = nil
+        collectionImportFailed = false
         defer { isImportingCollection = false }
 
         do {
@@ -381,6 +398,7 @@ struct SavedArtifactDetailView: View {
                 )
             }
         } catch {
+            collectionImportFailed = true
             collectionImportMessage = error.localizedDescription
         }
     }
@@ -398,7 +416,9 @@ struct SavedArtifactDetailView: View {
             duplicates > 0 ? GravitiCopy.duplicatesAvoided(duplicates) : nil,
             skipped > 0 ? GravitiCopy.couldNotImport(skipped) : nil
         ].compactMap { $0 }.joined(separator: " · ")
-        return "\(title): \(details)"
+        let result = "\(title): \(details)"
+        guard skipped > 0 else { return result }
+        return result + " " + String(localized: "Some entries could not be imported. Check your connection and refresh this collection again later.")
     }
 
     private var enrichmentStatus: (text: String, symbol: String)? {
