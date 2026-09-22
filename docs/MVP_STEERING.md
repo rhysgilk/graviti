@@ -99,10 +99,10 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 
 ### Richer understanding
 
-- [ ] Expand semantic detail beyond the current deterministic vocabulary so Graviti can distinguish motifs such as forest versus desert hiking, rocky coast versus beach, historic versus modern architecture, and a specific dish versus generic food.
+- [x] Expand semantic detail beyond the current deterministic vocabulary so Graviti can distinguish motifs such as forest versus desert hiking, rocky coast versus beach, historic versus modern architecture, and a specific dish versus generic food.
 - [ ] Evaluate on-device or privacy-preserving background AI enrichment. It must remain asynchronous, expose provenance and confidence, preserve the original source, and never overwrite user corrections.
-- [ ] Let a user inspect why a description or interest was inferred and which source text, detected image text, place metadata, or collection title supported it.
-- [ ] Preserve optional user descriptions on every media type and give user-authored evidence more weight than generated text.
+- [x] Let a user inspect why a description or interest was inferred and which source text, detected image text, place metadata, or collection title supported it.
+- [x] Preserve optional user descriptions on every media type and give user-authored evidence more weight than generated text.
 
 ### Recommendation depth and calibration
 
@@ -117,7 +117,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 
 - [ ] Add reviewed ranking signals beyond Apple Maps relevance when a permitted provider exposes current ratings or quality data. Never scrape or fabricate review scores.
 - [ ] Add guide-level organization, notes, removal, and explicit archival when users accumulate many Fit Guides.
-- [ ] Preserve the current pattern-grouped flow so destination recommendations always lead to concrete places a user can save and revisit.
+- [x] Preserve the current pattern-grouped flow so destination recommendations always lead to concrete places a user can save and revisit.
 - [ ] If social features are introduced, use trusted people and compatible interest patterns as an additional ranking signal while keeping personal Library evidence understandable and separately weighted.
 
 ### Data ownership and portability

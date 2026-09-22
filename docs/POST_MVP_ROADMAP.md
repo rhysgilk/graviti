@@ -1,6 +1,6 @@
 # Graviti Post-MVP Roadmap
 
-**Status:** Local V1.0 frozen; post-MVP work in progress
+**Status:** Local V1.0 frozen; planned local implementation complete through the current V1.1 foundation; user-managed Figma audit pending
 
 **Baseline tag:** `v1.0-local-mvp`
 
@@ -172,7 +172,19 @@ Use current provider data only through permitted APIs. Do not scrape, invent, or
 - [x] Add a Send Feedback action and an optional Copy Diagnostics report that contains aggregate status only and excludes saved content and identifiers.
 - [x] Make slow-network and partial-import states explicit for map resolution, list importing, Fit Guide search, and web previews, with preserved-content messaging and retry or refresh paths.
 - [x] Cover legacy missing-state fallback and backup versions 1, 2, and 3. No persisted model fields changed after the local-MVP baseline; require a disk-backed prior-schema fixture with the next persisted-field change and before any external release.
-- Add focused snapshot or visual regression coverage for the Gravity Field and highest-risk reusable states when the maintenance cost is justified.
+- [x] Review snapshot coverage. Retain deterministic layout tests plus the existing manual accessibility and crowded-field matrix; defer pixel snapshot infrastructure until recurring rendering regressions justify its maintenance cost.
+
+## Current decision gate
+
+The local engineering milestones selected from the Phase 2 review are implemented and verified. The following items are intentionally driven by future evidence rather than assumed scope:
+
+- The user-managed Figma source of truth remains pending review. Codex will audit it after the owner reports that the update is complete.
+- Broader AI enrichment remains exploratory until a private, inspectable approach improves on the deterministic fallback without weakening provenance or corrections.
+- Fit calibration requires enough real save, dismissal, and trip feedback to form a meaningful held-out evaluation set.
+- More Fit Guide management, contextual travel constraints, sync, and social signals remain later bets that should respond to observed use.
+- Snapshot infrastructure remains deferred while deterministic layout tests and the manual simulator matrix catch the current rendering risks.
+
+External TestFlight and App Store work is excluded by owner decision and is not a completion gate.
 
 ## Sync decision
 
