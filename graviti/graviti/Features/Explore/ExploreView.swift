@@ -403,6 +403,49 @@ private struct DestinationRecommendationView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
 
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("How this Fit was calculated")
+                        .font(.headline)
+
+                    fitContributionRow(
+                        title: "Relevance",
+                        value: "\(recommendation.relevancePercent)%",
+                        detail: "How strongly this destination matches patterns across your saves."
+                    )
+                    fitContributionRow(
+                        title: "Evidence confidence",
+                        value: "\(recommendation.confidencePercent)%",
+                        detail: "Distinct places, areas, sources, and detail quality limit certainty."
+                    )
+                    fitContributionRow(
+                        title: "Destination knowledge",
+                        value: "\(recommendation.knowledgeConfidencePercent)%",
+                        detail: "Reviewed destination evidence limits how certain Graviti can be."
+                    )
+                    fitContributionRow(
+                        title: "Preference match",
+                        value: preferenceContribution,
+                        detail: "Preferences you add are visible and receive only a small boost."
+                    )
+                    fitContributionRow(
+                        title: "Novelty",
+                        value: String(localized: "New to your Library"),
+                        detail: "Destinations already represented in your Library are filtered out."
+                    )
+                    fitContributionRow(
+                        title: "Negative feedback",
+                        value: String(localized: "Applied as filters"),
+                        detail: "Avoided interests, Not for Me, and visited destinations are removed before ranking."
+                    )
+
+                    Text("Fit is a conservative comparison signal, not the chance you will enjoy a trip.")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.68))
+                }
+                .padding(18)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
+
                 if !recommendation.knowledgeSources.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Destination sources")
@@ -498,6 +541,39 @@ private struct DestinationRecommendationView: View {
         .foregroundStyle(.white)
         .navigationTitle("Recommendation")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var preferenceContribution: String {
+        guard !recommendation.explicitMatches.isEmpty else {
+            return String(localized: "No added boost")
+        }
+        return recommendation.explicitMatches
+            .map { InterestDisplayName.localized($0) }
+            .joined(separator: ", ")
+    }
+
+    private func fitContributionRow(
+        title: LocalizedStringKey,
+        value: String,
+        detail: LocalizedStringKey
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Spacer(minLength: 12)
+                Text(value)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(GravitiColors.signalMint)
+                    .multilineTextAlignment(.trailing)
+            }
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.62))
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.035), in: RoundedRectangle(cornerRadius: 14))
     }
 }
 

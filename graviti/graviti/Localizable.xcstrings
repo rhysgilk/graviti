@@ -4,6 +4,176 @@
     "" : {
 
     },
+    "Applied as filters" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicados como filtros"
+          }
+        }
+      }
+    },
+    "Avoided interests, Not for Me, and visited destinations are removed before ranking." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los intereses evitados, No es para mí y los destinos visitados se eliminan antes de ordenar."
+          }
+        }
+      }
+    },
+    "Destination knowledge" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conocimiento del destino"
+          }
+        }
+      }
+    },
+    "Destinations already represented in your Library are filtered out." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se filtran los destinos que ya están representados en tu Biblioteca."
+          }
+        }
+      }
+    },
+    "Distinct places, areas, sources, and detail quality limit certainty." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los lugares, las zonas, las fuentes y la calidad de los detalles limitan la certeza."
+          }
+        }
+      }
+    },
+    "Evidence confidence" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confianza de la evidencia"
+          }
+        }
+      }
+    },
+    "Fit is a conservative comparison signal, not the chance you will enjoy a trip." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fit es una señal comparativa prudente, no la probabilidad de que disfrutes un viaje."
+          }
+        }
+      }
+    },
+    "How strongly this destination matches patterns across your saves." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qué tanto coincide este destino con los patrones de tus elementos guardados."
+          }
+        }
+      }
+    },
+    "How this Fit was calculated" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo se calculó este Fit"
+          }
+        }
+      }
+    },
+    "Negative feedback" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentarios negativos"
+          }
+        }
+      }
+    },
+    "New to your Library" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo en tu Biblioteca"
+          }
+        }
+      }
+    },
+    "No added boost" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin impulso adicional"
+          }
+        }
+      }
+    },
+    "Novelty" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novedad"
+          }
+        }
+      }
+    },
+    "Preference match" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coincidencia con preferencias"
+          }
+        }
+      }
+    },
+    "Preferences you add are visible and receive only a small boost." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las preferencias que añades son visibles y reciben solo un pequeño impulso."
+          }
+        }
+      }
+    },
+    "Relevance" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relevancia"
+          }
+        }
+      }
+    },
+    "Reviewed destination evidence limits how certain Graviti can be." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La evidencia revisada del destino limita el nivel de certeza de Graviti."
+          }
+        }
+      }
+    },
     "%@ is a %@ in %@, saved for %@." : {
       "localizations" : {
         "es" : {

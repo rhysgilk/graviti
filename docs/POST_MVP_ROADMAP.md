@@ -1,6 +1,6 @@
 # Graviti Post-MVP Roadmap
 
-**Status:** Local V1.0 frozen; planned local implementation complete through the current V1.1 foundation; user-managed Figma audit pending
+**Status:** Local V1.0 frozen; planned local implementation complete through the current V1.1 foundation; current Figma audit and iteration complete
 
 **Baseline tag:** `v1.0-local-mvp`
 
@@ -41,7 +41,7 @@ Geographic concentration is useful evidence for Gravity. It cannot be the sole e
 
 ## Milestone 1: Current design source of truth
 
-**Owner:** user-managed ChatGPT/Figma workflow. Codex will audit the result after the user reports that the Figma update is complete; no Figma write work is part of the current app implementation stream.
+**Status: audited and iterated.** Page **05 — Current MVP / V1.0** now records the implemented local product while pages 01–04 remain as design history. Page **06 — Fit Clarity & Library Control** adds the reviewed next pass for calibrated Fit cards, a detailed contribution breakdown, Library multi-select, and the local-first About and diagnostics surface.
 
 The implementation is ahead of the existing Figma exploration. Create and maintain a new page named **05 — Current MVP / V1.0**. Preserve earlier pages as product history.
 
@@ -56,7 +56,7 @@ The current page should represent:
 - Saved Item detail, generated details, provenance, editing, retry, refresh, and correction
 - onboarding, import summaries, confirmations, failures, offline states, and accessibility variants
 
-Create a separate page named **06 — V1.1 Concepts** for unimplemented ideas. Label concepts clearly so they are not mistaken for current behavior.
+Keep unimplemented concepts on later, clearly labeled pages so they are not mistaken for current behavior. Page 06 currently documents implemented behavior and its product rationale.
 
 Connect the highest-value reusable SwiftUI components first:
 
@@ -178,7 +178,7 @@ Use current provider data only through permitted APIs. Do not scrape, invent, or
 
 The local engineering milestones selected from the Phase 2 review are implemented and verified. The following items are intentionally driven by future evidence rather than assumed scope:
 
-- The user-managed Figma source of truth remains pending review. Codex will audit it after the owner reports that the update is complete.
+- Figma pages 05 and 06 have been audited against the current SwiftUI behavior. Page 05 remains the broad current-MVP source of truth; page 06 documents Fit clarity, Library selection, and local-first support details.
 - Broader AI enrichment remains exploratory until a private, inspectable approach improves on the deterministic fallback without weakening provenance or corrections.
 - Fit calibration requires enough real save, dismissal, and trip feedback to form a meaningful held-out evaluation set.
 - More Fit Guide management, contextual travel constraints, sync, and social signals remain later bets that should respond to observed use.
