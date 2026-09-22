@@ -144,6 +144,8 @@ Batch update and delete operations validate all requested IDs before mutating an
 
 Image bytes live in the App Group's `MediaAssets` directory. Artifacts store only a validated filename key. Writes are atomic; deletion removes the corresponding file after the repository delete succeeds.
 
+Legacy records with no later processing-state fields are covered by a focused compatibility test for the fallback rules in `StoredArtifact.asArtifact()`. Backup schema compatibility is tested separately for versions 1, 2, and 3. No persisted `StoredArtifact` fields have changed since the `v1.0-local-mvp` baseline; if they do, a disk-backed schema fixture must be added with that change.
+
 ## 7. Capture and processing state machine
 
 Capture persists synchronously from the user's perspective. Optional work begins afterward.

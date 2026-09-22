@@ -4,6 +4,29 @@ import XCTest
 
 @MainActor
 final class SwiftDataArtifactRepositoryTests: XCTestCase {
+    func testLegacyRecordWithoutLaterStateFieldsInfersSafeDefaults() throws {
+        let original = Artifact(
+            kind: .url,
+            sourceURL: "https://example.com/legacy-place",
+            originalText: "Legacy place",
+            processingState: .saved
+        )
+        let stored = StoredArtifact(original)
+        stored.enrichmentStateRawValue = nil
+        stored.textExtractionStateRawValue = nil
+        stored.linkMetadataStateRawValue = nil
+
+        let migrated = try stored.asArtifact()
+
+        XCTAssertEqual(migrated.id, original.id)
+        XCTAssertEqual(migrated.sourceURL, original.sourceURL)
+        XCTAssertEqual(migrated.originalText, original.originalText)
+        XCTAssertEqual(migrated.processingState, .saved)
+        XCTAssertEqual(migrated.enrichmentState, .pending)
+        XCTAssertEqual(migrated.textExtractionState, .unavailable)
+        XCTAssertEqual(migrated.linkMetadataState, .pending)
+    }
+
     func testRichArtifactRoundTripsThroughSwiftData() async throws {
         let repository = try makeRepository()
         let artifact = richArtifact()

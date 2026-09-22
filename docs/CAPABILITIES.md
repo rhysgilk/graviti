@@ -467,7 +467,7 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 
 ## 17. Verification summary
 
-The current automated suite has 97 tests and passes on iOS 18.6 and iOS 26.2 simulators. It includes focused checks that diagnostics use aggregate counts and omit saved content and identifiers. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v3, visited-feedback, Gravity Insights, Destination Readiness, semantic-evidence, destination-catalog, and diagnostics tests were added.
+The current automated suite has 98 tests and passes on iOS 18.6 and iOS 26.2 simulators. It includes legacy persisted-state fallback coverage and focused checks that diagnostics use aggregate counts and omit saved content and identifiers. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v3, visited-feedback, Gravity Insights, Destination Readiness, semantic-evidence, destination-catalog, diagnostics, and compatibility tests were added.
 
 Manual and live-service checks include:
 

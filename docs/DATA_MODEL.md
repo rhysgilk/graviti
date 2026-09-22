@@ -108,6 +108,8 @@ The states are independent. A photo can be safely saved while OCR is processing 
 
 Older SwiftData records infer missing state fields from available data for migration compatibility.
 
+A focused compatibility test verifies that records without the later enrichment, OCR, and link-metadata state fields receive the expected fallback states. The `StoredArtifact` schema has not changed since the `v1.0-local-mvp` baseline. Any future persisted-field change must add a disk-backed prior-schema fixture before it ships.
+
 ## 5. SavedPlace
 
 `SavedPlace` is a Codable value:

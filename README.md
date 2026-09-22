@@ -106,9 +106,9 @@ xcodebuild \
 
 The shared `graviti` scheme includes `gravitiTests`. Run **Product → Test** in Xcode or use an installed simulator destination with `xcodebuild test`.
 
-The current suite contains 97 tests. It covers import parsing and migration, Fit relevance and confidence, reversible visited feedback, versioned destination-catalog validation and motif generalization, region-scoped Fit Guide search behavior, fine-grained semantic evidence, interest profiles, adaptive geographic resolution, deterministic crowded layouts, Gravity Insights, Destination Readiness, backup validation and media round trips, backup v1 and v2 compatibility and v3 Explore-state restoration, privacy-safe diagnostics, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
+The current suite contains 98 tests. It covers import parsing and migration, legacy SwiftData record defaults, Fit relevance and confidence, reversible visited feedback, versioned destination-catalog validation and motif generalization, region-scoped Fit Guide search behavior, fine-grained semantic evidence, interest profiles, adaptive geographic resolution, deterministic crowded layouts, Gravity Insights, Destination Readiness, backup validation and media round trips, backup v1 and v2 compatibility and v3 Explore-state restoration, privacy-safe diagnostics, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
 
-The latest verified runs passed all 97 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
+The latest verified runs passed all 98 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
 
 ## Test data
 
