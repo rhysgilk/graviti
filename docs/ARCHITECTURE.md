@@ -291,7 +291,7 @@ The recommendation retains supporting Artifacts, visited-liked matches, and dest
 
 The engine deduplicates places between pattern sections and limits each section to six suggestions.
 
-Guide persistence uses source collection titles on Artifacts rather than a separate guide table. This supports multiple guide memberships on one canonical place and automatically includes membership in backup/restore.
+Guide persistence uses source collection titles on Artifacts rather than a separate guide table. This supports multiple guide memberships on one canonical place and automatically includes membership in backup/restore. `FitGuideLibraryView` receives every saved guide reconstructed by Explore and filters locally across destination metadata, guide interests, and saved place names, so retrieval does not depend on whether a guide is present in the current recommendation ranking.
 
 ## 15. Backup architecture
 

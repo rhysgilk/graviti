@@ -74,7 +74,7 @@ struct ExploreView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Your Fit Guides")
                                 .font(.headline)
-                            ForEach(savedGuides) { guide in
+                            ForEach(savedGuides.prefix(3)) { guide in
                                 NavigationLink {
                                     FitGuideView(
                                         guide: guide,
@@ -83,24 +83,21 @@ struct ExploreView: View {
                                         onKeepGuide: {}
                                     )
                                 } label: {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: "bookmark.fill")
-                                            .foregroundStyle(GravitiColors.signalMint)
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(guide.destination.name).font(.headline)
-                                            Text("\(guide.destination.country) · \(GravitiCopy.savedItems(library.artifacts.filter(guide.contains).count))")
-                                                .font(.caption)
-                                                .foregroundStyle(.white.opacity(0.62))
-                                        }
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .foregroundStyle(.white.opacity(0.55))
-                                    }
-                                    .padding(14)
-                                    .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+                                    FitGuideRow(guide: guide, library: library)
+                                        .padding(.horizontal, 14)
+                                        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
                                 }
                                 .buttonStyle(.plain)
                             }
+                            NavigationLink {
+                                FitGuideLibraryView(guides: savedGuides, library: library)
+                            } label: {
+                                Label("Browse all Fit Guides", systemImage: "books.vertical.fill")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity, minHeight: 48)
+                                    .background(GravitiColors.iris.opacity(0.28), in: RoundedRectangle(cornerRadius: 14))
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
 

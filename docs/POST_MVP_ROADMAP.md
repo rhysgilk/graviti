@@ -155,14 +155,14 @@ Existing **Save destination**, **Not for me**, Fit Guide membership, and user co
 
 ## Fit Guide evolution
 
-The current pattern-grouped Fit Guide completes the core recommendation loop. Later organization may include:
+The current pattern-grouped Fit Guide completes the core recommendation loop. A searchable all-guides library now keeps every saved guide retrievable by destination, country, pattern, or saved place even when it is absent from the current Fit ranking. Later organization may include:
 
 - guide rename
 - guide note
 - remove a place from a guide without deleting its source save
 - reorder places
 - archive a guide
-- browse many guides independently of whether the destination is currently visible in the top Fit list
+- [x] browse many guides independently of whether the destination is currently visible in the top Fit list
 
 Use current provider data only through permitted APIs. Do not scrape, invent, or imply review ratings that MapKit does not expose.
 

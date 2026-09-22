@@ -5444,6 +5444,46 @@
           }
         }
       }
+    },
+    "Browse all Fit Guides" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver todas las guías de Fit"
+          }
+        }
+      }
+    },
+    "Fit Guides" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guías de Fit"
+          }
+        }
+      }
+    },
+    "Fit Guides stay here even when their destinations are no longer in your current recommendations." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las guías de Fit permanecen aquí aunque sus destinos ya no aparezcan en tus recomendaciones actuales."
+          }
+        }
+      }
+    },
+    "Search guides and saved places" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar guías y lugares guardados"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

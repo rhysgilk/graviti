@@ -268,7 +268,7 @@ Explore begins with:
 
 > **What are you looking for?**
 
-Explore also keeps saved Fit Guides visible. A recommendation is useful only when the user can move from the destination level to concrete experiences, save those experiences, and retrieve the resulting guide later.
+Explore also keeps saved Fit Guides visible. The main screen previews recent alphabetic entries and links to a searchable guide library that matches destination, country, patterns, and saved place names. A recommendation is useful only when the user can move from the destination level to concrete experiences, save those experiences, and retrieve the resulting guide later.
 
 Current controls let users select a broad region, choose preferred interests, and choose interests to avoid. Save Destination retains a recommendation in Your Fit Guides; Not for Me excludes that destination from later results. A recommendation can be marked **Loved it** or **Didn’t fit** after a visit. Both outcomes remove the already-visited destination from future results; only the liked outcome contributes a small reviewed-trait signal. Tune Explore lists trip feedback and lets the user remove it. More detailed travel-time, transportation, budget, season, accessibility, and climate constraints remain future work.
 

@@ -28,7 +28,7 @@ The local MVP is complete and verified. It requires no account or Graviti server
 - Decorative white and yellow pulsing stars that respect Reduce Motion
 - Explainable interest patterns, conservative Fit scoring, personal-evidence confidence, reviewed destination-knowledge confidence, preferences, “Not for me,” and reversible visited feedback
 - Fit Guides with region-bound live suggestions grouped by the patterns behind a recommendation
-- Persistent Fit Guide membership without duplicating an existing saved place
+- Persistent Fit Guide membership without duplicating an existing saved place, plus a searchable guide library
 - Sora typography, Spanish localization, Dynamic Type, VoiceOver, increased contrast, RTL inspection, and conventional alternatives to the spatial UI
 - Debug-only focused and crowded dogfood datasets
 

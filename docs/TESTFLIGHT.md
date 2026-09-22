@@ -22,6 +22,7 @@ Graviti is a private travel-interest library. Save places, links, notes, screens
 - Mark a recommendation Not for me and save another recommendation.
 - Build Fit Guides for New York City and then at least one international destination such as Kyoto or Mexico City. Confirm every result is a real place within the selected destination, sections follow the matched patterns, and the destination itself is not returned as a venue.
 - Save a place from two different Fit Guides or imported collections and confirm one canonical place retains both source memberships.
+- Open Browse all Fit Guides, search by a destination, pattern, and saved place name, and confirm older guides remain retrievable when they are absent from current Fit recommendations.
 - Export a backup, add another item, restore the backup, and confirm existing records are not duplicated.
 - Test Dynamic Type, VoiceOver, Reduce Motion, airplane mode, and relaunch after force quitting.
 

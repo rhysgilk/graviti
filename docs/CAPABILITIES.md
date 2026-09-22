@@ -364,7 +364,7 @@ Examples include matcha cafés, tea houses, museums, historic landmarks, scenic 
 
 Each row opens its Apple Maps listing for current ratings, hours, and details. MapKit does not expose a reliable rating field to this app, so Graviti does not invent, scrape, or display review scores.
 
-Saving a suggestion records collection membership such as `Mexico City Fit Guide · Museums`. If that canonical place already exists, Graviti adds the guide membership to the existing artifact instead of duplicating it. Explore lists saved Fit Guides and reconstructs them from the destination catalog plus the current interest profile; saved membership survives backup and restore.
+Saving a suggestion records collection membership such as `Mexico City Fit Guide · Museums`. If that canonical place already exists, Graviti adds the guide membership to the existing artifact instead of duplicating it. Explore previews the first three saved Fit Guides and provides a searchable guide library for the complete collection. Guide search matches destination, country, contributing interests, and saved place names. Guides remain available there even when the destination leaves the current recommendation list. Graviti reconstructs guides from the destination catalog plus the current interest profile; saved membership survives backup and restore.
 
 ## 12. Backup, restore, and deletion
 
