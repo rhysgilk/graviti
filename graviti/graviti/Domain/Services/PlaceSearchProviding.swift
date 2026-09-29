@@ -13,6 +13,11 @@ protocol PlaceSearchProviding {
     func search(_ query: String, near destination: SavedDestination) async throws -> [PlaceCandidate]
 }
 
+@MainActor
+protocol PlaceGeographyRepairing {
+    func repairedPlace(_ place: SavedPlace) async throws -> SavedPlace?
+}
+
 extension PlaceSearchProviding {
     func search(_ query: String, near destination: SavedDestination) async throws -> [PlaceCandidate] {
         try await search("\(query) in \(destination.name), \(destination.country)")

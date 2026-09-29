@@ -6,7 +6,56 @@ struct SharedArtifactEnvelope: Codable {
     let originalText: String?
     let userNote: String?
     let mediaKey: String?
+    let sourceCollectionTitle: String?
+    let isHighPriority: Bool
+    let tags: [String]
+    let skipPlaceIdentification: Bool
     let capturedAt: Date
+
+    init(
+        id: UUID,
+        sourceURL: String?,
+        originalText: String?,
+        userNote: String?,
+        mediaKey: String?,
+        sourceCollectionTitle: String? = nil,
+        isHighPriority: Bool = false,
+        tags: [String] = [],
+        skipPlaceIdentification: Bool = false,
+        capturedAt: Date
+    ) {
+        self.id = id
+        self.sourceURL = sourceURL
+        self.originalText = originalText
+        self.userNote = userNote
+        self.mediaKey = mediaKey
+        self.sourceCollectionTitle = sourceCollectionTitle
+        self.isHighPriority = isHighPriority
+        self.tags = tags
+        self.skipPlaceIdentification = skipPlaceIdentification
+        self.capturedAt = capturedAt
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, sourceURL, originalText, userNote, mediaKey, sourceCollectionTitle
+        case isHighPriority, tags, skipPlaceIdentification, capturedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            id: try values.decode(UUID.self, forKey: .id),
+            sourceURL: try values.decodeIfPresent(String.self, forKey: .sourceURL),
+            originalText: try values.decodeIfPresent(String.self, forKey: .originalText),
+            userNote: try values.decodeIfPresent(String.self, forKey: .userNote),
+            mediaKey: try values.decodeIfPresent(String.self, forKey: .mediaKey),
+            sourceCollectionTitle: try values.decodeIfPresent(String.self, forKey: .sourceCollectionTitle),
+            isHighPriority: try values.decodeIfPresent(Bool.self, forKey: .isHighPriority) ?? false,
+            tags: try values.decodeIfPresent([String].self, forKey: .tags) ?? [],
+            skipPlaceIdentification: try values.decodeIfPresent(Bool.self, forKey: .skipPlaceIdentification) ?? false,
+            capturedAt: try values.decode(Date.self, forKey: .capturedAt)
+        )
+    }
 }
 
 enum SharedMediaStore {

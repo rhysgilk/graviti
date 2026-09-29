@@ -123,7 +123,7 @@ Research direction: attribute-aware hierarchical smoothing is useful for sparse 
 ### Data ownership and portability
 
 - [x] Include saved-destination, Not for Me, and Explore preference state in backward-compatible backup schema version 2.
-- [x] Add both visited-feedback states in backup schema version 3 while retaining version 1 and 2 restore compatibility.
+- [x] Add both visited-feedback states in backup schema version 3, then add durable guides, recommendation feedback/outcomes, Import Inbox attempts, and saved filters in schema version 4 while retaining version 1 through 3 restore compatibility.
 - [ ] If account sync is added, make it opt-in and provide an explicit migration path from the existing SwiftData Library and version 1, 2, or 3 backups.
 - [ ] Define conflict handling that preserves original Artifacts, collection memberships, and user corrections across devices.
 

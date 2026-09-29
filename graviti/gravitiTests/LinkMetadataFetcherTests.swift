@@ -51,6 +51,35 @@ final class LinkMetadataFetcherTests: XCTestCase {
         }
     }
 
+    func testInstagramMetadataUsesCaptionWithoutPlatformBoilerplate() async throws {
+        let html = """
+        <html><head>
+        <meta property="og:title" content="Alyssa | Boston Foodie on Instagram: &quot;Hottest new sandwich spot in Boston 👀&#10;&#10;What we ordered: The South End, The Calabria, Roman Gold&#10;&#10;📍South End — @calistosdeli&#10;682 Tremont St Boston, MA 02118&quot;">
+        <meta property="og:description" content="1,287 likes, 46 comments - bottomlyssbites on August 18, 2026: &quot;Hottest new sandwich spot in Boston 👀&#10;&#10;The Roman Gold has a crispy chicken cutlet, and the South End has turkey, whipped Brie and fig jam.&#10;&#10;What we ordered: The South End, The Calabria, Roman Gold&#10;&#10;📍South End — @calistosdeli&#10;682 Tremont St Boston, MA 02118&#10;&#10;#bostonfood #sandwiches Boston recs&quot;. ">
+        <meta property="og:site_name" content="Instagram">
+        </head></html>
+        """
+        MockURLProtocol.handler = { request in
+            (HTTPURLResponse(
+                url: request.url!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: ["Content-Type": "text/html; charset=utf-8"]
+            )!, Data(html.utf8))
+        }
+
+        let metadata = try await LinkMetadataFetcher(session: session()).fetch(
+            "https://www.instagram.com/reel/DcMn8LBpcM0/"
+        )
+
+        XCTAssertEqual(metadata?.title, "Hottest new sandwich spot in Boston 👀")
+        XCTAssertTrue(metadata?.summary?.contains("Roman Gold") == true)
+        XCTAssertTrue(metadata?.summary?.contains("682 Tremont St Boston, MA 02118") == true)
+        XCTAssertFalse(metadata?.summary?.contains("likes, 46 comments") == true)
+        XCTAssertFalse(metadata?.summary?.contains("#bostonfood") == true)
+        XCTAssertEqual(metadata?.siteName, "Instagram")
+    }
+
     private func session() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -88,6 +117,30 @@ final class LinkMetadataEnrichmentPipelineTests: XCTestCase {
         XCTAssertEqual(updated.enrichment?.source, .linkMetadata)
         XCTAssertTrue(updated.enrichment?.interests.contains("Forests") == true)
         XCTAssertTrue(updated.enrichment?.interests.contains("Hiking") == true)
+    }
+
+    func testLinkCaptionBecomesDescriptionAndSemanticEvidence() async throws {
+        let caption = "Calistos Deli in Boston serves crispy chicken cutlet sandwiches, whipped Brie, and fig jam at 682 Tremont St."
+        let artifact = Artifact(
+            kind: .url,
+            sourceURL: "https://www.instagram.com/reel/example/",
+            originalText: "Hottest new sandwich spot in Boston",
+            linkMetadata: ArtifactLinkMetadata(
+                title: "Hottest new sandwich spot in Boston",
+                summary: caption,
+                siteName: "Instagram",
+                imageData: nil,
+                resolvedURL: "https://www.instagram.com/reel/example/",
+                fetchedAt: .now
+            ),
+            linkMetadataState: .processed
+        )
+
+        let result = try await ArtifactEnricher().enrich(artifact)
+
+        XCTAssertEqual(result?.summary, caption)
+        XCTAssertEqual(result?.category, .foodAndDrink)
+        XCTAssertEqual(result?.source, .linkMetadata)
     }
 }
 

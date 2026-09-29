@@ -16,7 +16,9 @@ enum DestinationOrbitBuilder {
             let meaningfulChildren = children.filter { $0.saveCount >= 2 }
             let meaningfulSaves = meaningfulChildren.reduce(0) { $0 + $1.saveCount }
             let coverage = Double(meaningfulSaves) / Double(max(collapsed.saveCount, 1))
-            return collapsed.saveCount >= 6 && meaningfulChildren.count >= 2 && coverage >= 0.65
+            let establishedClusters = collapsed.saveCount >= 6 && meaningfulChildren.count >= 2 && coverage >= 0.65
+            let usefulBreadth = collapsed.saveCount >= 4 && children.count >= 2
+            return establishedClusters || usefulBreadth
         }
     }
 

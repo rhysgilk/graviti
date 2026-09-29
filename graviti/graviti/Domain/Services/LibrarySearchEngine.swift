@@ -11,13 +11,16 @@ enum LibrarySearchEngine {
     static func search(
         _ query: String,
         in artifacts: [Artifact],
+        index: LibraryDerivedIndex? = nil,
         limit: Int = 20,
         locale: Locale? = nil
     ) -> LibrarySearchResults {
         let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !term.isEmpty else { return LibrarySearchResults(artifacts: [], destinations: [], interests: [], places: []) }
 
+        let candidateIDs = index?.candidateArtifactIDs(for: term)
         let artifactMatches = Array(artifacts.filter {
+            (candidateIDs == nil || candidateIDs?.contains($0.id) == true) &&
             searchText(for: $0, locale: locale).localizedCaseInsensitiveContains(term)
         }.prefix(limit))
         let destinations = Array(DestinationOrbitBuilder.nodes(from: artifacts, mode: .automatic, limit: nil)

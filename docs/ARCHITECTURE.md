@@ -1,5 +1,13 @@
 # Graviti Implemented Architecture
 
+## Current architecture expansion
+
+Search remains a combined local and MapKit surface, with view-level scopes over indexed `LibrarySearchEngine` results, real distance ordering, and persisted zero-query suggestions. The Import Inbox combines live Artifact states with independent ImportAttempt records, so duplicate and failed collection attempts remain inspectable even when they create no Artifact. Place lifecycle writes use the repository's atomic `updateMany` operation across every Artifact sharing a canonical place ID.
+
+Artifacts remain authoritative. Background work is represented by independent persisted jobs; the search/grouping index is disposable; Fit Guide identity and membership are durable local records; and recommendation questions and outcomes remain inspectable local event histories. Provider protocols separate MapKit, metadata, social extraction, destination knowledge, ranking, and optional sync behavior from feature views.
+
+See [Next Phase Plan](NEXT_PHASE_PLAN.md) for the completed delivery sequence and [Optional CloudKit Sync Design](OPTIONAL_CLOUDKIT_SYNC_DESIGN.md) for the future cross-device boundary.
+
 **Version:** 1.0
 
 **Status:** Local MVP implementation
@@ -31,22 +39,32 @@ SwiftUI App
 │   │   └── SwiftDataArtifactRepository
 │   ├── ArtifactProcessingCoordinator
 │   │   ├── MapPlaceResolver
-│   │   │   └── MapKitPlaceSearchProvider
+│   │   │   ├── PlaceSearchProviding → MapKitPlaceSearchProvider
+│   │   │   ├── MapLinkExpanding → URLSessionMapLinkExpander
+│   │   │   └── SocialPlaceHintProviding
 │   │   ├── VisionTextRecognizer
-│   │   ├── LinkMetadataFetcher
+│   │   ├── LinkMetadataProviding → LinkMetadataFetcher
 │   │   └── ArtifactEnricher
+│   ├── ProcessingJobStore
+│   │   └── App Group GravitiProcessing/jobs.json
+│   ├── LibraryDerivedIndexStore
+│   │   └── disposable cache GravitiDerived/library-index.json
 │   ├── ArtifactImportCoordinator
 │   │   ├── AppleMapsGuideParser
 │   │   ├── GoogleMapsListImporter
 │   │   └── GoogleSavedCSVParser
-│   └── LibraryBackupService
+│   └── LibraryBackupService (schema v4)
 ├── DestinationOrbitBuilder and OrbitLayoutEngine
 ├── InterestProfileBuilder and DestinationFitEngine
-├── FitGuideSearchEngine
+├── DestinationKnowledgeProviding and RecommendationRankingProviding
+├── FitGuideSearchEngine and durable FitGuideLibraryState
+├── RecommendationFeedbackStore and RecommendationOutcomeStore
+├── LibrarySyncProviding → LocalOnlyLibrarySyncProvider
 ├── AppDiagnosticsReport
 └── App Group
     ├── SharedArtifactInbox JSON envelopes
-    └── MediaAssets image files
+    ├── MediaAssets image files
+    └── durable processing state
 
 Share Extension
 └── validates one URL, text item, or image
@@ -144,7 +162,7 @@ Batch update and delete operations validate all requested IDs before mutating an
 
 Image bytes live in the App Group's `MediaAssets` directory. Artifacts store only a validated filename key. Writes are atomic; deletion removes the corresponding file after the repository delete succeeds.
 
-Legacy records with no later processing-state fields are covered by a focused compatibility test for the fallback rules in `StoredArtifact.asArtifact()`. Backup schema compatibility is tested separately for versions 1, 2, and 3. No persisted `StoredArtifact` fields have changed since the `v1.0-local-mvp` baseline; if they do, a disk-backed schema fixture must be added with that change.
+Legacy records with no later processing-state fields are covered by a focused compatibility test for the fallback rules in `StoredArtifact.asArtifact()`. Backup schema compatibility is tested separately for versions 1 through 4. No persisted `StoredArtifact` fields have changed since the `v1.0-local-mvp` baseline; if they do, a disk-backed schema fixture must be added with that change.
 
 ## 7. Capture and processing state machine
 
@@ -173,9 +191,13 @@ pending → processing → processed
                      → failed
 ```
 
-Cancellation returns an active job to `pending`. A transient failure can retry on the next foreground pass. Existing successful enrichment is retained if a later refresh fails.
+Cancellation returns an active job to `pending`. Map place work runs through one paced queue so large imports do not launch simultaneous provider requests. Transient failures are retained in a coalesced in-memory retry set and retried with increasing delays, in addition to the next foreground pass. If an enrichment result becomes stale because its place, text, OCR, or link metadata changed while it was running, the coordinator resets that artifact to `pending` and immediately schedules a fresh pass. Existing successful enrichment is retained if a later refresh fails.
 
 `unavailable` means the inputs were insufficient; it is different from a processing error.
+
+`ProcessingJobStore` persists the durable execution ledger separately from SwiftData. Every eligible Artifact is reconciled against six job specifications: link metadata, text extraction, place identification, enrichment, profile indexing, and thumbnail availability. Jobs retain version, status, attempt count, last error, next retry, dependencies, creation/start/completion/update times, and optional output provenance. Relaunch converts orphaned `running` jobs to `waitingForRetry`; bounded exponential delays stop after six attempts. Explicit retry resets the attempt budget. The store is a value type owned by `ArtifactLibrary`, avoiding actor-isolated reference destruction on the iOS 18 runtime.
+
+The persisted ledger coordinates recovery and visibility. Artifacts remain the result authority, so deleting the ledger cannot delete a save and reconciliation can recreate every required job.
 
 The UI mirrors these states without hiding persisted content. Saved Item detail exposes place and link-metadata retry actions, collection imports retain their wrapper Artifact and report partial counts, and Fit Guide loading leaves persisted guide membership visible. `ArtifactLibrary.retryLinkMetadata` resets only the metadata state before running the bounded fetch again.
 
@@ -234,12 +256,13 @@ The vocabulary keeps broad tags used by the recommendation catalog while adding 
 
 Automatic resolution starts broad and expands a country only when:
 
-- it has at least six saves
-- at least two child clusters have at least two saves
-- those meaningful children cover at least 65% of the country's saves
+- four or more saves already span at least two useful child areas, or
+- it has at least six saves, at least two child clusters have two saves each, and those meaningful children cover at least 65% of the country's saves
 - the expansion fits the ten-label budget
 
 Several cities in one useful region can group at state/province level. Unknown geography falls back without crashing.
+
+MapKit geography is normalized at the adapter boundary. On iOS 26, `regionName` represents the country, so Graviti derives the state or province from `cityWithContext` and expands US and Canadian abbreviations to full names. On launch, a paced background repair re-resolves older places that have a city and country but no state/province, then persists the repaired place across every matching save.
 
 Gravity is deterministic and based on explicit saved artifacts. Nodes rank by Gravity, then save count, then localized name, then stable ID.
 
@@ -261,9 +284,24 @@ Readiness is computed on demand for the selected destination and remains indepen
 
 ## 12. Search
 
-`LibrarySearchEngine` is pure and synchronous. It searches cached local fields and builds grouped results.
+`LibrarySearchEngine` is pure and synchronous. It searches cached local fields and builds grouped results. `LibraryDerivedIndex` maintains rebuildable mappings for place → Artifacts, destination → places, interest → Artifacts, guide → Artifacts, processing state → Artifacts, and normalized search tokens → Artifact IDs. A deterministic source fingerprint identifies the canonical inputs used to build it.
 
-`SearchView` runs local matching immediately and debounces live MapKit search. Saving a result goes through `ArtifactLibrary`.
+`LibraryDerivedIndexStore` writes the index to the caches container. Decode failure, schema mismatch, or deletion falls back to an empty index and a rebuild from Artifacts plus durable Fit Guide memberships. Search uses index candidates when available and retains its full matching rules as the final check.
+
+`SearchView` runs local matching immediately and debounces live MapKit search. Scope chips filter local groups; Near me uses `SearchLocationManager` and `CLLocation` distance rather than text approximation. Saving a result goes through `ArtifactLibrary`.
+
+## 12.1 Provider boundaries
+
+The following protocols isolate replaceable or failure-prone dependencies:
+
+- `PlaceSearchProviding`
+- `LinkMetadataProviding`
+- `SocialPlaceHintProviding`
+- `DestinationKnowledgeProviding`
+- `RecommendationRankingProviding`
+- `LibrarySyncProviding`
+
+The local MVP uses MapKit, the bounded URL metadata fetcher, deterministic social-caption extraction, the reviewed bundled destination catalog, deterministic ranking engines, and `LocalOnlyLibrarySyncProvider`. Feature views consume the provider interfaces and can receive controlled test doubles without network access. The sync provider currently reports local-only health; it performs no cloud transfer.
 
 ## 13. Fit recommendation architecture
 
@@ -288,6 +326,8 @@ The engine calculates:
 
 The recommendation retains supporting Artifacts, visited-liked matches, and destination sources so the detail screen can explain personal evidence and link to the reviewed knowledge provenance. Visited feedback is stored in dedicated Explore preference sets. It does not create Artifacts, alter Gravity, or rewrite explicit interests. A not-fit visit contributes no positive interest signal; a liked visit contributes a capped secondary signal and a modest confidence contribution.
 
+`RecommendationFeedbackStore` retains one-tap Yes, No, and Not sure responses and supports correction or deletion. `RecommendationPromptStore` rate limits a question for seven days and records permanent dismissal. `RecommendationOutcomeStore` records shown, opened, destination saved, suggested place saved, dismissed, visited-loved, and visited-did-not-fit events. Daily impression deduplication bounds noise, histories have fixed maximum sizes, and Fit evidence events carry producer/version provenance. These events remain local and inspectable. They are deliberately excluded from ranking until the deterministic evaluation gate demonstrates better relevance and calibration.
+
 ## 14. Fit Guide architecture
 
 `FitGuideSearchEngine` maps interests to specific and fallback MapKit terms.
@@ -302,11 +342,13 @@ The recommendation retains supporting Artifacts, visited-liked matches, and dest
 
 The engine deduplicates places between pattern sections and limits each section to six suggestions.
 
-Guide persistence uses source collection titles on Artifacts rather than a separate guide table. This supports multiple guide memberships on one canonical place and automatically includes membership in backup/restore. `FitGuideLibraryView` receives every saved guide reconstructed by Explore and filters locally across destination metadata, guide interests, and saved place names, so retrieval does not depend on whether a guide is present in the current recommendation ranking.
+`FitGuideLibraryState` is a versioned local aggregate of `FitGuideRecord` and `FitGuideMembership`. A membership points from a stable guide ID to an Artifact ID and optional interest section. Legacy title-encoded memberships migrate without deleting their source context. Separate `FitGuideMetadata` stores the user title, note, archive state, cover Artifact, shortlist place IDs, ordered Artifact IDs, and update time.
+
+This design supports multiple guide memberships on one canonical Artifact, removal from one guide without deleting the save, independent duplicated guides, and retrieval after a destination leaves the recommendation ranking. `FitGuideLibraryView` filters locally across guide metadata, destination, country, interests, and saved place names.
 
 ## 15. Backup architecture
 
-`LibraryBackupService` serializes a schema-versioned archive with full Artifacts, optional image bytes, and a snapshot of Explore recommendation preferences. Schema version 2 added region, preferred and avoided interests, saved destinations, and Not for Me exclusions. Schema version 3 adds visited-and-liked and visited-and-did-not-fit destination IDs. Versions 1 and 2 remain decode compatible.
+`LibraryBackupService` serializes a schema-versioned archive with full Artifacts, optional image bytes, and a snapshot of durable local app state. Schema version 2 added region, preferred and avoided interests, saved destinations, and Not for Me exclusions. Schema version 3 added visited-and-liked and visited-and-did-not-fit destination IDs. Schema version 4 adds Fit Guide records and metadata, recommendation feedback/outcomes/prompt history, ImportAttempt records, and saved Library filters. Versions 1 through 3 remain decode compatible.
 
 Decode validates total size, schema, count, unique IDs, media consistency, preference bounds, and the recommendation region before returning a normalized archive. Restore skips existing Artifact IDs, applies preferences only when the archive contains them, and cleans up newly written media if repository insertion fails.
 

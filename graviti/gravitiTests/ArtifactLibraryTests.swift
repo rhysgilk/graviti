@@ -3,6 +3,88 @@ import XCTest
 
 @MainActor
 final class ArtifactLibraryTests: XCTestCase {
+    func testUnmatchedInstagramPlaceAttemptDoesNotEnterNeedsReview() async throws {
+        let url = "https://www.instagram.com/reel/example/"
+        let saved = Artifact(
+            kind: .url,
+            sourceURL: url,
+            originalText: "Boston sandwiches",
+            linkMetadata: ArtifactLinkMetadata(
+                title: "Boston sandwiches",
+                summary: "Try this one 📍South End — @calistosdeli",
+                siteName: "Instagram",
+                imageData: nil,
+                resolvedURL: url,
+                fetchedAt: .now
+            ),
+            linkMetadataState: .processed
+        )
+        let repository = PreviewArtifactRepository()
+        try await repository.save(saved)
+        let resolver = MapPlaceResolver(
+            searchProvider: EmptyPlaceSearchProvider(),
+            linkExpander: IdentityMapLinkExpander()
+        )
+        let library = ArtifactLibrary(repository: repository, placeResolver: resolver)
+
+        await library.load()
+        await library.processPendingMaps()
+
+        XCTAssertEqual(library.artifacts.first?.processingState, .processed)
+        XCTAssertNil(library.artifacts.first?.place)
+    }
+
+    func testIncorrectInstagramCityMatchIsRepairedOnResume() async throws {
+        let url = "https://www.instagram.com/reel/example/"
+        let boston = SavedPlace(
+            id: "boston",
+            name: "Boston",
+            latitude: 42.36,
+            longitude: -71.06,
+            locality: "Boston",
+            region: "Massachusetts",
+            country: "United States"
+        )
+        let josephine = SavedPlace(
+            id: "josephine",
+            name: "Josephine",
+            latitude: 42.39,
+            longitude: -71.10,
+            locality: "Somerville",
+            region: "Massachusetts",
+            country: "United States"
+        )
+        let saved = Artifact(
+            kind: .url,
+            sourceURL: url,
+            originalText: "Somerville steak and cheese",
+            linkMetadata: ArtifactLinkMetadata(
+                title: "Somerville steak and cheese",
+                summary: "The prime rib melts in your mouth. 📍Josephine, Somerville, ma follow @bostoneatin for more Boston recs",
+                siteName: "Instagram",
+                imageData: nil,
+                resolvedURL: url,
+                fetchedAt: .now
+            ),
+            linkMetadataState: .processed,
+            place: boston,
+            processingState: .processed
+        )
+        let repository = PreviewArtifactRepository()
+        try await repository.save(saved)
+        let resolver = MapPlaceResolver(
+            searchProvider: SinglePlaceSearchProvider(place: josephine),
+            linkExpander: IdentityMapLinkExpander()
+        )
+        let library = ArtifactLibrary(repository: repository, placeResolver: resolver)
+
+        await library.load()
+        await library.processPendingMaps()
+
+        XCTAssertEqual(library.artifacts.first?.processingState, .processed)
+        XCTAssertEqual(library.artifacts.first?.place, josephine)
+    }
+
     func testOfflineMapFailureKeepsOriginalSaveVisible() async throws {
         let saved = Artifact(
             kind: .url,
@@ -55,6 +137,42 @@ final class ArtifactLibraryTests: XCTestCase {
         XCTAssertEqual(library.artifacts.first?.processingState, .failed)
 
         await library.processPendingMaps()
+
+        XCTAssertEqual(library.artifacts.first?.processingState, .processed)
+        XCTAssertEqual(library.artifacts.first?.place, expectedPlace)
+        XCTAssertEqual(provider.searchCount, 2)
+    }
+
+    func testTransientMapFailureRetriesAutomaticallyInBackground() async throws {
+        let saved = Artifact(
+            kind: .url,
+            sourceURL: "https://maps.apple.com/?q=Acadia%20National%20Park",
+            originalText: "Acadia National Park"
+        )
+        let repository = PreviewArtifactRepository()
+        try await repository.save(saved)
+        let expectedPlace = SavedPlace(
+            id: "acadia-background",
+            name: "Acadia National Park",
+            latitude: 44.3386,
+            longitude: -68.2733,
+            locality: "Bar Harbor",
+            region: "Maine",
+            country: "United States"
+        )
+        let provider = RecoveringPlaceSearchProvider(place: expectedPlace)
+        let library = ArtifactLibrary(
+            repository: repository,
+            placeResolver: MapPlaceResolver(searchProvider: provider, linkExpander: IdentityMapLinkExpander())
+        )
+        await library.load()
+
+        await library.processPendingMaps()
+        XCTAssertEqual(library.artifacts.first?.processingState, .failed)
+
+        for _ in 0..<30 where library.artifacts.first?.place == nil {
+            try await Task.sleep(for: .milliseconds(100))
+        }
 
         XCTAssertEqual(library.artifacts.first?.processingState, .processed)
         XCTAssertEqual(library.artifacts.first?.place, expectedPlace)
@@ -155,6 +273,62 @@ final class ArtifactLibraryTests: XCTestCase {
         XCTAssertEqual(summary.preferences, preferences)
         XCTAssertEqual(library.artifacts.map(\.id), [source.id])
     }
+
+    func testPlaceStatusPropagatesAcrossEverySaveForThePlace() async throws {
+        let place = SavedPlace(
+            id: "josephine",
+            name: "Josephine",
+            latitude: 42.39,
+            longitude: -71.10,
+            locality: "Somerville",
+            region: "Massachusetts",
+            country: "United States"
+        )
+        let first = Artifact(kind: .url, sourceURL: "https://example.com/one", place: place, processingState: .processed)
+        let second = Artifact(kind: .manual, originalText: "Try the prime rib", place: place, processingState: .processed)
+        let repository = PreviewArtifactRepository()
+        try await repository.saveMany([first, second])
+        let library = ArtifactLibrary(repository: repository)
+        await library.load()
+
+        try await library.setPlaceStatus(.loved, for: place.id)
+
+        XCTAssertEqual(library.placeStatus(for: place.id), .loved)
+        XCTAssertEqual(library.artifacts.compactMap { $0.userDetails?.placeStatus }, [.loved, .loved])
+        let persisted = try await repository.artifacts()
+        XCTAssertEqual(persisted.compactMap { $0.userDetails?.placeStatus }, [.loved, .loved])
+    }
+
+    func testSettingPlaceStatusPreservesGeneratedDetails() async throws {
+        let place = SavedPlace(
+            id: "park",
+            name: "Acadia",
+            latitude: 44.3,
+            longitude: -68.2,
+            locality: nil,
+            region: "Maine",
+            country: "United States"
+        )
+        let enrichment = ArtifactEnrichment(
+            summary: "A rocky coastal national park.",
+            category: .sceneryAndNature,
+            interests: ["rocky coast", "national parks"],
+            source: .savedText,
+            confidence: 0.9,
+            generatedAt: .now
+        )
+        let artifact = Artifact(kind: .url, place: place, enrichment: enrichment, enrichmentState: .processed, processingState: .processed)
+        let repository = PreviewArtifactRepository()
+        try await repository.save(artifact)
+        let library = ArtifactLibrary(repository: repository)
+        await library.load()
+
+        try await library.setPlaceStatus(.shortlisted, for: place.id)
+
+        XCTAssertEqual(library.artifacts[0].effectiveSummary, enrichment.summary)
+        XCTAssertEqual(library.artifacts[0].effectiveCategory, enrichment.category)
+        XCTAssertEqual(library.artifacts[0].effectiveInterests, enrichment.interests)
+    }
 }
 
 private enum TestInboxError: LocalizedError {
@@ -166,6 +340,18 @@ private enum TestInboxError: LocalizedError {
 private struct OfflinePlaceSearchProvider: PlaceSearchProviding {
     func search(_ query: String) async throws -> [PlaceCandidate] {
         throw URLError(.notConnectedToInternet)
+    }
+}
+
+private struct EmptyPlaceSearchProvider: PlaceSearchProviding {
+    func search(_ query: String) async throws -> [PlaceCandidate] { [] }
+}
+
+private struct SinglePlaceSearchProvider: PlaceSearchProviding {
+    let place: SavedPlace
+
+    func search(_ query: String) async throws -> [PlaceCandidate] {
+        [PlaceCandidate(place: place, sourceURL: "https://maps.apple.com")]
     }
 }
 

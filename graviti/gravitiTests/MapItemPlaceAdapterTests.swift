@@ -23,6 +23,41 @@ final class MapItemPlaceAdapterTests: XCTestCase {
         XCTAssertNil(MapItemPlaceAdapter.savedPlace(from: item))
     }
 
+    func testIOS26AddressContextExtractsFullUSStateNames() {
+        XCTAssertEqual(
+            MapItemPlaceAdapter.regionName(
+                cityName: "New York",
+                cityWithContext: "New York, NY",
+                country: "United States"
+            ),
+            "New York"
+        )
+        XCTAssertEqual(
+            MapItemPlaceAdapter.regionName(
+                cityName: "Boston",
+                cityWithContext: "Boston, MA",
+                country: "United States"
+            ),
+            "Massachusetts"
+        )
+    }
+
+    func testIOS26AddressContextPreservesInternationalProvinceNames() {
+        XCTAssertEqual(
+            MapItemPlaceAdapter.regionName(
+                cityName: "Barcelona",
+                cityWithContext: "Barcelona, Catalonia, Spain",
+                country: "Spain"
+            ),
+            "Catalonia"
+        )
+        XCTAssertNil(MapItemPlaceAdapter.regionName(
+            cityName: "Singapore",
+            cityWithContext: "Singapore",
+            country: "Singapore"
+        ))
+    }
+
     func testSearchSourceURLPreservesCoordinatesAndEscapesPlaceName() throws {
         let place = SavedPlace(
             id: "nishiki",

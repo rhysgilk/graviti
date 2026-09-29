@@ -1,6 +1,6 @@
 # Graviti Post-MVP Roadmap
 
-**Status:** Local V1.0 frozen; planned local implementation complete through the current V1.1 foundation; current Figma audit and iteration complete
+**Status:** Local V1.0 frozen; planned local V1.1 implementation and Figma parity audit complete
 
 **Baseline tag:** `v1.0-local-mvp`
 
@@ -12,7 +12,7 @@ This roadmap turns product feedback, dogfood findings, the completed MVP audit, 
 
 The V1.0 local MVP is complete. It supports capture, importing, local enrichment, correction, geographic organization, Gravity, interest patterns, conservative Fit recommendations, actionable Fit Guides, search, backup and restore, accessibility, localization, and debug datasets.
 
-The baseline is tagged `v1.0-local-mvp`. Backup schema version 2 was the first post-MVP maintenance change. Schema version 3 adds reversible visited feedback while preserving version 1 and version 2 restore compatibility.
+The baseline is tagged `v1.0-local-mvp`. Backup schema version 2 was the first post-MVP maintenance change. Schema version 3 added reversible visited feedback. Schema version 4 adds durable Fit Guides, recommendation feedback and outcomes, Import Inbox attempts, and saved Library filters while preserving version 1 through version 3 restore compatibility.
 
 External distribution work is intentionally paused. Existing TestFlight and archive documents remain as optional future references; they are not current milestones.
 
@@ -37,13 +37,13 @@ Geographic concentration is useful evidence for Gravity. It cannot be the sole e
 - [x] Keep version 1 backups restorable without overwriting current Explore settings.
 - [x] Validate preference bounds and normalize restored preference values.
 - [x] Cover version compatibility and preference restoration with automated tests.
-- [x] Add schema version 3 for visited feedback while preserving version 1 and 2 restore compatibility.
+- [x] Add schema version 3 for visited feedback and schema version 4 for durable local feature state while preserving version 1 through 3 restore compatibility.
 
 ## Milestone 1: Current design source of truth
 
-**Status: audited and iterated.** Page **05 — Current MVP / V1.0** now records the implemented local product while pages 01–04 remain as design history. Page **06 — Fit Clarity & Library Control** adds the reviewed next pass for calibrated Fit cards, a detailed contribution breakdown, Library multi-select, and the local-first About and diagnostics surface.
+**Status: audited and iterated.** Page **05 — Current MVP / V1.0** records the implemented local baseline while pages 01–04 remain as design history. Page **06 — Fit Clarity & Library Control** documents calibrated Fit cards, a detailed contribution breakdown, Library multi-select, and the local-first About and diagnostics surface. Page **07 — Local V1.1 Experience** now captures the completed Search, Import Inbox, place lifecycle, durable Fit Guide, Share Extension, and onboarding flows.
 
-The implementation is ahead of the existing Figma exploration. Create and maintain a new page named **05 — Current MVP / V1.0**. Preserve earlier pages as product history.
+The implementation and current Figma reference are aligned through page **07 — Local V1.1 Experience**. Preserve earlier pages as product history.
 
 The current page should represent:
 
@@ -149,7 +149,7 @@ The shipped local catalog contains 23 destinations in `destination-catalog-v1.js
 
 **Status: explicit trip feedback implemented with automated coverage.**
 
-Recommendation detail now records **Loved it** and **Didn’t fit** as reversible Explore state. Both outcomes exclude the already-visited destination. A liked destination contributes a small, capped signal from its reviewed catalog strengths; a did-not-fit destination contributes no invented interests. Neither state creates a Library Artifact, changes Gravity, or rewrites explicit interests. Tune Explore exposes every response for removal, and backup schema version 3 preserves both sets while versions 1 and 2 remain restorable.
+Recommendation detail now records **Loved it** and **Didn’t fit** as reversible Explore state. Both outcomes exclude the already-visited destination. A liked destination contributes a small, capped signal from its reviewed catalog strengths; a did-not-fit destination contributes no invented interests. Neither state creates a Library Artifact, changes Gravity, or rewrites explicit interests. Tune Explore exposes every response for removal, and backup schema version 4 preserves these outcomes alongside the newer durable local feature state while versions 1 through 3 remain restorable.
 
 Existing **Save destination**, **Not for me**, Fit Guide membership, and user corrections remain distinct signals. Later calibration can evaluate all of these outcomes together before the Fit score is treated as a probability. Future social evidence may supplement personal evidence, but it must remain separately weighted and understandable.
 

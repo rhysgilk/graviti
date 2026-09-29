@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Couldn't save to Graviti" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -12,6 +13,7 @@
       }
     },
     "Graviti's local media storage is unavailable." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -22,6 +24,7 @@
       }
     },
     "Graviti's shared save storage is unavailable." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -32,6 +35,7 @@
       }
     },
     "OK" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -42,6 +46,7 @@
       }
     },
     "There's no link or text to save." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -52,6 +57,7 @@
       }
     },
     "This app shared content Graviti can't read yet." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -62,6 +68,7 @@
       }
     },
     "This image format or size isn't supported yet." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

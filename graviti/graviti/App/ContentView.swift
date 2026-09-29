@@ -17,7 +17,15 @@ struct ContentView: View {
     @State private var shareImportNotice: String?
 
     init(repository: any ArtifactRepository) {
-        _library = StateObject(wrappedValue: ArtifactLibrary(repository: repository))
+        let searchProvider = MapKitPlaceSearchProvider()
+        _library = StateObject(wrappedValue: ArtifactLibrary(
+            repository: repository,
+            placeResolver: MapPlaceResolver(
+                searchProvider: searchProvider,
+                linkExpander: URLSessionMapLinkExpander()
+            ),
+            geographyRepairProvider: searchProvider
+        ))
     }
 
     var body: some View {
@@ -87,6 +95,11 @@ struct ContentView: View {
                 onSaveOrImport: {
                     hasCompletedOnboarding = true
                     selectedTab = .save
+                },
+                onTrySampleLibrary: {
+                    _ = try await library.addSampleLibrary()
+                    hasCompletedOnboarding = true
+                    selectedTab = .home
                 },
                 onExplore: {
                     hasCompletedOnboarding = true

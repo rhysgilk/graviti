@@ -8,6 +8,7 @@ struct SavedPlaceDetailView: View {
     @State private var showingRemoveConfirmation = false
     @State private var actionError: String?
     @State private var isRemoving = false
+    @State private var isUpdatingStatus = false
 
     private var artifacts: [Artifact] {
         library.artifacts.filter { $0.place?.id == place.id }
@@ -20,7 +21,13 @@ struct SavedPlaceDetailView: View {
                     center: CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude),
                     span: MKCoordinateSpan(latitudeDelta: 0.015, longitudeDelta: 0.015)
                 ))) {
-                    Marker(place.name, coordinate: CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude))
+                    let category = PlaceMapCategoryStyle.category(for: place.id, in: artifacts)
+                    Marker(
+                        place.name,
+                        systemImage: category.mapSymbolName,
+                        coordinate: CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude)
+                    )
+                    .tint(category.mapTint)
                 }
                 .frame(height: 240)
                 .clipShape(RoundedRectangle(cornerRadius: 18))
@@ -31,6 +38,21 @@ struct SavedPlaceDetailView: View {
                         .font(.custom("Sora-SemiBold", size: 26, relativeTo: .title))
                     Text(place.subtitle)
                         .foregroundStyle(.secondary)
+                }
+
+                PlaceStatusRail(
+                    selection: library.placeStatus(for: place.id),
+                    isUpdating: isUpdatingStatus
+                ) { status in
+                    isUpdatingStatus = true
+                    Task {
+                        do {
+                            try await library.setPlaceStatus(status, for: place.id)
+                        } catch {
+                            actionError = error.localizedDescription
+                        }
+                        isUpdatingStatus = false
+                    }
                 }
 
                 if artifacts.count > 1 {
@@ -101,5 +123,51 @@ struct SavedPlaceDetailView: View {
         } message: {
             Text("The \(artifacts.count) associated saves stay in your Library without a place. You can match them again later.")
         }
+    }
+}
+
+private struct PlaceStatusRail: View {
+    let selection: PlaceLifecycleStatus
+    let isUpdating: Bool
+    let onSelect: (PlaceLifecycleStatus) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Your journey")
+                    .font(GravitiTypography.headline)
+                Spacer()
+                Text(selection.title)
+                    .font(GravitiTypography.captionSemibold)
+                    .foregroundStyle(GravitiColors.signalMint)
+            }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 9) {
+                    ForEach(PlaceLifecycleStatus.allCases) { status in
+                        Button { onSelect(status) } label: {
+                            VStack(spacing: 6) {
+                                Image(systemName: status.symbol)
+                                    .font(.system(size: 17, weight: .semibold))
+                                    .frame(width: 38, height: 38)
+                                    .background(selection == status ? GravitiColors.iris : .white.opacity(0.07), in: Circle())
+                                    .overlay(Circle().strokeBorder(selection == status ? GravitiColors.signalMint.opacity(0.8) : .white.opacity(0.08)))
+                                Text(status.title)
+                                    .font(GravitiTypography.caption)
+                                    .lineLimit(1)
+                            }
+                            .foregroundStyle(selection == status ? .white : .white.opacity(0.62))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isUpdating)
+                        .accessibilityAddTraits(selection == status ? .isSelected : [])
+                    }
+                }
+            }
+            Text("Status applies to this place across all of its saves and can help future recommendations learn from what happened.")
+                .font(GravitiTypography.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(16)
+        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
     }
 }

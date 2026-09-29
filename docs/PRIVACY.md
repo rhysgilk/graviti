@@ -16,8 +16,8 @@ Graviti stores the data needed to provide its features locally:
 - generated descriptions, categories, interests, confidence, and provenance
 - user corrections
 - Apple Maps, Google Maps, and Fit Guide collection membership
-- recommendation preferences, saved destinations, Not for Me exclusions, and visited feedback
-- app display preferences
+- recommendation preferences, saved destinations, Not for Me exclusions, visited feedback, lightweight answers, and local recommendation outcome events
+- durable Fit Guide records and metadata, Import Inbox attempts, processing jobs, saved Library filters, and app display preferences
 
 The main Library is stored with SwiftData. Images and Share Extension envelopes use the app's private App Group container.
 
@@ -25,11 +25,11 @@ Graviti does not require an account and does not synchronize the Library to a Gr
 
 ## Backups
 
-A person can export a versioned JSON backup through Library → Actions. The backup includes Artifact records, place matches, generated and edited details, source collection history, cached link details, embedded saved image bytes, Explore preferences, saved destinations, Not for Me exclusions, and visited feedback.
+A person can export a versioned JSON backup through Library → Actions. The backup includes Artifact records, place matches, generated and edited details, source collection history, cached link details, embedded saved image bytes, Explore preferences, saved destinations, Not for Me exclusions, visited feedback, durable Fit Guides and metadata, recommendation feedback and outcome history, Import Inbox attempts, and saved Library filters.
 
 The backup leaves Graviti only when the person chooses an export destination through the system file interface. Graviti does not upload exported backups.
 
-Current exports use backup schema version 3. Graviti can also restore version 2 backups without visited feedback and version 1 backups without Explore preferences. Saved places inside Fit Guides retain their guide membership because that membership belongs to the Artifact record.
+Current exports use backup schema version 4. Graviti can restore version 3 backups without the newer durable guide and feedback records, version 2 backups without visited feedback, and version 1 backups without Explore preferences. Version 4 stores Fit Guide membership independently so removing a place from one guide does not remove the save or its other memberships.
 
 Deleting Graviti removes its local Library and App Group media. Export a backup before uninstalling if the Library should be retained.
 
@@ -84,7 +84,8 @@ A person can:
 - delete one saved item
 - select and atomically delete multiple saved items
 - select and remove multiple place associations while preserving their source saves
-- remove previously recorded trip feedback
+- remove previously recorded trip feedback and lightweight recommendation answers
+- rename, archive, duplicate, export, or delete a Fit Guide without deleting its saved places
 - export and restore a backup
 
 Deleting a saved image removes its local file after the Artifact record is deleted. Derived Places, Gravity, patterns, and recommendations are recalculated from the remaining Library.

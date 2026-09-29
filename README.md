@@ -11,25 +11,26 @@ The local MVP is complete and verified. It requires no account or Graviti server
 ### Implemented capabilities
 
 - In-app capture for web links, manual notes, photos, screenshots, and Map links
-- iOS Share Extension for URLs, text, and one image with an optional note
+- Instant iOS Share Extension capture for URLs, text, and one image, with optional note, guide, priority, personal tag, and save-without-identification choices
 - Direct import from public Apple Maps guide links and shared Google Maps list links
 - Google Takeout Saved CSV and Apple/Google `.webloc` import
-- Immediate local persistence followed by resumable place resolution, OCR, link preview fetching, and enrichment
+- Immediate local persistence followed by a durable, independently versioned job queue for place resolution, OCR, link previews, enrichment, profile indexing, and thumbnails
 - Explicit slow-connection, retry, and partial-result states that keep the original save or guide available
 - Editable descriptions, categories, interests, notes, place matches, and source collection history
 - Fine-grained semantic interests with per-interest source provenance and confidence
-- Library browsing by Destinations, Places, Saves, and Map
-- Individual deletion, atomic bulk save deletion, and bulk place-association removal
-- Global local search plus live Apple MapKit place search
-- Backward-compatible JSON backup and restore, including saved image bytes and Explore recommendation state
+- Library browsing by Destinations, Places, Saves, and Map, with category-specific map markers, saved smart filters, completeness review, and surface-specific sorting
+- Peeking, snapping destination cards plus swipe-to-delete rows and drag-across multi-selection
+- Individual deletion with Undo, atomic bulk save deletion, and bulk place-association removal
+- Scoped local search for All, Places, Destinations, Interests, Guides, Notes, and Near me, with zero-query suggestions, recent searches, saved guides, and live Apple MapKit place search
+- Backward-compatible schema v4 JSON backup and restore, including saved image bytes, Fit Guides, Import Inbox history, saved Library filters, and recommendation feedback/outcomes
 - Adaptive Gravity Field with country, state/province, and city resolution
 - Direct switching between visible Gravity bubbles and semantic geographic drill-down
 - A browsable Gravity Insights carousel for recent momentum, geographic splits, recurring interests, and quiet destinations
 - Destination Readiness bands that discount duplicate saves and explain whether the current variety supports a weekend or several days
 - Decorative white and yellow pulsing stars that respect Reduce Motion
-- Explainable interest patterns, conservative Fit scoring, personal-evidence confidence, reviewed destination-knowledge confidence, preferences, “Not for me,” and reversible visited feedback
-- Fit Guides with region-bound live suggestions grouped by the patterns behind a recommendation
-- Persistent Fit Guide membership without duplicating an existing saved place, plus a searchable guide library
+- Explainable interest patterns, conservative Fit scoring, personal-evidence confidence, reviewed destination-knowledge confidence, preferences, “Not for me,” reversible visited feedback, lightweight one-tap questions, and private local outcome history
+- Fit Guides with region-bound live suggestions grouped by the patterns behind a recommendation, plus rename, notes, cover images, reordering, shortlist, archive, duplication, completion, and clean export
+- Persistent Fit Guide membership without duplicating an existing saved place, plus a searchable and sortable guide library
 - Sora typography, Spanish localization, Dynamic Type, VoiceOver, increased contrast, RTL inspection, and conventional alternatives to the spatial UI
 - A Home-level About surface with the local-data promise, network boundaries, version details, public feedback route, and aggregate-only diagnostics
 - Debug-only focused and crowded dogfood datasets
@@ -54,6 +55,7 @@ See [Complete Capability Reference](docs/CAPABILITIES.md) for workflows, data be
 - [Implemented Data Model](docs/DATA_MODEL.md)
 - [MVP Steering and Roadmap](docs/MVP_STEERING.md)
 - [Post-MVP Roadmap](docs/POST_MVP_ROADMAP.md)
+- [Next Phase Implementation Plan](docs/NEXT_PHASE_PLAN.md)
 - [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md)
 - [Privacy Policy](docs/PRIVACY.md)
 - [Optional TestFlight Preparation](docs/TESTFLIGHT.md)
@@ -106,9 +108,9 @@ xcodebuild \
 
 The shared `graviti` scheme includes `gravitiTests`. Run **Product → Test** in Xcode or use an installed simulator destination with `xcodebuild test`.
 
-The current suite contains 98 tests. It covers import parsing and migration, legacy SwiftData record defaults, Fit relevance and confidence, reversible visited feedback, versioned destination-catalog validation and motif generalization, region-scoped Fit Guide search behavior, fine-grained semantic evidence, interest profiles, adaptive geographic resolution, deterministic crowded layouts, Gravity Insights, Destination Readiness, backup validation and media round trips, backup v1 and v2 compatibility and v3 Explore-state restoration, privacy-safe diagnostics, OCR, safe link metadata fetching, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
+The current suite contains 144 tests. It covers import parsing and migration, durable Import Inbox attempts, place lifecycle, smart filters, completeness, distance sorting, undo, Fit Guide metadata and membership, recommendation feedback and outcomes, durable processing jobs and interrupted-work recovery, rebuildable derived indexes, backup schema v1 through v4 compatibility, Fit relevance and confidence, destination-catalog validation, semantic evidence, adaptive geography, Gravity Insights, Destination Readiness, privacy-safe diagnostics, OCR, safe link metadata fetching, social-caption place extraction, place resolution, bulk deletion, retry behavior, and SwiftData persistence.
 
-The latest verified runs passed all 98 tests on iOS 18.6 and iOS 26.2. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
+The latest complete runs passed all 141 tests then present on iOS 18.6 and iOS 26.2 on September 28, 2026. The three subsequently added Home geography checks passed inside a focused 13-test iOS 26.2 run. See [MVP Release Audit](docs/MVP_RELEASE_AUDIT.md) for the exact evidence and commit boundaries.
 
 ## Test data
 
@@ -116,4 +118,4 @@ Debug builds expose a dataset switcher at the bottom of Save. Loading a fixture 
 
 ## Data ownership
 
-Graviti stores its Library locally and has no account, analytics SDK, advertising SDK, or Graviti-operated backend in the MVP. Library → Actions can export and restore a versioned JSON backup containing saved records, generated details, place matches, source collection membership, cached link details, image bytes, Explore preferences, saved destinations, Not for Me exclusions, and visited feedback. Uninstalling the app removes the local Library unless the user exports a backup first.
+Graviti stores its Library locally and has no account, analytics SDK, advertising SDK, or Graviti-operated backend in the MVP. Library → Actions can export and restore a versioned JSON backup containing saved records, generated details, place matches, source collection membership, cached link details, image bytes, Explore preferences, saved destinations, Not for Me exclusions, visited feedback, durable Fit Guides, recommendation feedback and outcome history, Import Inbox attempts, and saved Library filters. Uninstalling the app removes the local Library unless the user exports a backup first.

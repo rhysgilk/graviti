@@ -82,6 +82,7 @@ struct ArtifactEnrichment: Codable, Hashable {
     let confidence: Double
     let generatedAt: Date
     let interestEvidence: [ArtifactInterestEvidence]?
+    let provenance: GeneratedDataProvenance?
 
     init(
         summary: String?,
@@ -90,7 +91,8 @@ struct ArtifactEnrichment: Codable, Hashable {
         source: Source,
         confidence: Double,
         generatedAt: Date,
-        interestEvidence: [ArtifactInterestEvidence]? = nil
+        interestEvidence: [ArtifactInterestEvidence]? = nil,
+        provenance: GeneratedDataProvenance? = nil
     ) {
         self.summary = summary
         self.category = category
@@ -99,5 +101,6 @@ struct ArtifactEnrichment: Codable, Hashable {
         self.confidence = confidence
         self.generatedAt = generatedAt
         self.interestEvidence = interestEvidence
+        self.provenance = provenance
     }
 }

@@ -9,6 +9,8 @@ struct SavedItemDetailsEditor: View {
     @State private var summary: String
     @State private var category: ExperienceCategory
     @State private var interests: String
+    @State private var tags: String
+    @State private var isHighPriority: Bool
     @State private var isSaving = false
     @State private var errorMessage: String?
 
@@ -19,6 +21,8 @@ struct SavedItemDetailsEditor: View {
         _summary = State(initialValue: artifact.effectiveSummary ?? "")
         _category = State(initialValue: artifact.effectiveCategory ?? .other)
         _interests = State(initialValue: artifact.effectiveInterests.joined(separator: ", "))
+        _tags = State(initialValue: artifact.userDetails?.tags.joined(separator: ", ") ?? "")
+        _isHighPriority = State(initialValue: artifact.userDetails?.isHighPriority ?? false)
     }
 
     var body: some View {
@@ -41,11 +45,14 @@ struct SavedItemDetailsEditor: View {
                     Text("Examples: matcha, scenic views, architecture. These help Graviti find patterns across your saves.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Toggle("High priority", isOn: $isHighPriority)
+                    TextField("Personal tags, separated by commas", text: $tags, axis: .vertical)
+                        .lineLimit(1...3)
                 }
                 if artifact.userDetails != nil {
                     Section {
                         Button("Use suggested details") {
-                            Task { await save(details: nil) }
+                            Task { await save(details: suggestedDetails) }
                         }
                         .disabled(isSaving)
                     } footer: {
@@ -73,14 +80,33 @@ struct SavedItemDetailsEditor: View {
 
     private var editedDetails: ArtifactUserDetails {
         var seen = Set<String>()
-        let tags = interests.split(separator: ",")
+        let parsedInterests = interests.split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && seen.insert($0.folding(options: .caseInsensitive, locale: .current)).inserted }
+        seen.removeAll()
+        let parsedTags = tags.split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty && seen.insert($0.folding(options: .caseInsensitive, locale: .current)).inserted }
         let trimmedSummary = summary.trimmingCharacters(in: .whitespacesAndNewlines)
         return ArtifactUserDetails(
             summary: trimmedSummary.isEmpty ? nil : trimmedSummary,
             category: category == .other ? nil : category,
-            interests: tags
+            interests: parsedInterests,
+            placeStatus: artifact.userDetails?.placeStatus,
+            isHighPriority: isHighPriority,
+            tags: parsedTags
+        )
+    }
+
+    private var suggestedDetails: ArtifactUserDetails? {
+        guard isHighPriority || artifact.userDetails?.tags.isEmpty == false else { return nil }
+        return ArtifactUserDetails(
+            summary: nil,
+            category: nil,
+            interests: [],
+            placeStatus: artifact.userDetails?.placeStatus,
+            isHighPriority: isHighPriority,
+            tags: artifact.userDetails?.tags ?? []
         )
     }
 

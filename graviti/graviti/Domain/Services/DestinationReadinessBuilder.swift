@@ -136,7 +136,7 @@ enum DestinationReadinessBuilder {
         }
     }
 
-    private static func normalized(_ value: String) -> String {
+    nonisolated private static func normalized(_ value: String) -> String {
         value.trimmingCharacters(in: .whitespacesAndNewlines)
             .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
     }

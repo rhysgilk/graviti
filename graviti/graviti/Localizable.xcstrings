@@ -4,249 +4,20 @@
     "" : {
 
     },
-    "Applied as filters" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplicados como filtros"
-          }
-        }
-      }
-    },
-    "Avoided interests, Not for Me, and visited destinations are removed before ranking." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los intereses evitados, No es para mí y los destinos visitados se eliminan antes de ordenar."
-          }
-        }
-      }
-    },
-    "Destination knowledge" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conocimiento del destino"
-          }
-        }
-      }
-    },
-    "Destinations already represented in your Library are filtered out." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se filtran los destinos que ya están representados en tu Biblioteca."
-          }
-        }
-      }
-    },
-    "Distinct places, areas, sources, and detail quality limit certainty." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los lugares, las zonas, las fuentes y la calidad de los detalles limitan la certeza."
-          }
-        }
-      }
-    },
-    "Evidence confidence" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confianza de la evidencia"
-          }
-        }
-      }
-    },
-    "Fit is a conservative comparison signal, not the chance you will enjoy a trip." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fit es una señal comparativa prudente, no la probabilidad de que disfrutes un viaje."
-          }
-        }
-      }
-    },
-    "How strongly this destination matches patterns across your saves." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Qué tanto coincide este destino con los patrones de tus elementos guardados."
-          }
-        }
-      }
-    },
-    "How this Fit was calculated" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cómo se calculó este Fit"
-          }
-        }
-      }
-    },
-    "Negative feedback" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comentarios negativos"
-          }
-        }
-      }
-    },
-    "New to your Library" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nuevo en tu Biblioteca"
-          }
-        }
-      }
-    },
-    "No added boost" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin impulso adicional"
-          }
-        }
-      }
-    },
-    "Novelty" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Novedad"
-          }
-        }
-      }
-    },
-    "Preference match" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coincidencia con preferencias"
-          }
-        }
-      }
-    },
-    "Preferences you add are visible and receive only a small boost." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las preferencias que añades son visibles y reciben solo un pequeño impulso."
-          }
-        }
-      }
-    },
-    "Relevance" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Relevancia"
-          }
-        }
-      }
-    },
-    "Reviewed destination evidence limits how certain Graviti can be." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La evidencia revisada del destino limita el nivel de certeza de Graviti."
-          }
-        }
-      }
-    },
-    "%@ is a %@ in %@, saved for %@." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ es de tipo %2$@ en %3$@ y se guardó por %4$@."
-          }
-        }
-      }
-    },
-    "%@ is a %@ in %@." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ es de tipo %2$@ en %3$@."
-          }
-        }
-      }
-    },
-    "%@ is a %@, saved for %@." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ es de tipo %2$@ y se guardó por %3$@."
-          }
-        }
-      }
-    },
-    "%@ is a %@." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ es de tipo %2$@."
-          }
-        }
-      }
-    },
-    "%@ is saved for %@." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ se guardó por %2$@."
-          }
-        }
-      }
-    },
-    "%@ keeps showing up" : {
-      "comment" : "A title and a description that explain a pattern of interest that the user has saved. The argument is the name of the interest.",
+    "·" : {
+      "comment" : "A period used to separate different pieces of information in a list.",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ aparece una y otra vez"
+            "value" : "·"
           }
         }
       }
     },
-    "%@ leads your field" : {
-      "comment" : "A title that highlights the leading destination in the user's field. The text is styled to look like a headline.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ lidera tu campo"
-          }
-        }
-      }
+    "“Rocky coastline and quiet sunrise trails”" : {
+
     },
     "%@ · %@" : {
       "localizations" : {
@@ -296,8 +67,21 @@
         }
       }
     },
+    "%@ · %lld saved" : {
+      "comment" : "A subheading that includes the name of a destination and the number of saved guides for that destination.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$lld saved"
+          }
+        }
+      }
+    },
     "%@ · %lld saved %@" : {
       "comment" : "A subheadline label showing the level of the destination and the number of saved items. The first argument is the localized name of the destination's level. The second argument is the count of saved items. The third argument is a pluralization suffix based on the count of saved items.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "en" : {
@@ -310,6 +94,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ · %2$lld %3$@ guardados"
+          }
+        }
+      }
+    },
+    "%@ · %lld%% confidence" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$lld%% de confianza"
           }
         }
       }
@@ -328,6 +122,137 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ · %2$lld%% de confianza de la evidencia"
+          }
+        }
+      }
+    },
+    "%@ away" : {
+      "comment" : "A string describing the distance from the user's current location to a specific place, using the user's locale's conventions for measurement units.",
+      "isCommentAutoGenerated" : true
+    },
+    "%@ Copy" : {
+
+    },
+    "%@ Fit Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guía Fit de %1$@"
+          }
+        }
+      }
+    },
+    "%@ has gone quiet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ lleva un tiempo sin actividad"
+          }
+        }
+      }
+    },
+    "%@ is a %@ in %@, saved for %@." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ es de tipo %2$@ en %3$@ y se guardó por %4$@."
+          }
+        }
+      }
+    },
+    "%@ is a %@ in %@." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ es de tipo %2$@ en %3$@."
+          }
+        }
+      }
+    },
+    "%@ is a %@, saved for %@." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ es de tipo %2$@ y se guardó por %3$@."
+          }
+        }
+      }
+    },
+    "%@ is a %@." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ es de tipo %2$@."
+          }
+        }
+      }
+    },
+    "%@ is coming into focus" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ está cobrando forma"
+          }
+        }
+      }
+    },
+    "%@ is gaining Gravity" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ está ganando Gravity"
+          }
+        }
+      }
+    },
+    "%@ is saved for %@." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ se guardó por %2$@."
+          }
+        }
+      }
+    },
+    "%@ keeps showing up" : {
+      "comment" : "A title and a description that explain a pattern of interest that the user has saved. The argument is the name of the interest.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ aparece una y otra vez"
+          }
+        }
+      }
+    },
+    "%@ leads your field" : {
+      "comment" : "A title that highlights the leading destination in the user's field. The text is styled to look like a headline.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ lidera tu campo"
+          }
+        }
+      }
+    },
+    "%@ now have enough Gravity to stand on their own" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ya tienen suficiente Gravity para destacar por sí solos"
           }
         }
       }
@@ -380,6 +305,7 @@
     },
     "%@, %@, Gravity %lld, %lld saved %@" : {
       "comment" : "An element that represents a destination with a name, a level, a gravity score, and a count of saved items. The first argument is the name of the destination. The second argument is the level of the destination. The third argument is the gravity score of the destination. The fourth argument is the count of saved items at the destination.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "en" : {
@@ -392,6 +318,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@, %2$@, Gravity %3$lld, %4$lld %5$@ guardados"
+          }
+        }
+      }
+    },
+    "%@, response %@" : {
+      "comment" : "A row in a list that shows a prompt, a user's response to that prompt, and the date and ID of the corresponding recommendation.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, response %2$@"
           }
         }
       }
@@ -409,6 +347,7 @@
       }
     },
     "%lld %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -426,6 +365,7 @@
     },
     "%lld %@ multiple saves" : {
       "comment" : "A description of how many groups of repeated places there are, followed by a count of how many places are in each group.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "en" : {
@@ -438,46 +378,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld %2$@ reúnen varios guardados"
-          }
-        }
-      }
-    },
-    "%lld Gravity" : {
-      "comment" : "Labels displaying various statistics about an orbit node.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld Gravity"
-          }
-        }
-      }
-    },
-    "%lld Gravity · %@" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld Gravity · %2$@"
-          }
-        }
-      }
-    },
-    "%lld Gravity · %lld saved %@" : {
-      "comment" : "A label displaying the gravity score and the number of saved items for the leading destination.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld Gravity · %2$lld saved %3$@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld Gravity · %2$lld %3$@ guardados"
           }
         }
       }
@@ -504,6 +404,19 @@
         }
       }
     },
+    "%lld distinct places" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld lugares distintos"
+          }
+        }
+      }
+    },
+    "%lld duplicates · nothing added" : {
+
+    },
     "%lld duplicates already present" : {
       "localizations" : {
         "es" : {
@@ -524,12 +437,138 @@
         }
       }
     },
+    "%lld experience types" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld tipos de experiencia"
+          }
+        }
+      }
+    },
+    "%lld FIT · %lld%% confidence" : {
+      "comment" : "A text displaying the FIT score and confidence percentage for a recommendation event.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld FIT · %2$lld%% confidence"
+          }
+        }
+      }
+    },
+    "%lld Gravity" : {
+      "comment" : "Labels displaying various statistics about an orbit node.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Gravity"
+          }
+        }
+      }
+    },
+    "%lld Gravity · %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Gravity · %2$@"
+          }
+        }
+      }
+    },
+    "%lld Gravity · %lld saved %@" : {
+      "comment" : "A label displaying the gravity score and the number of saved items for the leading destination.",
+      "extractionState" : "stale",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld Gravity · %2$lld saved %3$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Gravity · %2$lld %3$@ guardados"
+          }
+        }
+      }
+    },
     "%lld imported" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld importados"
+          }
+        }
+      }
+    },
+    "%lld imported · %lld refreshed · %lld duplicates" : {
+      "comment" : "A summary of the results of an import attempt. The first argument is the number of items that were imported. The second argument is the number of items that were refreshed. The third argument is the number of items that were duplicates.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld imported · %2$lld refreshed · %3$lld duplicates"
+          }
+        }
+      }
+    },
+    "%lld interests" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld intereses"
+          }
+        }
+      }
+    },
+    "%lld local events · Inspect or remove" : {
+      "comment" : "A string describing the number of local events that have been recorded. The argument is the number of such events.",
+      "isCommentAutoGenerated" : true
+    },
+    "%lld local responses · View, change, or remove" : {
+      "comment" : "A description of the number of feedback responses that have been recorded locally. The argument is the count of such responses.",
+      "isCommentAutoGenerated" : true
+    },
+    "%lld of %lld" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld de %2$lld"
+          }
+        }
+      }
+    },
+    "%lld of %lld patterns have saved places" : {
+      "comment" : "A label that shows the number of your patterns that have saved places, out of the total number of patterns.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld patterns have saved places"
+          }
+        }
+      }
+    },
+    "%lld place details refreshed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld detalles de lugares actualizados"
           }
         }
       }
@@ -544,6 +583,10 @@
         }
       }
     },
+    "%lld places on map" : {
+      "comment" : "Label for the number of places displayed on the map.",
+      "isCommentAutoGenerated" : true
+    },
     "%lld preferences" : {
       "localizations" : {
         "es" : {
@@ -556,6 +599,7 @@
     },
     "%lld saved %@" : {
       "comment" : "A label displaying the number of saved items and their count.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "en" : {
@@ -574,6 +618,7 @@
     },
     "%lld saved %@ · %lld Gravity" : {
       "comment" : "A secondary line of text below the main title, showing the number of saves and gravity level of the area.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "en" : {
@@ -622,12 +667,32 @@
         }
       }
     },
+    "%lld saves across %lld destinations" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld guardados en %2$lld destinos"
+          }
+        }
+      }
+    },
     "%lld saves at %lld places" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld guardados en %2$lld lugares"
+          }
+        }
+      }
+    },
+    "%lld saves at %lld places in the last %lld days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld guardados en %2$lld lugares en los últimos %3$lld días"
           }
         }
       }
@@ -664,6 +729,26 @@
         }
       }
     },
+    "1 destination" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 destino"
+          }
+        }
+      }
+    },
+    "1 distinct place" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 lugar distinto"
+          }
+        }
+      }
+    },
     "1 duplicate already present" : {
       "localizations" : {
         "es" : {
@@ -684,12 +769,32 @@
         }
       }
     },
+    "1 experience type" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 tipo de experiencia"
+          }
+        }
+      }
+    },
     "1 imported" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 importado"
+          }
+        }
+      }
+    },
+    "1 interest" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 interés"
           }
         }
       }
@@ -703,6 +808,20 @@
           }
         }
       }
+    },
+    "1 place detail refreshed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 detalle de lugar actualizado"
+          }
+        }
+      }
+    },
+    "1 place on map" : {
+      "comment" : "Label indicating that there is one place on the map.",
+      "isCommentAutoGenerated" : true
     },
     "1 preference" : {
       "localizations" : {
@@ -764,6 +883,10 @@
         }
       }
     },
+    "A home for places" : {
+      "comment" : "Title of the first onboarding page.",
+      "isCommentAutoGenerated" : true
+    },
     "A note, if you like" : {
       "localizations" : {
         "es" : {
@@ -773,6 +896,10 @@
           }
         }
       }
+    },
+    "A save becomes more useful as its place, category, interests, and your reason for saving it come together." : {
+      "comment" : "Description of a feature in the \"From save to signal\" onboarding page.",
+      "isCommentAutoGenerated" : true
     },
     "A saved idea about %@." : {
       "localizations" : {
@@ -804,6 +931,16 @@
         }
       }
     },
+    "About Graviti" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de Graviti"
+          }
+        }
+      }
+    },
     "About this save" : {
       "localizations" : {
         "es" : {
@@ -814,12 +951,56 @@
         }
       }
     },
+    "Acadia National Park" : {
+      "comment" : "The name of a national park.",
+      "isCommentAutoGenerated" : true
+    },
+    "Across your Library" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En toda tu biblioteca"
+          }
+        }
+      }
+    },
     "Activities" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actividades"
+          }
+        }
+      }
+    },
+    "Add %lld more distinct places and broaden the mix of experiences to support a weekend." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade %1$lld lugares distintos más y amplía la variedad de experiencias para preparar un fin de semana."
+          }
+        }
+      }
+    },
+    "Add %lld more distinct places to support a longer trip." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade %1$lld lugares distintos más para preparar un viaje más largo."
+          }
+        }
+      }
+    },
+    "Add %lld more distinct places to support a weekend." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade %1$lld lugares distintos más para preparar un fin de semana."
           }
         }
       }
@@ -854,6 +1035,30 @@
         }
       }
     },
+    "Add another kind of experience and %lld more distinct places to support a longer trip." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade otro tipo de experiencia y %1$lld lugares distintos más para preparar un viaje más largo."
+          }
+        }
+      }
+    },
+    "Add another kind of experience to support a longer trip." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade otro tipo de experiencia para preparar un viaje más largo."
+          }
+        }
+      }
+    },
+    "Add the details only you know" : {
+      "comment" : "A description of what the \"Complete saves\" button does.",
+      "isCommentAutoGenerated" : true
+    },
     "Added %lld shared saves to your Library" : {
       "localizations" : {
         "es" : {
@@ -874,6 +1079,26 @@
         }
       }
     },
+    "Added in the last 30 days" : {
+      "comment" : "A toggle that filters saved views to include only those added in the last 30 days.",
+      "isCommentAutoGenerated" : true
+    },
+    "All" : {
+      "comment" : "Title of a library smart filter option that shows all items.",
+      "isCommentAutoGenerated" : true
+    },
+    "All saved" : {
+      "comment" : "Title for a category button in the destination library detail view that shows all saved artifacts.",
+      "isCommentAutoGenerated" : true
+    },
+    "All saved places" : {
+      "comment" : "A description of the number of artifacts that have been saved in a destination.",
+      "isCommentAutoGenerated" : true
+    },
+    "Alphabetical" : {
+      "comment" : "Title of the \"Alphabetical\" option in the FitGuide sort menu.",
+      "isCommentAutoGenerated" : true
+    },
     "Already saved" : {
       "comment" : "A label describing a saved place.",
       "isCommentAutoGenerated" : true,
@@ -882,6 +1107,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ya está guardado"
+          }
+        }
+      }
+    },
+    "Already visited?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Ya lo visitaste?"
           }
         }
       }
@@ -898,8 +1133,33 @@
         }
       }
     },
+    "amusement park" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "parque de atracciones"
+          }
+        }
+      }
+    },
+    "Any category" : {
+      "comment" : "A placeholder text for a picker that lets users select a category.",
+      "isCommentAutoGenerated" : true
+    },
+    "Any note state" : {
+      "comment" : "Title of a saved library filter rule that matches any artifact note state.",
+      "isCommentAutoGenerated" : true
+    },
+    "Any source" : {
+      "comment" : "Title of a saved library filter source rule that matches any source.",
+      "isCommentAutoGenerated" : true
+    },
+    "Any status" : {
+      "comment" : "A placeholder text for a picker that lets users select a \"place status\".",
+      "isCommentAutoGenerated" : true
+    },
     "Anywhere" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -919,12 +1179,32 @@
         }
       }
     },
+    "Apple MapKit powers place search and Fit Guide suggestions. Public map collections and saved webpages are contacted only for features you invoke or eligible links you save. Photo text recognition runs on device." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple MapKit permite buscar lugares y obtener sugerencias de las guías de Fit. Las colecciones públicas de mapas y las páginas web guardadas solo se consultan para funciones que usas o enlaces compatibles que guardas. El reconocimiento de texto en fotos se ejecuta en el dispositivo."
+          }
+        }
+      }
+    },
     "Apple Maps guide" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Guía de Apple Maps"
+          }
+        }
+      }
+    },
+    "Apple Maps place category" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Categoría del lugar en Apple Maps"
           }
         }
       }
@@ -973,7 +1253,28 @@
         }
       }
     },
+    "Applied as filters" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicados como filtros"
+          }
+        }
+      }
+    },
+    "aquarium" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "acuario"
+          }
+        }
+      }
+    },
     "Architecture" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -983,8 +1284,13 @@
         }
       }
     },
+    "Archive" : {
+      "comment" : "A button label that archives a guide.",
+      "isCommentAutoGenerated" : true
+    },
     "Areas" : {
       "comment" : "A section header that lists the areas within a destination library.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -1006,7 +1312,6 @@
       }
     },
     "Asia" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1048,6 +1353,16 @@
         }
       }
     },
+    "Avoided interests, Not for Me, and visited destinations are removed before ranking." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los intereses evitados, No es para mí y los destinos visitados se eliminan antes de ordenar."
+          }
+        }
+      }
+    },
     "Back" : {
       "comment" : "A label for a button that navigates back to the previous screen.",
       "isCommentAutoGenerated" : true,
@@ -1084,6 +1399,40 @@
         }
       }
     },
+    "Backups are yours" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus copias de seguridad te pertenecen"
+          }
+        }
+      }
+    },
+    "bakery" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "panadería"
+          }
+        }
+      }
+    },
+    "Bar Harbor, Maine" : {
+
+    },
+    "Barbecue" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Barbacoa"
+          }
+        }
+      }
+    },
     "Based on %lld of your saved items across the Library." : {
       "comment" : "A text label explaining that the recommendation is based on a number of saved items in the user's Library. The argument is the count of saved items in the user's Library.",
       "isCommentAutoGenerated" : true,
@@ -1096,7 +1445,18 @@
         }
       }
     },
+    "beach" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "playa"
+          }
+        }
+      }
+    },
     "Beaches" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1106,12 +1466,89 @@
         }
       }
     },
+    "Boston restaurants" : {
+      "comment" : "Title of a library smart filter category that includes Boston restaurants.",
+      "isCommentAutoGenerated" : true
+    },
+    "brewery" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cervecería"
+          }
+        }
+      }
+    },
+    "Bring in places, Maps lists, social links, screenshots, photos, and notes. Graviti keeps the source while it finds the place and fills in details." : {
+
+    },
     "Bring in saved places" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Importa lugares guardados"
+          }
+        }
+      }
+    },
+    "Broaden the mix of experiences to support a weekend." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amplía la variedad de experiencias para preparar un fin de semana."
+          }
+        }
+      }
+    },
+    "Browse all Fit Guides" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver todas las guías de Fit"
+          }
+        }
+      }
+    },
+    "Build my %@ Fit Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear mi guía Fit de %1$@"
+          }
+        }
+      }
+    },
+    "Built from your patterns" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creada a partir de tus patrones"
+          }
+        }
+      }
+    },
+    "café" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cafetería"
+          }
+        }
+      }
+    },
+    "campground" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "camping"
           }
         }
       }
@@ -1124,6 +1561,20 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancelar"
+          }
+        }
+      }
+    },
+    "Cards" : {
+      "comment" : "Title for the \"Cards\" option in the destination save display mode picker.",
+      "isCommentAutoGenerated" : true
+    },
+    "castle" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "castillo"
           }
         }
       }
@@ -1149,6 +1600,9 @@
           }
         }
       }
+    },
+    "Category uncertain" : {
+
     },
     "Change photo" : {
       "localizations" : {
@@ -1202,6 +1656,20 @@
         }
       }
     },
+    "Checking for places in this Google Maps list…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando lugares en esta lista de Google Maps…"
+          }
+        }
+      }
+    },
+    "Choose another category to keep exploring %@." : {
+      "comment" : "A view shown when a category in the destination library has no saved places. The argument is the name of the category.",
+      "isCommentAutoGenerated" : true
+    },
     "Choose from Photos" : {
       "localizations" : {
         "es" : {
@@ -1220,6 +1688,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elige el lugar correspondiente"
+          }
+        }
+      }
+    },
+    "cities" : {
+      "comment" : "A label for the number of cities imported.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ciudades"
           }
         }
       }
@@ -1243,6 +1723,25 @@
           }
         }
       }
+    },
+    "Clear" : {
+      "comment" : "A button that clears all recommendation activity when pressed.",
+      "isCommentAutoGenerated" : true
+    },
+    "Clear all activity" : {
+      "comment" : "A button that clears all recommendation activity.",
+      "isCommentAutoGenerated" : true
+    },
+    "Clear all feedback" : {
+      "comment" : "A button that clears all saved recommendation feedback.",
+      "isCommentAutoGenerated" : true
+    },
+    "Clear all recommendation feedback?" : {
+
+    },
+    "Clear recommendation activity?" : {
+      "comment" : "A confirmation dialog title asking if the user wants to clear all recommendation activity.",
+      "isCommentAutoGenerated" : true
     },
     "Close destination" : {
       "comment" : "A label for a button that closes a destination selection card.",
@@ -1291,11 +1790,90 @@
       }
     },
     "Coffee" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Café"
+          }
+        }
+      }
+    },
+    "Collect matching museums, scenery, food, and more." : {
+      "comment" : "Description of a feature in the OnboardingView, related to the \"Fit Guides\" feature.",
+      "isCommentAutoGenerated" : true
+    },
+    "Combine place, interest, category, source, note, and status rules into a view that updates automatically." : {
+      "comment" : "A description of the functionality of the Saved Library Filters feature.",
+      "isCommentAutoGenerated" : true
+    },
+    "Complete %lld saves" : {
+      "comment" : "A label describing a feature that helps users identify and correct inaccuracies in their saved locations.",
+      "isCommentAutoGenerated" : true
+    },
+    "Complete saves" : {
+      "comment" : "The title of a view that lists artifacts with incomplete details.",
+      "isCommentAutoGenerated" : true
+    },
+    "Connect to the internet to load live place suggestions. Places already saved in this guide remain available." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conéctate a internet para cargar sugerencias de lugares. Los lugares ya guardados en esta guía siguen disponibles."
+          }
+        }
+      }
+    },
+    "Continue" : {
+      "comment" : "A button that lets the user continue to the next screen in the onboarding flow.",
+      "isCommentAutoGenerated" : true
+    },
+    "Copies app and aggregate status details without saved content" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia datos de la app y del estado agregado sin contenido guardado"
+          }
+        }
+      }
+    },
+    "Copy diagnostics" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar diagnósticos"
+          }
+        }
+      }
+    },
+    "Couldn't identify a place" : {
+      "comment" : "Title for an import inbox state when a place could not be identified.",
+      "isCommentAutoGenerated" : true
+    },
+    "couldn’t import" : {
+      "comment" : "A label describing an item that could not be imported.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no se pudieron importar"
+          }
+        }
+      }
+    },
+    "countries" : {
+      "comment" : "A string that can be used as a label for a count of countries.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "países"
           }
         }
       }
@@ -1320,17 +1898,13 @@
         }
       }
     },
-    "Data & Privacy" : {
-      "comment" : "The title of a view that explains Graviti's data usage and privacy practices.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Datos y privacidad"
-          }
-        }
-      }
+    "Created %@." : {
+      "comment" : "A notice displayed to the user after duplicating a fit guide. The placeholder is replaced with the name of the newly created guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "Curious" : {
+      "comment" : "Title of a place lifecycle status when the user is curious about the place.",
+      "isCommentAutoGenerated" : true
     },
     "Data & privacy" : {
       "comment" : "A menu item in the library's toolbar that navigates to the data privacy view.",
@@ -1344,8 +1918,25 @@
         }
       }
     },
+    "Data & Privacy" : {
+      "comment" : "The title of a view that explains Graviti's data usage and privacy practices.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datos y privacidad"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "comment" : "The text for a button that deletes an item.",
+      "isCommentAutoGenerated" : true
+    },
     "Delete %lld selected" : {
       "comment" : "A button that deletes multiple saved locations.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -1358,6 +1949,7 @@
     },
     "Delete %lld selected %@?" : {
       "comment" : "A confirmation dialog that asks whether the user wants to delete the selected saves.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "en" : {
@@ -1446,6 +2038,13 @@
         }
       }
     },
+    "Deleted %@" : {
+      "comment" : "A message that appears in the undo stack when a saved item is deleted. The argument is the title of the saved item.",
+      "isCommentAutoGenerated" : true
+    },
+    "Deletes only the clearly labeled sample saves. Your own saves stay in place." : {
+
+    },
     "Deleting Graviti also removes its local Library. Use Export backup from Library Actions to keep a copy, including saved photos, and Restore backup to bring it back later." : {
       "comment" : "Text describing the process of backing up and restoring the Library on a device that has been uninstalled.",
       "isCommentAutoGenerated" : true,
@@ -1458,12 +2057,34 @@
         }
       }
     },
+    "Desert hiking" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senderismo en desierto"
+          }
+        }
+      }
+    },
     "Desserts" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Postres"
+          }
+        }
+      }
+    },
+    "Destination knowledge" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conocimiento del destino"
           }
         }
       }
@@ -1474,16 +2095,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Conocimiento del destino · %1$lld%% de confianza revisada"
-          }
-        }
-      }
-    },
-    "Destination sources" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fuentes del destino"
           }
         }
       }
@@ -1500,12 +2111,32 @@
         }
       }
     },
+    "Destination sources" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fuentes del destino"
+          }
+        }
+      }
+    },
     "Destinations" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Destinos"
+          }
+        }
+      }
+    },
+    "Destinations already represented in your Library are filtered out." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se filtran los destinos que ya están representados en tu Biblioteca."
           }
         }
       }
@@ -1523,6 +2154,7 @@
       }
     },
     "Destinations grow as your real saves accumulate." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1531,6 +2163,14 @@
           }
         }
       }
+    },
+    "Destinations grow from your actual saves." : {
+      "comment" : "Description of a feature in the OnboardingView, related to how destinations are suggested based on actual saves.",
+      "isCommentAutoGenerated" : true
+    },
+    "Destinations in your orbit" : {
+      "comment" : "A section header that lists destinations within the user's orbit.",
+      "isCommentAutoGenerated" : true
     },
     "Details edited by you" : {
       "localizations" : {
@@ -1598,6 +2238,37 @@
         }
       }
     },
+    "Diagnostics copied" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnósticos copiados"
+          }
+        }
+      }
+    },
+    "Didn't fit" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No encajó"
+          }
+        }
+      }
+    },
+    "Dim sum" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dim sum"
+          }
+        }
+      }
+    },
     "Discover deeper patterns" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1605,6 +2276,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descubre patrones más profundos"
+          }
+        }
+      }
+    },
+    "Dismiss" : {
+      "comment" : "A button that dismisses a prompt about influencing future recommendations.",
+      "isCommentAutoGenerated" : true
+    },
+    "Display" : {
+      "comment" : "A label for a segmented control that lets a user choose how to display their saved places.",
+      "isCommentAutoGenerated" : true
+    },
+    "Distance" : {
+      "comment" : "Title of a library sort option that sorts locations by distance from the user's current location.",
+      "isCommentAutoGenerated" : true
+    },
+    "Distinct places, areas, sources, and detail quality limit certainty." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los lugares, las zonas, las fuentes y la calidad de los detalles limitan la certeza."
           }
         }
       }
@@ -1629,6 +2322,26 @@
         }
       }
     },
+    "Duplicate" : {
+      "comment" : "Title for a state in the import inbox view that indicates a duplicate import attempt.",
+      "isCommentAutoGenerated" : true
+    },
+    "Duplicate guide" : {
+      "comment" : "A button label that duplicates a fit guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "duplicates avoided" : {
+      "comment" : "A description of a feature that helps prevent duplicate entries when importing data.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "duplicados evitados"
+          }
+        }
+      }
+    },
     "Early signal" : {
       "localizations" : {
         "es" : {
@@ -1639,6 +2352,10 @@
         }
       }
     },
+    "Edit %@" : {
+      "comment" : "A label for an action button that appears in a list row. The label text is generated from the name of the filter being edited.",
+      "isCommentAutoGenerated" : true
+    },
     "Edit description and interests" : {
       "localizations" : {
         "es" : {
@@ -1648,6 +2365,14 @@
           }
         }
       }
+    },
+    "Edit Fit Guide" : {
+      "comment" : "The title of a view that allows users to edit details of a fit guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "Edit guide" : {
+      "comment" : "A menu item to edit the title or note of a fit guide.",
+      "isCommentAutoGenerated" : true
     },
     "Edit saved item" : {
       "comment" : "The title of a view that allows a user to edit details of a previously saved item.",
@@ -1674,12 +2399,21 @@
       }
     },
     "Europe" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Europa"
+          }
+        }
+      }
+    },
+    "Evidence confidence" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confianza de la evidencia"
           }
         }
       }
@@ -1706,7 +2440,12 @@
         }
       }
     },
+    "Explore areas" : {
+      "comment" : "A heading for a section that lists destinations within a library.",
+      "isCommentAutoGenerated" : true
+    },
     "Explore the app" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1715,6 +2454,10 @@
           }
         }
       }
+    },
+    "Explore without samples" : {
+      "comment" : "A button that allows users to explore the app without using the sample library.",
+      "isCommentAutoGenerated" : true
     },
     "Export backup" : {
       "comment" : "A button that exports a backup of the user's library.",
@@ -1727,6 +2470,30 @@
           }
         }
       }
+    },
+    "Feedback & support" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentarios y ayuda"
+          }
+        }
+      }
+    },
+    "Feedback opens the public GitHub issue tracker. Do not include private or sensitive information. Diagnostics contain aggregate counts and app details only." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los comentarios abren el registro público de incidencias de GitHub. No incluyas información privada ni confidencial. Los diagnósticos solo contienen recuentos agregados y datos de la app."
+          }
+        }
+      }
+    },
+    "Filter saves by category" : {
+      "comment" : "An accessibility label for the filter section in the destination library detail view.",
+      "isCommentAutoGenerated" : true
     },
     "Find a place" : {
       "localizations" : {
@@ -1796,6 +2563,16 @@
         }
       }
     },
+    "Finding places for your patterns…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando lugares para tus patrones…"
+          }
+        }
+      }
+    },
     "Finding this place" : {
       "comment" : "A label indicating that the app is trying to find a matching place for a saved artifact.",
       "isCommentAutoGenerated" : true,
@@ -1808,12 +2585,46 @@
         }
       }
     },
+    "Finding your location…" : {
+      "comment" : "A text indicating that the app is trying to find the user's location.",
+      "isCommentAutoGenerated" : true
+    },
     "Fit" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fit"
+          }
+        }
+      }
+    },
+    "Fit Guides" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guías de Fit"
+          }
+        }
+      }
+    },
+    "Fit Guides stay here even when their destinations are no longer in your current recommendations." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las guías de Fit permanecen aquí aunque sus destinos ya no aparezcan en tus recomendaciones actuales."
+          }
+        }
+      }
+    },
+    "Fit is a conservative comparison signal, not the chance you will enjoy a trip." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fit es una señal comparativa prudente, no la probabilidad de que disfrutes un viaje."
           }
         }
       }
@@ -1828,7 +2639,29 @@
         }
       }
     },
+    "food market" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mercado gastronómico"
+          }
+        }
+      }
+    },
+    "Forest hiking" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senderismo en bosque"
+          }
+        }
+      }
+    },
     "Forests" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1838,7 +2671,16 @@
         }
       }
     },
+    "From Instagram" : {
+      "comment" : "Title for a library smart filter that shows only locations added from Instagram.",
+      "isCommentAutoGenerated" : true
+    },
+    "From save to signal" : {
+      "comment" : "Title of a section in the OnboardingView that describes how Graviti can help you discover new places.",
+      "isCommentAutoGenerated" : true
+    },
     "Gardens" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1868,6 +2710,9 @@
         }
       }
     },
+    "Google Maps CSV" : {
+
+    },
     "Google Maps import complete" : {
       "localizations" : {
         "es" : {
@@ -1888,8 +2733,26 @@
         }
       }
     },
+    "grav" : {
+      "comment" : "The first letter of the word \"graviti\".",
+      "extractionState" : "stale",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "grav"
+          }
+        }
+      }
+    },
+    "Graviti keeps filling details automatically. This queue highlights the few saves where a personal note, correction, or retry can make future recommendations more useful." : {
+      "comment" : "A description of the purpose of the \"Complete saves\" view.",
+      "isCommentAutoGenerated" : true
+    },
     "Graviti organizes the places that catch your attention, learns the interests behind them, and helps reveal where you may want to go next." : {
       "comment" : "A description of what Graviti does.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -1920,6 +2783,56 @@
         }
       }
     },
+    "Gravity" : {
+      "comment" : "Title of a library sort option.",
+      "isCommentAutoGenerated" : true
+    },
+    "Gravity shows where your attention gathers. Fit combines interests, evidence, and confidence. Fit Guides turn a destination into specific places you can shortlist." : {
+      "comment" : "Description of the \"Fit\" feature in the OnboardingView.",
+      "isCommentAutoGenerated" : true
+    },
+    "Growing now" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creciendo ahora"
+          }
+        }
+      }
+    },
+    "Guide name" : {
+      "comment" : "A label for the name of a fit guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "Guide note" : {
+      "comment" : "A label for a text field where the user can enter a note for a fit guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "Guides" : {
+      "comment" : "Title for a search scope that filters results to only include guides.",
+      "isCommentAutoGenerated" : true
+    },
+    "Guides appear here when you save a Fit destination." : {
+      "comment" : "A description text that appears when there are no Fit Guides saved.",
+      "isCommentAutoGenerated" : true
+    },
+    "Has a personal note" : {
+      "comment" : "Description of a saved library note rule when the user has a personal note.",
+      "isCommentAutoGenerated" : true
+    },
+    "Help Graviti learn" : {
+      "comment" : "A label above a card that asks users to help improve Graviti.",
+      "isCommentAutoGenerated" : true
+    },
+    "High priority" : {
+      "comment" : "A toggle that lets the user mark a save as high priority.",
+      "isCommentAutoGenerated" : true
+    },
+    "High priority only" : {
+      "comment" : "A toggle that filters experiences to show only those with high priority.",
+      "isCommentAutoGenerated" : true
+    },
     "Hiking" : {
       "localizations" : {
         "es" : {
@@ -1930,7 +2843,29 @@
         }
       }
     },
+    "hiking area" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zona de senderismo"
+          }
+        }
+      }
+    },
+    "Historic architecture" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arquitectura histórica"
+          }
+        }
+      }
+    },
     "History" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1950,12 +2885,52 @@
         }
       }
     },
+    "hotel" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hotel"
+          }
+        }
+      }
+    },
+    "How strongly this destination matches patterns across your saves." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qué tanto coincide este destino con los patrones de tus elementos guardados."
+          }
+        }
+      }
+    },
+    "How this Fit was calculated" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo se calculó este Fit"
+          }
+        }
+      }
+    },
     "I want more of" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quiero más de esto"
+          }
+        }
+      }
+    },
+    "Import .webloc file" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar archivo .webloc"
           }
         }
       }
@@ -1970,7 +2945,23 @@
         }
       }
     },
+    "Import guide places" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar lugares de la guía"
+          }
+        }
+      }
+    },
+    "Import Inbox is clear" : {
+      "comment" : "A message indicating that the Import Inbox is empty.",
+      "isCommentAutoGenerated" : true
+    },
     "Import Maps link file" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1980,12 +2971,55 @@
         }
       }
     },
-    "Import guide places" : {
+    "Import or refresh every place from this Apple Maps guide." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importar lugares de la guía"
+            "value" : "Importa o actualiza todos los lugares de esta guía de Apple Maps."
+          }
+        }
+      }
+    },
+    "Import or refresh every place from this Google Maps list." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa o actualiza todos los lugares de esta lista de Google Maps."
+          }
+        }
+      }
+    },
+    "Import or refresh places" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar o actualizar lugares"
+          }
+        }
+      }
+    },
+    "Import the places in this Apple Maps guide into your Library." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa a tu Biblioteca los lugares de esta guía de Apple Maps."
+          }
+        }
+      }
+    },
+    "imported" : {
+      "comment" : "Label for the number of imported places.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "importados"
           }
         }
       }
@@ -2000,22 +3034,26 @@
         }
       }
     },
-    "Import the places in this Apple Maps guide into your Library." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importa a tu Biblioteca los lugares de esta guía de Apple Maps."
-          }
-        }
-      }
+    "Imported successfully" : {
+
     },
     "Importing guide" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Importando guía"
+          }
+        }
+      }
+    },
+    "Importing places" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importando lugares"
           }
         }
       }
@@ -2030,6 +3068,10 @@
         }
       }
     },
+    "Inbox" : {
+      "comment" : "Title of a library mode when the user is in the inbox.",
+      "isCommentAutoGenerated" : true
+    },
     "Insight" : {
       "comment" : "The title of a view that provides insights into a user's progress in the game.",
       "isCommentAutoGenerated" : true,
@@ -2041,6 +3083,30 @@
           }
         }
       }
+    },
+    "Insight destination" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destino de la información"
+          }
+        }
+      }
+    },
+    "Insights" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información"
+          }
+        }
+      }
+    },
+    "Instagram" : {
+      "comment" : "Text for a filter rule that matches artifacts shared from Instagram.",
+      "isCommentAutoGenerated" : true
     },
     "Interest" : {
       "comment" : "The title of the view that shows detailed information about a search interest.",
@@ -2076,6 +3142,33 @@
         }
       }
     },
+    "ı" : {
+      "comment" : "The letter \"ı\" displayed in the Graviti wordmark.",
+      "extractionState" : "stale",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ı"
+          }
+        }
+      }
+    },
+    "Keep moving while details finish in the background." : {
+      "comment" : "Feature description in the OnboardingView.",
+      "isCommentAutoGenerated" : true
+    },
+    "landmark" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lugar emblemático"
+          }
+        }
+      }
+    },
     "Landmarks" : {
       "localizations" : {
         "es" : {
@@ -2088,6 +3181,7 @@
     },
     "Leading destination" : {
       "comment" : "A label indicating that a destination is the leading one in the user's field of interest.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -2108,6 +3202,14 @@
         }
       }
     },
+    "Least complete" : {
+      "comment" : "Title of a library sort option when the user wants to see the least complete libraries first.",
+      "isCommentAutoGenerated" : true
+    },
+    "Let your saves point somewhere." : {
+      "comment" : "Detail text for a feature in the Fit section of the onboarding view.",
+      "isCommentAutoGenerated" : true
+    },
     "Library" : {
       "localizations" : {
         "es" : {
@@ -2118,6 +3220,10 @@
         }
       }
     },
+    "Library action failed" : {
+      "comment" : "The title of an alert that appears when a row action in the library fails.",
+      "isCommentAutoGenerated" : true
+    },
     "Library actions" : {
       "comment" : "A label for the actions available in the library view.",
       "isCommentAutoGenerated" : true,
@@ -2126,6 +3232,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Acciones de la Biblioteca"
+          }
+        }
+      }
+    },
+    "Library Actions can export a versioned backup with saved media and recommendation preferences. Deleting the app removes local data unless you export a backup first." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las acciones de la Biblioteca pueden exportar una copia de seguridad versionada con archivos guardados y preferencias de recomendación. Al eliminar la app se borran los datos locales, a menos que exportes primero una copia de seguridad."
           }
         }
       }
@@ -2176,6 +3292,17 @@
         }
       }
     },
+    "Link preview unavailable" : {
+
+    },
+    "Links, photos, and shared items appear here while Graviti finds their places and details." : {
+      "comment" : "A description of what will appear in the Import Inbox when it is empty.",
+      "isCommentAutoGenerated" : true
+    },
+    "List" : {
+      "comment" : "Title for the destination save display mode option that lists saved destinations.",
+      "isCommentAutoGenerated" : true
+    },
     "Load test dataset" : {
       "comment" : "A button label that triggers the loading of a test dataset.",
       "isCommentAutoGenerated" : true,
@@ -2210,15 +3337,29 @@
         }
       }
     },
-    "MORE SAVES NEEDED" : {
+    "Location access is off. Enable it in Settings to sort places near you." : {
+      "comment" : "Error message shown when location access is denied or restricted.",
+      "isCommentAutoGenerated" : true
+    },
+    "Location needed" : {
+      "comment" : "A label indicating that location data is required to display the view.",
+      "isCommentAutoGenerated" : true
+    },
+    "Loved" : {
+
+    },
+    "Loved it" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SE NECESITAN MÁS GUARDADOS"
+            "value" : "Me encantó"
           }
         }
       }
+    },
+    "Manage saved views" : {
+
     },
     "Map" : {
       "localizations" : {
@@ -2229,6 +3370,10 @@
           }
         }
       }
+    },
+    "Map of saved places in %@" : {
+      "comment" : "An accessibility label for the map view that describes its content.",
+      "isCommentAutoGenerated" : true
     },
     "Map showing %@" : {
       "comment" : "A map displaying a single marked location. The text inside the marker is the name of the place being shown.",
@@ -2242,6 +3387,13 @@
         }
       }
     },
+    "Maps link" : {
+      "comment" : "Description of a saved library filter rule that matches artifacts linked to maps.",
+      "isCommentAutoGenerated" : true
+    },
+    "Maps link file" : {
+
+    },
     "Maps link saved to Library." : {
       "localizations" : {
         "es" : {
@@ -2252,7 +3404,12 @@
         }
       }
     },
+    "Match all selected rules" : {
+      "comment" : "A section header indicating that all currently selected rules must be matched for the view to apply.",
+      "isCommentAutoGenerated" : true
+    },
     "Matcha" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2261,6 +3418,10 @@
           }
         }
       }
+    },
+    "Matcha everywhere" : {
+      "comment" : "Title for a filter option that shows only locations tagged as \"Matcha everywhere\".",
+      "isCommentAutoGenerated" : true
     },
     "Matches" : {
       "comment" : "A section header that indicates there are matching places.",
@@ -2274,7 +3435,46 @@
         }
       }
     },
+    "Missing a personal note" : {
+
+    },
+    "Modern architecture" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arquitectura moderna"
+          }
+        }
+      }
+    },
+    "monument" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "monumento"
+          }
+        }
+      }
+    },
+    "MORE SAVES NEEDED" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SE NECESITAN MÁS GUARDADOS"
+          }
+        }
+      }
+    },
+    "Most evidence" : {
+      "comment" : "Title of a fit guide sort option that sorts fit guides by the number of evidence entries they contain.",
+      "isCommentAutoGenerated" : true
+    },
     "Mountains" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2284,12 +3484,43 @@
         }
       }
     },
+    "museum" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "museo"
+          }
+        }
+      }
+    },
     "Museums" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Museos"
+          }
+        }
+      }
+    },
+    "music venue" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sala de conciertos"
+          }
+        }
+      }
+    },
+    "national park" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "parque nacional"
           }
         }
       }
@@ -2305,6 +3536,7 @@
       }
     },
     "Nature" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2313,6 +3545,26 @@
           }
         }
       }
+    },
+    "Near me" : {
+      "comment" : "Title for a search scope that filters results based on proximity to the user's current location.",
+      "isCommentAutoGenerated" : true
+    },
+    "Nearby ideas" : {
+      "comment" : "A section header for suggestions related to nearby locations.",
+      "isCommentAutoGenerated" : true
+    },
+    "Needs a description" : {
+      "comment" : "A toggle that filters experiences that need a description.",
+      "isCommentAutoGenerated" : true
+    },
+    "Needs description" : {
+      "comment" : "Title for a library smart filter that shows only locations that need a description.",
+      "isCommentAutoGenerated" : true
+    },
+    "Needs help" : {
+      "comment" : "Title for a state in the import inbox screen that indicates that the user needs help identifying a place.",
+      "isCommentAutoGenerated" : true
     },
     "Needs place review" : {
       "comment" : "A label indicating that a place needs review.",
@@ -2338,6 +3590,16 @@
         }
       }
     },
+    "Negative feedback" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentarios negativos"
+          }
+        }
+      }
+    },
     "Neighborhood" : {
       "localizations" : {
         "es" : {
@@ -2347,6 +3609,58 @@
           }
         }
       }
+    },
+    "New imports appear immediately. You can keep using Graviti while place matching and details finish in the background." : {
+      "comment" : "A description below the list of import attempts, explaining that new imports are processed in the background.",
+      "isCommentAutoGenerated" : true
+    },
+    "New to your Library" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo en tu Biblioteca"
+          }
+        }
+      }
+    },
+    "New view" : {
+      "comment" : "A button label that indicates the creation of a new saved view.",
+      "isCommentAutoGenerated" : true
+    },
+    "Next insight" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información siguiente"
+          }
+        }
+      }
+    },
+    "No" : {
+
+    },
+    "No activity recorded yet" : {
+      "comment" : "Summary text indicating that there are no local activity records.",
+      "isCommentAutoGenerated" : true
+    },
+    "No added boost" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin impulso adicional"
+          }
+        }
+      }
+    },
+    "No archived guides" : {
+      "comment" : "A message indicating that there are no archived guides to display.",
+      "isCommentAutoGenerated" : true
+    },
+    "No description" : {
+
     },
     "No destinations match every filter" : {
       "localizations" : {
@@ -2370,6 +3684,10 @@
         }
       }
     },
+    "No Fit Guides" : {
+      "comment" : "A message indicating that there are no Fit Guides available.",
+      "isCommentAutoGenerated" : true
+    },
     "No matches. Try the place name with its city." : {
       "localizations" : {
         "es" : {
@@ -2379,6 +3697,19 @@
           }
         }
       }
+    },
+    "No new saves in %lld months" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay elementos nuevos guardados desde hace %1$lld meses"
+          }
+        }
+      }
+    },
+    "No personal note" : {
+
     },
     "No places found. Try a name and city." : {
       "comment" : "A message displayed when no places are found for a given search query.",
@@ -2428,6 +3759,22 @@
         }
       }
     },
+    "No recommendation activity" : {
+      "comment" : "A message indicating that there is no recommendation activity to display.",
+      "isCommentAutoGenerated" : true
+    },
+    "No recommendation feedback" : {
+      "comment" : "A message indicating that there is no recommendation feedback to display.",
+      "isCommentAutoGenerated" : true
+    },
+    "No responses recorded yet" : {
+      "comment" : "Text displayed when there are no feedback responses recorded locally.",
+      "isCommentAutoGenerated" : true
+    },
+    "No saved views" : {
+      "comment" : "A message indicating that there are no saved views.",
+      "isCommentAutoGenerated" : true
+    },
     "No saves yet" : {
       "comment" : "Text displayed in a view when a user has not saved any artifacts in their library.",
       "isCommentAutoGenerated" : true,
@@ -2440,8 +3787,17 @@
         }
       }
     },
+    "No suggestions found" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron sugerencias"
+          }
+        }
+      }
+    },
     "North America" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2475,12 +3831,36 @@
         }
       }
     },
+    "Not sure" : {
+
+    },
     "Note" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nota"
+          }
+        }
+      }
+    },
+    "Noted as uncertain" : {
+      "comment" : "A note indicating that the user has not yet made a decision about the influence of a particular interest on future recommendations.",
+      "isCommentAutoGenerated" : true
+    },
+    "Notes" : {
+
+    },
+    "Nothing saved here yet" : {
+      "comment" : "A message indicating that there are no saved items in a particular category.",
+      "isCommentAutoGenerated" : true
+    },
+    "Novelty" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novedad"
           }
         }
       }
@@ -2497,16 +3877,6 @@
         }
       }
     },
-    "Open Google Takeout" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir Google Takeout"
-          }
-        }
-      }
-    },
     "Open field insight" : {
       "comment" : "A button label that opens the field insight view.",
       "isCommentAutoGenerated" : true,
@@ -2515,6 +3885,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abrir información del campo"
+          }
+        }
+      }
+    },
+    "Open Google Takeout" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Google Takeout"
           }
         }
       }
@@ -2528,6 +3908,14 @@
           }
         }
       }
+    },
+    "Open Settings" : {
+      "comment" : "A link that opens the user's device settings.",
+      "isCommentAutoGenerated" : true
+    },
+    "Opened" : {
+      "comment" : "Text for the \"Opened\" recommendation outcome.",
+      "isCommentAutoGenerated" : true
     },
     "Opens destination" : {
       "localizations" : {
@@ -2547,6 +3935,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abre zonas más pequeñas dentro de %1$@"
+          }
+        }
+      }
+    },
+    "Opens the Apple Maps listing with current ratings and details" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la ficha de Apple Maps con valoraciones y detalles actuales"
           }
         }
       }
@@ -2573,6 +3971,16 @@
         }
       }
     },
+    "Original saved text" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texto original guardado"
+          }
+        }
+      }
+    },
     "Original saves stay separate and strengthen this place’s signal." : {
       "comment" : "A description displayed below the \"Repeated places\" navigation title, explaining how repeated saves are handled.",
       "isCommentAutoGenerated" : true,
@@ -2585,12 +3993,53 @@
         }
       }
     },
+    "park" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "parque"
+          }
+        }
+      }
+    },
+    "Pasta" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasta"
+          }
+        }
+      }
+    },
     "Paste a link" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pegar un enlace"
+          }
+        }
+      }
+    },
+    "Paste an Apple Maps or Google Maps link to save a place or import a shared guide or list. You can also import Google Takeout CSVs and .webloc files." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pega un enlace de Apple Maps o Google Maps para guardar un lugar o importar una guía o lista compartida. También puedes importar archivos CSV de Google Takeout y archivos .webloc."
+          }
+        }
+      }
+    },
+    "Paste Maps link" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegar enlace de Maps"
           }
         }
       }
@@ -2615,6 +4064,21 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Patrones"
+          }
+        }
+      }
+    },
+    "Personal tags, separated by commas" : {
+      "comment" : "A prompt for users to enter personal tags for an artifact. These tags are not visible to other users.",
+      "isCommentAutoGenerated" : true
+    },
+    "Pho" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pho"
           }
         }
       }
@@ -2661,12 +4125,33 @@
         }
       }
     },
+    "Pizza" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pizza"
+          }
+        }
+      }
+    },
     "Place" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lugar"
+          }
+        }
+      }
+    },
+    "place details refreshed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "detalles de lugares actualizados"
           }
         }
       }
@@ -2682,6 +4167,10 @@
           }
         }
       }
+    },
+    "Place found" : {
+      "comment" : "Title of an import inbox state when a place is successfully identified.",
+      "isCommentAutoGenerated" : true
     },
     "Place lookup didn't finish" : {
       "localizations" : {
@@ -2717,6 +4206,14 @@
         }
       }
     },
+    "Place not identified" : {
+      "comment" : "Title for a gap in an artifact's completeness evaluation related to the location of the artifact.",
+      "isCommentAutoGenerated" : true
+    },
+    "Place or area" : {
+      "comment" : "A label for a text field that allows the user to filter saved library experiences by location.",
+      "isCommentAutoGenerated" : true
+    },
     "Place search and resolution use Apple MapKit. Saved public links may be contacted to fetch a title, description, and preview image. On-device Vision reads photo text without uploading the image for recognition." : {
       "comment" : "Privacy section detail text.",
       "isCommentAutoGenerated" : true,
@@ -2749,6 +4246,10 @@
         }
       }
     },
+    "Place status" : {
+      "comment" : "A picker for filtering saved library places by their status (e.g. \"Open now\", \"Closed\", \"Needs renovation\").",
+      "isCommentAutoGenerated" : true
+    },
     "Places" : {
       "localizations" : {
         "es" : {
@@ -2770,7 +4271,18 @@
         }
       }
     },
+    "Places, interests, and saves" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lugares, intereses y guardados"
+          }
+        }
+      }
+    },
     "Places, Maps links, photos, screenshots, and notes." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2780,12 +4292,42 @@
         }
       }
     },
-    "Places, interests, and saves" : {
+    "Preference match" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lugares, intereses y guardados"
+            "value" : "Coincidencia con preferencias"
+          }
+        }
+      }
+    },
+    "Preferences you add are visible and receive only a small boost." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las preferencias que añades son visibles y reciben solo un pequeño impulso."
+          }
+        }
+      }
+    },
+    "Preview unavailable" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vista previa no disponible"
+          }
+        }
+      }
+    },
+    "Previous insight" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información anterior"
           }
         }
       }
@@ -2800,7 +4342,22 @@
         }
       }
     },
+    "Processing" : {
+      "comment" : "Title for each state in the import inbox.",
+      "isCommentAutoGenerated" : true
+    },
+    "Quiet lately" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin actividad reciente"
+          }
+        }
+      }
+    },
     "Ramen" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2822,6 +4379,32 @@
         }
       }
     },
+    "Ready for 4–5 days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo para 4–5 días"
+          }
+        }
+      }
+    },
+    "Recent searches" : {
+      "comment" : "A section header for recent searches made in the search view.",
+      "isCommentAutoGenerated" : true
+    },
+    "Recently added" : {
+      "comment" : "Title for a library smart filter that shows only recently added locations.",
+      "isCommentAutoGenerated" : true
+    },
+    "Recently saved" : {
+      "comment" : "Title of a library sort option that sorts libraries by how recently they were saved.",
+      "isCommentAutoGenerated" : true
+    },
+    "Recently updated" : {
+      "comment" : "Title of a fit guide sort option that sorts fit guides by their last update date.",
+      "isCommentAutoGenerated" : true
+    },
     "Recommendation" : {
       "comment" : "The title of the view that displays a destination recommendation.",
       "isCommentAutoGenerated" : true,
@@ -2833,6 +4416,24 @@
           }
         }
       }
+    },
+    "Recommendation activity" : {
+
+    },
+    "Recommendation Activity" : {
+      "comment" : "The title of a view that lists the user's recommendation activity.",
+      "isCommentAutoGenerated" : true
+    },
+    "Recommendation feedback" : {
+
+    },
+    "Recommendation Feedback" : {
+      "comment" : "The title of a view that lists feedback about Fit recommendations.",
+      "isCommentAutoGenerated" : true
+    },
+    "Recommendations explain the patterns and confidence behind them." : {
+      "comment" : "Description of a feature in the \"Let your saves point somewhere.\" section of the OnboardingView.",
+      "isCommentAutoGenerated" : true
     },
     "Refresh suggestions" : {
       "localizations" : {
@@ -2866,6 +4467,20 @@
         }
       }
     },
+    "Relevance" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relevancia"
+          }
+        }
+      }
+    },
+    "Remove" : {
+      "comment" : "A button label that deletes an item.",
+      "isCommentAutoGenerated" : true
+    },
     "Remove %@ from your places?" : {
       "comment" : "A confirmation dialog asking the user to remove a saved place from their Library. The argument is the title of the dialog.",
       "isCommentAutoGenerated" : true,
@@ -2880,6 +4495,7 @@
     },
     "Remove %lld selected" : {
       "comment" : "A button that allows the user to remove one or more saved places. The text inside the button changes based on whether any places are selected.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -2892,6 +4508,7 @@
     },
     "Remove %lld selected %@?" : {
       "comment" : "Confirmation dialogs for bulk actions on places and saves. The first argument is the message that appears in the dialog title. The second argument is a Boolean binding that determines whether the dialog is currently presented. The third argument is the visibility of the dialog title. The fourth argument is a closure that is triggered when the \"Remove places\" button is tapped. The fifth argument is a closure that is triggered when the \"Delete",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "en" : {
@@ -2927,6 +4544,14 @@
           }
         }
       }
+    },
+    "Remove from guide" : {
+      "comment" : "A button label that indicates the action of removing an artifact from a guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "Remove from shortlist" : {
+      "comment" : "A button label that removes an artifact from the shortlist.",
+      "isCommentAutoGenerated" : true
     },
     "Remove place" : {
       "comment" : "A button that removes a saved place from the user's library.",
@@ -2974,6 +4599,12 @@
         }
       }
     },
+    "Remove sample library" : {
+
+    },
+    "Remove samples" : {
+
+    },
     "Remove selected place" : {
       "localizations" : {
         "es" : {
@@ -2996,6 +4627,9 @@
         }
       }
     },
+    "Remove the sample library?" : {
+
+    },
     "Remove the selected place?" : {
       "localizations" : {
         "es" : {
@@ -3006,7 +4640,36 @@
         }
       }
     },
+    "Remove trip feedback for %@" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar comentarios del viaje para %1$@"
+          }
+        }
+      }
+    },
+    "Removed %@" : {
+      "comment" : "A message that appears in the undo stack when a user deletes a place from their library. The argument is the name of the place.",
+      "isCommentAutoGenerated" : true
+    },
+    "Removed from this guide. The source save remains in your Library." : {
+      "comment" : "Notification text shown when an artifact is removed from a guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "Removing feedback lets the destination appear in Fit again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al eliminar estos comentarios, el destino podrá volver a aparecer en Fit."
+          }
+        }
+      }
+    },
     "Repeated interests across places shape future recommendations." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3038,6 +4701,20 @@
         }
       }
     },
+    "Responses to occasional Fit questions will stay on this device and appear here." : {
+      "comment" : "A description of the content that will be displayed in the \"Recommendation Feedback\" view.",
+      "isCommentAutoGenerated" : true
+    },
+    "restaurant" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "restaurante"
+          }
+        }
+      }
+    },
     "Restore backup" : {
       "comment" : "A button that triggers the import of a backup.",
       "isCommentAutoGenerated" : true,
@@ -3049,6 +4726,24 @@
           }
         }
       }
+    },
+    "Restored to this guide." : {
+      "comment" : "Text displayed when a user restores an artifact from a removed guide back into the guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "Retry" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
+          }
+        }
+      }
+    },
+    "Retry available" : {
+      "comment" : "A state that indicates that the import process is available to be retried.",
+      "isCommentAutoGenerated" : true
     },
     "Retry lookup" : {
       "comment" : "A button that retries looking up a saved artifact's location.",
@@ -3074,6 +4769,27 @@
         }
       }
     },
+    "Reviewed destination evidence limits how certain Graviti can be." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La evidencia revisada del destino limita el nivel de certeza de Graviti."
+          }
+        }
+      }
+    },
+    "Rocky coast" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Costa rocosa"
+          }
+        }
+      }
+    },
     "Save" : {
       "localizations" : {
         "es" : {
@@ -3092,6 +4808,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Guardar %1$@"
+          }
+        }
+      }
+    },
+    "Save %@ in this Fit Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar %1$@ en esta guía Fit"
           }
         }
       }
@@ -3141,7 +4867,20 @@
         }
       }
     },
+    "Save first" : {
+      "comment" : "Feature description in the OnboardingView.",
+      "isCommentAutoGenerated" : true
+    },
+    "Save no longer available" : {
+      "comment" : "A message indicating that a feature (like saving an artifact) is no longer available.",
+      "isCommentAutoGenerated" : true
+    },
+    "Save or import" : {
+      "comment" : "A button that allows users to save or import their saved places.",
+      "isCommentAutoGenerated" : true
+    },
     "Save or import something" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3181,12 +4920,26 @@
         }
       }
     },
+    "Save view" : {
+      "comment" : "A button label that suggests saving the current view as a filter.",
+      "isCommentAutoGenerated" : true
+    },
     "Save what pulls you." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Guarda lo que te atrae."
+          }
+        }
+      }
+    },
+    "Save what pulls you. Graviti turns a private collection of travel inspiration into patterns, destination Fit, and places you can act on." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda lo que te atrae. Graviti convierte una colección privada de inspiración para viajar en patrones, Fit de destinos y lugares que puedes aprovechar."
           }
         }
       }
@@ -3211,6 +4964,16 @@
         }
       }
     },
+    "Saved %@ in %@." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se guardó %1$@ en %2$@."
+          }
+        }
+      }
+    },
     "Saved %@ to Graviti." : {
       "localizations" : {
         "es" : {
@@ -3222,11 +4985,45 @@
       }
     },
     "Saved destinations" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Destinos guardados"
+          }
+        }
+      }
+    },
+    "saved details" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "detalles guardados"
+          }
+        }
+      }
+    },
+    "Saved guides" : {
+
+    },
+    "Saved in this Fit Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardado en esta guía Fit"
+          }
+        }
+      }
+    },
+    "Saved in this guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardado en esta guía"
           }
         }
       }
@@ -3265,6 +5062,9 @@
         }
       }
     },
+    "Saved nearby" : {
+
+    },
     "Saved note" : {
       "localizations" : {
         "es" : {
@@ -3283,6 +5083,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Foto guardada"
+          }
+        }
+      }
+    },
+    "Saved place" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lugar guardado"
           }
         }
       }
@@ -3319,6 +5129,14 @@
         }
       }
     },
+    "Saved View" : {
+      "comment" : "The title of the view that allows users to edit and save their own filters.",
+      "isCommentAutoGenerated" : true
+    },
+    "Saved Views" : {
+      "comment" : "The title of a view that lists and allows editing of saved views.",
+      "isCommentAutoGenerated" : true
+    },
     "Saves" : {
       "localizations" : {
         "es" : {
@@ -3352,6 +5170,7 @@
       }
     },
     "Scenic views" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3362,6 +5181,7 @@
       }
     },
     "Seafood" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3405,6 +5225,16 @@
         }
       }
     },
+    "Search guides and saved places" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar guías y lugares guardados"
+          }
+        }
+      }
+    },
     "Search places" : {
       "comment" : "A button label that initiates a search for places.",
       "isCommentAutoGenerated" : true,
@@ -3419,6 +5249,7 @@
     },
     "Search places in %@" : {
       "comment" : "A button that searches for places in the recommended destination.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -3473,6 +5304,10 @@
         }
       }
     },
+    "See what Graviti notices." : {
+      "comment" : "Title of a section in the OnboardingView that describes how users can see what Graviti notices about their saved places.",
+      "isCommentAutoGenerated" : true
+    },
     "Select" : {
       "comment" : "A button that toggles selection mode for places in the library.",
       "isCommentAutoGenerated" : true,
@@ -3521,12 +5356,37 @@
         }
       }
     },
+    "Send feedback" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar comentarios"
+          }
+        }
+      }
+    },
     "Share an Apple Maps or Google Maps place, paste its link, or import a .webloc file. Apple Maps guides can bring in their places. For Google Maps lists, select Saved in Google Takeout and import its CSV." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comparte un lugar de Apple Maps o Google Maps, pega su enlace o importa un archivo .webloc. Puedes importar los lugares de una guía de Apple Maps. Para las listas de Google Maps, selecciona Guardados en Google Takeout e importa su CSV."
+          }
+        }
+      }
+    },
+    "Share guide" : {
+      "comment" : "A menu item to share a guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "shop" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tienda"
           }
         }
       }
@@ -3553,6 +5413,20 @@
         }
       }
     },
+    "Shortlist" : {
+
+    },
+    "Should %@ influence future recommendations?" : {
+
+    },
+    "Show active guides" : {
+      "comment" : "A button label that toggles whether archived or active Fit Guides are displayed.",
+      "isCommentAutoGenerated" : true
+    },
+    "Show archived guides" : {
+      "comment" : "A button label that toggles whether archived Fit Guides are shown.",
+      "isCommentAutoGenerated" : true
+    },
     "Showing only items that need review" : {
       "comment" : "An accessibility label describing the filter option to show only items that need review.",
       "isCommentAutoGenerated" : true,
@@ -3565,6 +5439,14 @@
         }
       }
     },
+    "Shown" : {
+      "comment" : "Name of the recommendation outcome kind when the user has not interacted with the recommendation yet.",
+      "isCommentAutoGenerated" : true
+    },
+    "Shown, opened, saved, dismissed, and visit outcomes will appear here." : {
+      "comment" : "A description text displayed when a user has not interacted with any recommendations.",
+      "isCommentAutoGenerated" : true
+    },
     "Shows every save connected to this place" : {
       "comment" : "An accessibility hint for the \"Repeated places\" view, describing the content of each list row.",
       "isCommentAutoGenerated" : true,
@@ -3573,6 +5455,55 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Muestra todos los guardados conectados con este lugar"
+          }
+        }
+      }
+    },
+    "Skip" : {
+      "comment" : "A button that allows users to skip the onboarding process.",
+      "isCommentAutoGenerated" : true
+    },
+    "Some entries could not be imported. Check your connection and refresh this collection again later." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas entradas no se pudieron importar. Comprueba la conexión y vuelve a actualizar esta colección más tarde."
+          }
+        }
+      }
+    },
+    "Some entries could not be imported. Open the saved guide or list in Library to refresh it later." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas entradas no se pudieron importar. Abre la guía o lista guardada en Biblioteca para actualizarla más tarde."
+          }
+        }
+      }
+    },
+    "Some items could not be imported." : {
+      "comment" : "Message displayed when some items could not be imported during an import attempt.",
+      "isCommentAutoGenerated" : true
+    },
+    "Sort" : {
+
+    },
+    "Sort Fit Guides" : {
+      "comment" : "A toolbar item that allows users to sort the list of Fit Guides.",
+      "isCommentAutoGenerated" : true
+    },
+    "Source" : {
+      "comment" : "A filter option for the source of an experience.",
+      "isCommentAutoGenerated" : true
+    },
+    "Source collection name" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de la colección de origen"
           }
         }
       }
@@ -3607,12 +5538,26 @@
         }
       }
     },
+    "Status applies to this place across all of its saves and can help future recommendations learn from what happened." : {
+      "comment" : "A description below the place status rail, explaining its purpose.",
+      "isCommentAutoGenerated" : true
+    },
     "Stay" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alojamiento"
+          }
+        }
+      }
+    },
+    "Still taking shape" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún tomando forma"
           }
         }
       }
@@ -3629,6 +5574,10 @@
         }
       }
     },
+    "Strong interests" : {
+      "comment" : "A section in the search results that lists user-identified interests.",
+      "isCommentAutoGenerated" : true
+    },
     "Strong signal" : {
       "localizations" : {
         "es" : {
@@ -3639,12 +5588,60 @@
         }
       }
     },
+    "Strong weekend" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buen plan para un fin de semana"
+          }
+        }
+      }
+    },
     "Suggested from %@" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sugerido a partir de %1$@"
+          }
+        }
+      }
+    },
+    "Suggested place saved" : {
+
+    },
+    "Suggested searches" : {
+      "comment" : "A section in the search view that lists suggested search terms.",
+      "isCommentAutoGenerated" : true
+    },
+    "Suggestions follow live Apple Maps relevance. Open any result in Maps to check current ratings, hours, and details." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las sugerencias siguen la relevancia actual de Apple Maps. Abre cualquier resultado en Mapas para consultar valoraciones, horarios y detalles."
+          }
+        }
+      }
+    },
+    "Suggestions unavailable" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugerencias no disponibles"
+          }
+        }
+      }
+    },
+    "Sushi" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sushi"
           }
         }
       }
@@ -3661,7 +5658,42 @@
         }
       }
     },
+    "t" : {
+      "comment" : "A letter in the wordmark.",
+      "extractionState" : "stale",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "t"
+          }
+        }
+      }
+    },
+    "Tacos" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tacos"
+          }
+        }
+      }
+    },
+    "Taking shape" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomando forma"
+          }
+        }
+      }
+    },
     "Tea" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3693,6 +5725,10 @@
         }
       }
     },
+    "Thanks — you can change this later in Data & Privacy." : {
+      "comment" : "A thank-you message that appears when a user confirms their feedback on a recommendation. It also mentions that the user can update their response later in the app.",
+      "isCommentAutoGenerated" : true
+    },
     "The %lld associated saves stay in your Library without a place. You can match them again later." : {
       "comment" : "A message explaining that when a place is removed from the Library, all its associated saves (i.e. artifacts) are also removed.",
       "isCommentAutoGenerated" : true,
@@ -3713,6 +5749,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Los guardados asociados permanecen en tu Biblioteca y puedes volver a asociarlos con lugares más adelante."
+          }
+        }
+      }
+    },
+    "The collection link is already saved. Keep Graviti open while it finds the places; partial results will be reported." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace de la colección ya está guardado. Mantén Graviti abierto mientras busca los lugares; se informarán los resultados parciales."
           }
         }
       }
@@ -3751,6 +5797,30 @@
         }
       }
     },
+    "The saved link is still available. Check your connection and try the preview again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace guardado sigue disponible. Comprueba la conexión y vuelve a intentar la vista previa."
+          }
+        }
+      }
+    },
+    "The saved processing queue was created by a newer version of Graviti." : {
+      "comment" : "Error message displayed when the saved processing queue was created by a newer version of Graviti.",
+      "isCommentAutoGenerated" : true
+    },
+    "theater" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "teatro"
+          }
+        }
+      }
+    },
     "These reviewed sources support what Graviti knows about this destination. They do not determine your personal fit by themselves." : {
       "localizations" : {
         "es" : {
@@ -3767,6 +5837,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se pudo leer esta guía de Apple Maps. Su enlace sigue guardado en tu Biblioteca."
+          }
+        }
+      }
+    },
+    "This backup was created by an unsupported version of Graviti." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta copia fue creada por una versión no compatible de Graviti."
           }
         }
       }
@@ -3801,16 +5881,6 @@
         }
       }
     },
-    "This backup was created by an unsupported version of Graviti." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esta copia fue creada por una versión no compatible de Graviti."
-          }
-        }
-      }
-    },
     "This file doesn't contain an Apple Maps or Google Maps link." : {
       "localizations" : {
         "es" : {
@@ -3820,6 +5890,50 @@
           }
         }
       }
+    },
+    "This Google Maps link isn't a shared list." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este enlace de Google Maps no es una lista compartida."
+          }
+        }
+      }
+    },
+    "This Google Maps list couldn't be read. Google may have changed its shared-list format." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo leer esta lista de Google Maps. Es posible que Google haya cambiado el formato de las listas compartidas."
+          }
+        }
+      }
+    },
+    "This Google Maps list doesn't contain any places Graviti can import." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta lista de Google Maps no contiene ningún lugar que Graviti pueda importar."
+          }
+        }
+      }
+    },
+    "This Google Maps list is unavailable. Check that link sharing is enabled and try again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta lista de Google Maps no está disponible. Comprueba que el enlace para compartir esté habilitado e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "This history stays on this device. Changing a response preserves when and where the question was asked." : {
+      "comment" : "A footer text in the \"Recommendation Feedback\" view, explaining that the feedback history persists on the device and that changing a response does not change the date or location of the original question.",
+      "isCommentAutoGenerated" : true
     },
     "This image format or size isn't supported yet." : {
       "localizations" : {
@@ -3875,6 +5989,20 @@
         }
       }
     },
+    "this place" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "este lugar"
+          }
+        }
+      }
+    },
+    "This removes every saved response from this device." : {
+      "comment" : "A message displayed in a confirmation dialog within the `RecommendationFeedbackHistoryView`.",
+      "isCommentAutoGenerated" : true
+    },
     "This removes the guide or list link. Places already imported from it remain saved." : {
       "localizations" : {
         "es" : {
@@ -3906,11 +6034,52 @@
       }
     },
     "This saves the list link. To add each place, import its Google Saved CSV from the Save tab." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esto guarda el enlace de la lista. Para añadir cada lugar, importa su CSV de guardados de Google desde la pestaña Guardar."
+          }
+        }
+      }
+    },
+    "This uses live Apple Maps data and may take a moment on slower connections. Saved guide places stay available." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto usa datos en vivo de Apple Maps y puede tardar un poco con conexiones lentas. Los lugares guardados en la guía seguirán disponibles."
+          }
+        }
+      }
+    },
+    "Trip feedback" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentarios del viaje"
+          }
+        }
+      }
+    },
+    "Trip readiness" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparación del viaje"
+          }
+        }
+      }
+    },
+    "Try again" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intentar de nuevo"
           }
         }
       }
@@ -3927,6 +6096,16 @@
         }
       }
     },
+    "Try again later or search for the destination from the Search tab." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inténtalo de nuevo más tarde o busca el destino desde la pestaña Buscar."
+          }
+        }
+      }
+    },
     "Try another region or remove an avoid rule. Your saved-interest patterns are still shown below." : {
       "localizations" : {
         "es" : {
@@ -3936,6 +6115,10 @@
           }
         }
       }
+    },
+    "Try another search." : {
+      "comment" : "A suggestion displayed below the search bar, encouraging the user to try a different search query.",
+      "isCommentAutoGenerated" : true
     },
     "Try reading image text again" : {
       "comment" : "A button label that attempts to read text from an image again.",
@@ -3948,6 +6131,10 @@
           }
         }
       }
+    },
+    "Try sample library" : {
+      "comment" : "A button label that allows users to try the sample library feature.",
+      "isCommentAutoGenerated" : true
     },
     "Tune" : {
       "localizations" : {
@@ -3968,6 +6155,25 @@
           }
         }
       }
+    },
+    "Unarchive" : {
+      "comment" : "A button label that unarchives a guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "Undo" : {
+      "comment" : "A button that undoes the removal of a guide.",
+      "isCommentAutoGenerated" : true
+    },
+    "Unshortlist" : {
+      "comment" : "A button label that unshorlists an artifact.",
+      "isCommentAutoGenerated" : true
+    },
+    "Unvisited scenery" : {
+      "comment" : "Title for a library smart filter that shows only unvisited scenery.",
+      "isCommentAutoGenerated" : true
+    },
+    "Use as guide cover" : {
+
     },
     "Use suggested details" : {
       "comment" : "A button that replaces user-entered details with those suggested by Graviti.",
@@ -4035,6 +6241,20 @@
         }
       }
     },
+    "View name" : {
+      "comment" : "A section header in the saved library filter editor.",
+      "isCommentAutoGenerated" : true
+    },
+    "View privacy policy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver la política de privacidad"
+          }
+        }
+      }
+    },
     "View saved items" : {
       "comment" : "A button label that translates to \"View saved items\".",
       "isCommentAutoGenerated" : true,
@@ -4047,6 +6267,41 @@
         }
       }
     },
+    "Visited" : {
+      "comment" : "Title of a place lifecycle status when the user has visited a place.",
+      "isCommentAutoGenerated" : true
+    },
+    "Visited · Didn't fit" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visitado · No encajó"
+          }
+        }
+      }
+    },
+    "Visited · Loved it" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visitado · Me encantó"
+          }
+        }
+      }
+    },
+    "Visited & loved" : {
+      "comment" : "Title for a filter option in the Library app that shows only visited and loved locations.",
+      "isCommentAutoGenerated" : true
+    },
+    "Visited and didn’t fit" : {
+
+    },
+    "Visited and loved" : {
+      "comment" : "Description of a recommendation outcome when the user visited a recommended place and found it enjoyable.",
+      "isCommentAutoGenerated" : true
+    },
     "Watch Gravity build" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4057,6 +6312,10 @@
           }
         }
       }
+    },
+    "Weekend ideas" : {
+      "comment" : "A placeholder text for a text field in the \"View name\" section of the saved library filter editor.",
+      "isCommentAutoGenerated" : true
     },
     "What caught your eye?" : {
       "localizations" : {
@@ -4113,6 +6372,16 @@
         }
       }
     },
+    "When the app connects" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuándo se conecta la app"
+          }
+        }
+      }
+    },
     "Where" : {
       "localizations" : {
         "es" : {
@@ -4123,7 +6392,18 @@
         }
       }
     },
+    "Why these interests" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por qué aparecen estos intereses"
+          }
+        }
+      }
+    },
     "Wildlife" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4133,14 +6413,56 @@
         }
       }
     },
+    "winery" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bodega"
+          }
+        }
+      }
+    },
+    "Without notes" : {
+      "comment" : "Title for a library smart filter that shows only locations without any notes.",
+      "isCommentAutoGenerated" : true
+    },
+    "Yes" : {
+      "comment" : "Label for a recommendation feedback response of \"Yes\".",
+      "isCommentAutoGenerated" : true
+    },
     "You can edit inferred details, remove place matches, and delete individual or multiple saves. Graviti has no advertising or analytics SDK in this beta." : {
       "comment" : "Description of privacy features in the Data & Privacy view.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Puedes editar detalles inferidos, eliminar asociaciones con lugares y borrar uno o varios guardados. Graviti no incluye ningún SDK de publicidad ni análisis en esta beta."
+          }
+        }
+      }
+    },
+    "You can edit inferred details, remove place matches, review recommendation feedback, and delete individual or multiple saves. Graviti has no advertising or analytics SDK in this beta." : {
+
+    },
+    "You have varied reasons to spend several days here, spread across different areas." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tienes motivos variados para pasar varios días aquí, repartidos entre distintas zonas."
+          }
+        }
+      }
+    },
+    "You have varied reasons to spend several days here." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tienes motivos variados para pasar varios días aquí."
           }
         }
       }
@@ -4175,24 +6497,12 @@
         }
       }
     },
-    "Your Library does not require an account and does not sync to a Graviti server." : {
-      "comment" : "A description of how user data is stored on their device.",
-      "isCommentAutoGenerated" : true,
+    "Your answer tunes future Fit suggestions without adding anything to your Library or changing Gravity." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu Biblioteca no requiere una cuenta ni se sincroniza con un servidor de Graviti."
-          }
-        }
-      }
-    },
-    "Your Library stays on this device. Export a backup whenever you want." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu Biblioteca permanece en este dispositivo. Exporta una copia cuando quieras."
+            "value" : "Tu respuesta ajusta futuras sugerencias de Fit sin añadir nada a tu Biblioteca ni cambiar la Gravedad."
           }
         }
       }
@@ -4219,6 +6529,17 @@
         }
       }
     },
+    "Your Explore preferences were restored." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus preferencias de Explorar se restauraron."
+          }
+        }
+      }
+    },
     "Your field starts here" : {
       "localizations" : {
         "es" : {
@@ -4228,6 +6549,19 @@
           }
         }
       }
+    },
+    "Your Fit Guides" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus guías Fit"
+          }
+        }
+      }
+    },
+    "Your guides are archived. Open the guide library to restore one." : {
+
     },
     "Your interests" : {
       "comment" : "A label displayed above the user's search interests.",
@@ -4241,12 +6575,70 @@
         }
       }
     },
+    "Your journey" : {
+      "comment" : "A label describing the user's current location within a place.",
+      "isCommentAutoGenerated" : true
+    },
+    "Your Library does not require an account and does not sync to a Graviti server." : {
+      "comment" : "A description of how user data is stored on their device.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu Biblioteca no requiere una cuenta ni se sincroniza con un servidor de Graviti."
+          }
+        }
+      }
+    },
+    "Your Library stays on this device and can be backed up." : {
+
+    },
+    "Your Library stays on this device. Export a backup whenever you want." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu Biblioteca permanece en este dispositivo. Exporta una copia cuando quieras."
+          }
+        }
+      }
+    },
+    "Your Library stays on this device. Graviti has no account, advertising SDK, analytics SDK, or Graviti-operated sync server." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu Biblioteca permanece en este dispositivo. Graviti no tiene cuentas, SDK de publicidad, SDK de analítica ni un servidor de sincronización operado por Graviti."
+          }
+        }
+      }
+    },
+    "Your location could not be updated. Try again in a moment." : {
+      "comment" : "Error message displayed when an error occurs while trying to update the user's location.",
+      "isCommentAutoGenerated" : true
+    },
+    "Your location is unavailable right now." : {
+      "comment" : "Error message displayed when the user's location cannot be determined.",
+      "isCommentAutoGenerated" : true
+    },
     "Your note" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu nota"
+          }
+        }
+      }
+    },
+    "Your note or photo description" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu nota o descripción de la foto"
           }
         }
       }
@@ -4262,6 +6654,13 @@
           }
         }
       }
+    },
+    "Your own saves, guides, and preferences will not be removed." : {
+
+    },
+    "Your patterns become plans" : {
+      "comment" : "Title of a section in the OnboardingView that discusses how user-generated saves can be used to discover and plan future destinations.",
+      "isCommentAutoGenerated" : true
     },
     "Your patterns will appear here" : {
       "localizations" : {
@@ -4295,1575 +6694,9 @@
         }
       }
     },
-    "Your saves" : {
-      "comment" : "A label displayed above a list of the user's saved artifacts.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tus guardados"
-          }
-        }
-      }
-    },
-    "amusement park" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "parque de atracciones"
-          }
-        }
-      }
-    },
-    "aquarium" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "acuario"
-          }
-        }
-      }
-    },
-    "bakery" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "panadería"
-          }
-        }
-      }
-    },
-    "beach" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "playa"
-          }
-        }
-      }
-    },
-    "brewery" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "cervecería"
-          }
-        }
-      }
-    },
-    "café" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "cafetería"
-          }
-        }
-      }
-    },
-    "campground" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "camping"
-          }
-        }
-      }
-    },
-    "castle" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "castillo"
-          }
-        }
-      }
-    },
-    "cities" : {
-      "comment" : "A label for the number of cities imported.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ciudades"
-          }
-        }
-      }
-    },
-    "couldn’t import" : {
-      "comment" : "A label describing an item that could not be imported.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "no se pudieron importar"
-          }
-        }
-      }
-    },
-    "countries" : {
-      "comment" : "A string that can be used as a label for a count of countries.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "países"
-          }
-        }
-      }
-    },
-    "duplicates avoided" : {
-      "comment" : "A description of a feature that helps prevent duplicate entries when importing data.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "duplicados evitados"
-          }
-        }
-      }
-    },
-    "food market" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "mercado gastronómico"
-          }
-        }
-      }
-    },
-    "grav" : {
-      "comment" : "The first letter of the word \"graviti\".",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "grav"
-          }
-        }
-      }
-    },
-    "hiking area" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "zona de senderismo"
-          }
-        }
-      }
-    },
-    "hotel" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "hotel"
-          }
-        }
-      }
-    },
-    "imported" : {
-      "comment" : "Label for the number of imported places.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "importados"
-          }
-        }
-      }
-    },
-    "landmark" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "lugar emblemático"
-          }
-        }
-      }
-    },
-    "monument" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "monumento"
-          }
-        }
-      }
-    },
-    "museum" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "museo"
-          }
-        }
-      }
-    },
-    "music venue" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "sala de conciertos"
-          }
-        }
-      }
-    },
-    "national park" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "parque nacional"
-          }
-        }
-      }
-    },
-    "park" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "parque"
-          }
-        }
-      }
-    },
-    "restaurant" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "restaurante"
-          }
-        }
-      }
-    },
-    "saved details" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "detalles guardados"
-          }
-        }
-      }
-    },
-    "shop" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "tienda"
-          }
-        }
-      }
-    },
-    "t" : {
-      "comment" : "A letter in the wordmark.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "t"
-          }
-        }
-      }
-    },
-    "theater" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "teatro"
-          }
-        }
-      }
-    },
-    "this place" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "este lugar"
-          }
-        }
-      }
-    },
-    "winery" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bodega"
-          }
-        }
-      }
-    },
-    "zoo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "zoológico"
-          }
-        }
-      }
-    },
-    "Checking for places in this Google Maps list…" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscando lugares en esta lista de Google Maps…"
-          }
-        }
-      }
-    },
-    "Import .webloc file" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importar archivo .webloc"
-          }
-        }
-      }
-    },
-    "Paste an Apple Maps or Google Maps link to save a place or import a shared guide or list. You can also import Google Takeout CSVs and .webloc files." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pega un enlace de Apple Maps o Google Maps para guardar un lugar o importar una guía o lista compartida. También puedes importar archivos CSV de Google Takeout y archivos .webloc."
-          }
-        }
-      }
-    },
-    "Paste Maps link" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pegar enlace de Maps"
-          }
-        }
-      }
-    },
-    "This Google Maps link isn't a shared list." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Este enlace de Google Maps no es una lista compartida."
-          }
-        }
-      }
-    },
-    "This Google Maps list couldn't be read. Google may have changed its shared-list format." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudo leer esta lista de Google Maps. Es posible que Google haya cambiado el formato de las listas compartidas."
-          }
-        }
-      }
-    },
-    "This Google Maps list doesn't contain any places Graviti can import." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esta lista de Google Maps no contiene ningún lugar que Graviti pueda importar."
-          }
-        }
-      }
-    },
-    "This Google Maps list is unavailable. Check that link sharing is enabled and try again." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esta lista de Google Maps no está disponible. Comprueba que el enlace para compartir esté habilitado e inténtalo de nuevo."
-          }
-        }
-      }
-    },
-    "place details refreshed" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "detalles de lugares actualizados"
-          }
-        }
-      }
-    },
-    "%lld place details refreshed" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld detalles de lugares actualizados"
-          }
-        }
-      }
-    },
-    "1 place detail refreshed" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 detalle de lugar actualizado"
-          }
-        }
-      }
-    },
-    "Import or refresh every place from this Apple Maps guide." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importa o actualiza todos los lugares de esta guía de Apple Maps."
-          }
-        }
-      }
-    },
-    "Import or refresh every place from this Google Maps list." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importa o actualiza todos los lugares de esta lista de Google Maps."
-          }
-        }
-      }
-    },
-    "Import or refresh places" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importar o actualizar lugares"
-          }
-        }
-      }
-    },
-    "Importing places" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importando lugares"
-          }
-        }
-      }
-    },
-    "Your Explore preferences were restored." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tus preferencias de Explorar se restauraron."
-          }
-        }
-      }
-    },
-    "Growing now" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Creciendo ahora"
-          }
-        }
-      }
-    },
-    "%@ is gaining Gravity" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ está ganando Gravity"
-          }
-        }
-      }
-    },
-    "Taking shape" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tomando forma"
-          }
-        }
-      }
-    },
-    "%@ is coming into focus" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ está cobrando forma"
-          }
-        }
-      }
-    },
-    "Across your Library" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En toda tu biblioteca"
-          }
-        }
-      }
-    },
-    "Quiet lately" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin actividad reciente"
-          }
-        }
-      }
-    },
-    "%@ has gone quiet" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ lleva un tiempo sin actividad"
-          }
-        }
-      }
-    },
-    "%lld of %lld" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld de %2$lld"
-          }
-        }
-      }
-    },
-    "Previous insight" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Información anterior"
-          }
-        }
-      }
-    },
-    "Next insight" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Información siguiente"
-          }
-        }
-      }
-    },
-    "1 destination" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 destino"
-          }
-        }
-      }
-    },
-    "%lld saves at %lld places in the last %lld days" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld guardados en %2$lld lugares en los últimos %3$lld días"
-          }
-        }
-      }
-    },
-    "%@ now have enough Gravity to stand on their own" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ ya tienen suficiente Gravity para destacar por sí solos"
-          }
-        }
-      }
-    },
-    "%lld saves across %lld destinations" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld guardados en %2$lld destinos"
-          }
-        }
-      }
-    },
-    "No new saves in %lld months" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No hay elementos nuevos guardados desde hace %1$lld meses"
-          }
-        }
-      }
-    },
-    "Insight destination" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Destino de la información"
-          }
-        }
-      }
-    },
-    "Insights" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Información"
-          }
-        }
-      }
-    },
-    "Still taking shape" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aún tomando forma"
-          }
-        }
-      }
-    },
-    "Strong weekend" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buen plan para un fin de semana"
-          }
-        }
-      }
-    },
-    "Ready for 4–5 days" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Listo para 4–5 días"
-          }
-        }
-      }
-    },
-    "You have varied reasons to spend several days here, spread across different areas." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tienes motivos variados para pasar varios días aquí, repartidos entre distintas zonas."
-          }
-        }
-      }
-    },
-    "You have varied reasons to spend several days here." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tienes motivos variados para pasar varios días aquí."
-          }
-        }
-      }
-    },
-    "Add another kind of experience and %lld more distinct places to support a longer trip." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añade otro tipo de experiencia y %1$lld lugares distintos más para preparar un viaje más largo."
-          }
-        }
-      }
-    },
-    "Add %lld more distinct places to support a longer trip." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añade %1$lld lugares distintos más para preparar un viaje más largo."
-          }
-        }
-      }
-    },
-    "Add another kind of experience to support a longer trip." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añade otro tipo de experiencia para preparar un viaje más largo."
-          }
-        }
-      }
-    },
-    "Add %lld more distinct places and broaden the mix of experiences to support a weekend." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añade %1$lld lugares distintos más y amplía la variedad de experiencias para preparar un fin de semana."
-          }
-        }
-      }
-    },
-    "Add %lld more distinct places to support a weekend." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añade %1$lld lugares distintos más para preparar un fin de semana."
-          }
-        }
-      }
-    },
-    "Broaden the mix of experiences to support a weekend." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Amplía la variedad de experiencias para preparar un fin de semana."
-          }
-        }
-      }
-    },
-    "1 distinct place" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 lugar distinto"
-          }
-        }
-      }
-    },
-    "%lld distinct places" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld lugares distintos"
-          }
-        }
-      }
-    },
-    "1 experience type" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 tipo de experiencia"
-          }
-        }
-      }
-    },
-    "%lld experience types" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld tipos de experiencia"
-          }
-        }
-      }
-    },
-    "1 interest" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 interés"
-          }
-        }
-      }
-    },
-    "%lld interests" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld intereses"
-          }
-        }
-      }
-    },
-    "%@ Fit Guide" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guía Fit de %1$@"
-          }
-        }
-      }
-    },
-    "Build my %@ Fit Guide" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Crear mi guía Fit de %1$@"
-          }
-        }
-      }
-    },
-    "Built from your patterns" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Creada a partir de tus patrones"
-          }
-        }
-      }
-    },
-    "Connect to the internet to load live place suggestions. Places already saved in this guide remain available." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conéctate a internet para cargar sugerencias de lugares. Los lugares ya guardados en esta guía siguen disponibles."
-          }
-        }
-      }
-    },
-    "Finding places for your patterns…" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscando lugares para tus patrones…"
-          }
-        }
-      }
-    },
-    "No suggestions found" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se encontraron sugerencias"
-          }
-        }
-      }
-    },
-    "Opens the Apple Maps listing with current ratings and details" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abre la ficha de Apple Maps con valoraciones y detalles actuales"
-          }
-        }
-      }
-    },
-    "Save %@ in this Fit Guide" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guardar %1$@ en esta guía Fit"
-          }
-        }
-      }
-    },
-    "Saved %@ in %@." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se guardó %1$@ en %2$@."
-          }
-        }
-      }
-    },
-    "Saved in this Fit Guide" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guardado en esta guía Fit"
-          }
-        }
-      }
-    },
-    "Saved in this guide" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guardado en esta guía"
-          }
-        }
-      }
-    },
-    "Saved place" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lugar guardado"
-          }
-        }
-      }
-    },
-    "Suggestions follow live Apple Maps relevance. Open any result in Maps to check current ratings, hours, and details." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las sugerencias siguen la relevancia actual de Apple Maps. Abre cualquier resultado en Mapas para consultar valoraciones, horarios y detalles."
-          }
-        }
-      }
-    },
-    "Suggestions unavailable" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sugerencias no disponibles"
-          }
-        }
-      }
-    },
-    "Try again" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Intentar de nuevo"
-          }
-        }
-      }
-    },
-    "Try again later or search for the destination from the Search tab." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inténtalo de nuevo más tarde o busca el destino desde la pestaña Buscar."
-          }
-        }
-      }
-    },
-    "Your Fit Guides" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tus guías Fit"
-          }
-        }
-      }
-    },
-    "Trip readiness" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preparación del viaje"
-          }
-        }
-      }
-    },
-    "Your note or photo description" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu nota o descripción de la foto"
-          }
-        }
-      }
-    },
-    "Original saved text" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Texto original guardado"
-          }
-        }
-      }
-    },
-    "Source collection name" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nombre de la colección de origen"
-          }
-        }
-      }
-    },
-    "Apple Maps place category" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Categoría del lugar en Apple Maps"
-          }
-        }
-      }
-    },
-    "Why these interests" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Por qué aparecen estos intereses"
-          }
-        }
-      }
-    },
-    "%@ · %lld%% confidence" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ · %2$lld%% de confianza"
-          }
-        }
-      }
-    },
-    "Forest hiking" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Senderismo en bosque"
-          }
-        }
-      }
-    },
-    "Desert hiking" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Senderismo en desierto"
-          }
-        }
-      }
-    },
-    "Rocky coast" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Costa rocosa"
-          }
-        }
-      }
-    },
-    "Historic architecture" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arquitectura histórica"
-          }
-        }
-      }
-    },
-    "Modern architecture" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arquitectura moderna"
-          }
-        }
-      }
-    },
-    "Sushi" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sushi"
-          }
-        }
-      }
-    },
-    "Tacos" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tacos"
-          }
-        }
-      }
-    },
-    "Pizza" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pizza"
-          }
-        }
-      }
-    },
-    "Pasta" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pasta"
-          }
-        }
-      }
-    },
-    "Pho" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pho"
-          }
-        }
-      }
-    },
-    "Dim sum" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dim sum"
-          }
-        }
-      }
-    },
-    "Barbecue" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Barbacoa"
-          }
-        }
-      }
-    },
-    "·" : {
-      "comment" : "A period used to separate different pieces of information in a list.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "·"
-          }
-        }
-      }
-    },
-    "ı" : {
-      "comment" : "The letter \"ı\" displayed in the Graviti wordmark.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ı"
-          }
-        }
-      }
-    },
-    "Already visited?" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Ya lo visitaste?"
-          }
-        }
-      }
-    },
-    "Didn't fit" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No encajó"
-          }
-        }
-      }
-    },
-    "Loved it" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Me encantó"
-          }
-        }
-      }
-    },
-    "Remove trip feedback for %@" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar comentarios del viaje para %1$@"
-          }
-        }
-      }
-    },
-    "Removing feedback lets the destination appear in Fit again." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Al eliminar estos comentarios, el destino podrá volver a aparecer en Fit."
-          }
-        }
-      }
-    },
-    "Trip feedback" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comentarios del viaje"
-          }
-        }
-      }
-    },
-    "Visited · Didn't fit" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visitado · No encajó"
-          }
-        }
-      }
-    },
-    "Visited · Loved it" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visitado · Me encantó"
-          }
-        }
-      }
-    },
-    "Your answer tunes future Fit suggestions without adding anything to your Library or changing Gravity." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu respuesta ajusta futuras sugerencias de Fit sin añadir nada a tu Biblioteca ni cambiar la Gravedad."
-          }
-        }
-      }
-    },
-    "Your visited-and-liked feedback also supports: %@." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tus comentarios sobre destinos visitados que te gustaron también respaldan: %1$@."
-          }
-        }
-      }
-    },
-    "Browse all Fit Guides" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ver todas las guías de Fit"
-          }
-        }
-      }
-    },
-    "Fit Guides" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guías de Fit"
-          }
-        }
-      }
-    },
-    "Fit Guides stay here even when their destinations are no longer in your current recommendations." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las guías de Fit permanecen aquí aunque sus destinos ya no aparezcan en tus recomendaciones actuales."
-          }
-        }
-      }
-    },
-    "Search guides and saved places" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscar guías y lugares guardados"
-          }
-        }
-      }
-    },
-    "About Graviti" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Acerca de Graviti"
-          }
-        }
-      }
-    },
-    "Your Library stays on this device. Graviti has no account, advertising SDK, analytics SDK, or Graviti-operated sync server." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu Biblioteca permanece en este dispositivo. Graviti no tiene cuentas, SDK de publicidad, SDK de analítica ni un servidor de sincronización operado por Graviti."
-          }
-        }
-      }
-    },
-    "Backups are yours" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tus copias de seguridad te pertenecen"
-          }
-        }
-      }
-    },
-    "Library Actions can export a versioned backup with saved media and recommendation preferences. Deleting the app removes local data unless you export a backup first." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las acciones de la Biblioteca pueden exportar una copia de seguridad versionada con archivos guardados y preferencias de recomendación. Al eliminar la app se borran los datos locales, a menos que exportes primero una copia de seguridad."
-          }
-        }
-      }
-    },
-    "When the app connects" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cuándo se conecta la app"
-          }
-        }
-      }
-    },
-    "Apple MapKit powers place search and Fit Guide suggestions. Public map collections and saved webpages are contacted only for features you invoke or eligible links you save. Photo text recognition runs on device." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple MapKit permite buscar lugares y obtener sugerencias de las guías de Fit. Las colecciones públicas de mapas y las páginas web guardadas solo se consultan para funciones que usas o enlaces compatibles que guardas. El reconocimiento de texto en fotos se ejecuta en el dispositivo."
-          }
-        }
-      }
-    },
-    "Save what pulls you. Graviti turns a private collection of travel inspiration into patterns, destination Fit, and places you can act on." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guarda lo que te atrae. Graviti convierte una colección privada de inspiración para viajar en patrones, Fit de destinos y lugares que puedes aprovechar."
-          }
-        }
-      }
-    },
-    "Feedback & support" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comentarios y ayuda"
-          }
-        }
-      }
-    },
-    "Feedback opens the public GitHub issue tracker. Do not include private or sensitive information. Diagnostics contain aggregate counts and app details only." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los comentarios abren el registro público de incidencias de GitHub. No incluyas información privada ni confidencial. Los diagnósticos solo contienen recuentos agregados y datos de la app."
-          }
-        }
-      }
-    },
-    "Copies app and aggregate status details without saved content" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copia datos de la app y del estado agregado sin contenido guardado"
-          }
-        }
-      }
-    },
-    "Send feedback" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar comentarios"
-          }
-        }
-      }
-    },
-    "Diagnostics copied" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diagnósticos copiados"
-          }
-        }
-      }
-    },
-    "Copy diagnostics" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar diagnósticos"
-          }
-        }
-      }
-    },
-    "View privacy policy" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ver la política de privacidad"
-          }
-        }
-      }
-    },
-    "Some entries could not be imported. Check your connection and refresh this collection again later." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Algunas entradas no se pudieron importar. Comprueba la conexión y vuelve a actualizar esta colección más tarde."
-          }
-        }
-      }
-    },
-    "Preview unavailable" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vista previa no disponible"
-          }
-        }
-      }
-    },
-    "Retry" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reintentar"
-          }
-        }
-      }
-    },
-    "Some entries could not be imported. Open the saved guide or list in Library to refresh it later." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Algunas entradas no se pudieron importar. Abre la guía o lista guardada en Biblioteca para actualizarla más tarde."
-          }
-        }
-      }
-    },
-    "The collection link is already saved. Keep Graviti open while it finds the places; partial results will be reported." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El enlace de la colección ya está guardado. Mantén Graviti abierto mientras busca los lugares; se informarán los resultados parciales."
-          }
-        }
-      }
-    },
-    "The saved link is still available. Check your connection and try the preview again." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El enlace guardado sigue disponible. Comprueba la conexión y vuelve a intentar la vista previa."
-          }
-        }
-      }
-    },
-    "This uses live Apple Maps data and may take a moment on slower connections. Saved guide places stay available." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto usa datos en vivo de Apple Maps y puede tardar un poco con conexiones lentas. Los lugares guardados en la guía seguirán disponibles."
-          }
-        }
-      }
+    "Your preferences, guides, and local activity were restored." : {
+      "comment" : "Suffix added to the summary text that describes the restoration of user preferences, guides, and local activity.",
+      "isCommentAutoGenerated" : true
     },
     "Your save is already safe. Place matching will continue when a connection is available." : {
       "localizations" : {
@@ -5881,6 +6714,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu elemento sigue en la Biblioteca. Comprueba la conexión y vuelve a intentar la búsqueda."
+          }
+        }
+      }
+    },
+    "Your saves" : {
+      "comment" : "A label displayed above a list of the user's saved artifacts.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus guardados"
+          }
+        }
+      }
+    },
+    "Your visited-and-liked feedback also supports: %@." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus comentarios sobre destinos visitados que te gustaron también respaldan: %1$@."
+          }
+        }
+      }
+    },
+    "zoo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zoológico"
           }
         }
       }

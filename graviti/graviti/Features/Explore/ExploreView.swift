@@ -3,6 +3,8 @@ import SwiftUI
 struct ExploreView: View {
     @ObservedObject var library: ArtifactLibrary
     let onFindPlace: (String) -> Void
+    private let knowledgeProvider: any DestinationKnowledgeProviding
+    private let rankingProvider: any RecommendationRankingProviding
     @AppStorage("explore.region") private var regionRaw = RecommendationRegion.anywhere.rawValue
     @AppStorage("explore.preferredInterests") private var preferredRaw = ""
     @AppStorage("explore.avoidedInterests") private var avoidedRaw = ""
@@ -10,14 +12,35 @@ struct ExploreView: View {
     @AppStorage("explore.excludedDestinations") private var excludedDestinationsRaw = ""
     @AppStorage("explore.visitedLikedDestinations") private var visitedLikedRaw = ""
     @AppStorage("explore.visitedNotFitDestinations") private var visitedNotFitRaw = ""
+    @AppStorage("fitGuide.metadata.v1") private var fitGuideMetadataJSON = ""
+    @AppStorage("fitGuide.library.v1") private var fitGuideLibraryJSON = ""
+    @AppStorage("recommendation.outcomes.v1") private var recommendationOutcomesJSON = ""
     @State private var showingPreferences = false
+
+    init(
+        library: ArtifactLibrary,
+        knowledgeProvider: (any DestinationKnowledgeProviding)? = nil,
+        rankingProvider: (any RecommendationRankingProviding)? = nil,
+        onFindPlace: @escaping (String) -> Void
+    ) {
+        self.library = library
+        self.onFindPlace = onFindPlace
+        self.knowledgeProvider = knowledgeProvider ?? BundledDestinationKnowledgeProvider()
+        self.rankingProvider = rankingProvider ?? DefaultRecommendationRankingProvider()
+    }
 
     private var profile: InterestProfile {
         InterestProfileBuilder.build(from: library.artifacts)
     }
 
     private var recommendations: [DestinationRecommendation] {
-        DestinationFitEngine.recommendations(from: profile, artifacts: library.artifacts, preferences: preferences)
+        rankingProvider.recommendations(
+            from: profile,
+            artifacts: library.artifacts,
+            preferences: preferences,
+            limit: 3,
+            catalog: knowledgeProvider.catalog
+        )
     }
 
     private var preferences: ExplorePreferences {
@@ -36,14 +59,26 @@ struct ExploreView: View {
     private var visitedLikedDestinationIDs: Set<String> { Self.decode(visitedLikedRaw) }
     private var visitedNotFitDestinationIDs: Set<String> { Self.decode(visitedNotFitRaw) }
 
-    private var savedGuides: [FitGuide] {
-        var guides = [FitGuide]()
+    private var allSavedGuides: [FitGuide] {
+        var guides = FitGuideLibraryStore.guides(in: fitGuideLibraryJSON)
+        var seen = Set(guides.map(\.id))
         for id in savedDestinationIDs {
-            if let guide = DestinationFitEngine.fitGuide(for: id, from: profile, preferences: preferences) {
+            if let guide = rankingProvider.fitGuide(
+                for: id,
+                from: profile,
+                preferences: preferences,
+                catalog: knowledgeProvider.catalog
+            ),
+               seen.insert(guide.id).inserted {
                 guides.append(guide)
             }
         }
         return guides.sorted { $0.destination.name < $1.destination.name }
+    }
+
+    private var savedGuides: [FitGuide] {
+        let allMetadata = FitGuideMetadataStore.decode(Data(fitGuideMetadataJSON.utf8))
+        return allSavedGuides.filter { allMetadata[$0.id]?.archived != true }
     }
 
     var body: some View {
@@ -70,7 +105,7 @@ struct ExploreView: View {
                         leadingPattern(leading)
                     }
 
-                    if !savedGuides.isEmpty {
+                    if !allSavedGuides.isEmpty {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Your Fit Guides")
                                 .font(.headline)
@@ -89,8 +124,13 @@ struct ExploreView: View {
                                 }
                                 .buttonStyle(.plain)
                             }
+                            if savedGuides.isEmpty {
+                                Text("Your guides are archived. Open the guide library to restore one.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.white.opacity(0.68))
+                            }
                             NavigationLink {
-                                FitGuideLibraryView(guides: savedGuides, library: library)
+                                FitGuideLibraryView(guides: allSavedGuides, library: library)
                             } label: {
                                 Label("Browse all Fit Guides", systemImage: "books.vertical.fill")
                                     .font(.subheadline.weight(.semibold))
@@ -217,6 +257,14 @@ struct ExploreView: View {
                     visitedNotFitRaw: $visitedNotFitRaw
                 )
             }
+            .task(id: guideSynchronizationKey) {
+                synchronizeSavedGuides()
+            }
+            .task(id: recommendationExposureKey) {
+                for recommendation in recommendations {
+                    record(.shown, for: recommendation)
+                }
+            }
         }
     }
 
@@ -304,6 +352,41 @@ struct ExploreView: View {
         excluded.remove(recommendation.id)
         savedDestinationsRaw = Self.encode(saved)
         excludedDestinationsRaw = Self.encode(excluded)
+        if let guide = rankingProvider.fitGuide(
+            for: recommendation.id,
+            from: profile,
+            preferences: preferences,
+            catalog: knowledgeProvider.catalog
+        ) {
+            FitGuideLibraryStore.ensureGuide(guide, in: &fitGuideLibraryJSON)
+        }
+        record(.saved, for: recommendation)
+    }
+
+    private var guideSynchronizationKey: String {
+        let artifactKey = library.artifacts.map { $0.id.uuidString }.sorted().joined(separator: ",")
+        return "\(savedDestinationsRaw)|\(artifactKey)"
+    }
+
+    private var recommendationExposureKey: String {
+        recommendations.map { "\($0.id):\($0.fitPercent):\($0.confidencePercent)" }.joined(separator: "|")
+    }
+
+    private func synchronizeSavedGuides() {
+        for destinationID in savedDestinationIDs {
+            guard let guide = rankingProvider.fitGuide(
+                for: destinationID,
+                from: profile,
+                preferences: preferences,
+                catalog: knowledgeProvider.catalog
+            ) else { continue }
+            FitGuideLibraryStore.ensureGuide(guide, in: &fitGuideLibraryJSON)
+            FitGuideLibraryStore.migrateLegacyMemberships(
+                for: guide,
+                artifacts: library.artifacts,
+                in: &fitGuideLibraryJSON
+            )
+        }
     }
 
     private func excludeDestination(_ recommendation: DestinationRecommendation) {
@@ -313,6 +396,7 @@ struct ExploreView: View {
         excluded.insert(recommendation.id)
         savedDestinationsRaw = Self.encode(saved)
         excludedDestinationsRaw = Self.encode(excluded)
+        record(.dismissed, for: recommendation)
     }
 
     private func markVisitedLiked(_ recommendation: DestinationRecommendation) {
@@ -325,6 +409,7 @@ struct ExploreView: View {
         visitedLikedRaw = Self.encode(liked)
         visitedNotFitRaw = Self.encode(notFit)
         excludedDestinationsRaw = Self.encode(excluded)
+        record(.visitedLoved, for: recommendation)
     }
 
     private func markVisitedNotFit(_ recommendation: DestinationRecommendation) {
@@ -334,6 +419,15 @@ struct ExploreView: View {
         notFit.insert(recommendation.id)
         visitedLikedRaw = Self.encode(liked)
         visitedNotFitRaw = Self.encode(notFit)
+        record(.visitedDidNotFit, for: recommendation)
+    }
+
+    private func record(_ kind: RecommendationOutcomeKind, for recommendation: DestinationRecommendation) {
+        recommendationOutcomesJSON = RecommendationOutcomeStore.recording(
+            kind,
+            recommendation: recommendation,
+            in: recommendationOutcomesJSON
+        )
     }
 
     private static func encode(_ values: Set<String>) -> String {
@@ -350,6 +444,11 @@ private struct DestinationRecommendationView: View {
     let onNotForMe: () -> Void
     let onVisitedLiked: () -> Void
     let onVisitedNotFit: () -> Void
+    @AppStorage("recommendation.feedback.v1") private var feedbackJSON = ""
+    @AppStorage("recommendation.outcomes.v1") private var recommendationOutcomesJSON = ""
+    @AppStorage("recommendation.prompts.v1") private var promptLedgerJSON = ""
+    @State private var feedbackResponse: RecommendationFeedbackResponse?
+    @State private var promptVisible = false
 
     var body: some View {
         ScrollView {
@@ -402,6 +501,11 @@ private struct DestinationRecommendationView: View {
                 .padding(18)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
+
+                if let interest = recommendation.matchedInterests.first,
+                   promptVisible || feedbackResponse != nil {
+                    feedbackCard(interest: interest)
+                }
 
                 VStack(alignment: .leading, spacing: 12) {
                     Text("How this Fit was calculated")
@@ -541,6 +645,14 @@ private struct DestinationRecommendationView: View {
         .foregroundStyle(.white)
         .navigationTitle("Recommendation")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            recommendationOutcomesJSON = RecommendationOutcomeStore.recording(
+                .opened,
+                recommendation: recommendation,
+                in: recommendationOutcomesJSON
+            )
+            preparePrompt()
+        }
     }
 
     private var preferenceContribution: String {
@@ -550,6 +662,78 @@ private struct DestinationRecommendationView: View {
         return recommendation.explicitMatches
             .map { InterestDisplayName.localized($0) }
             .joined(separator: ", ")
+    }
+
+    private func feedbackCard(interest: String) -> some View {
+        let prompt = String(localized: "Should \(InterestDisplayName.localized(interest)) influence future recommendations?")
+        return VStack(alignment: .leading, spacing: 12) {
+            Label("Help Graviti learn", systemImage: "sparkles")
+                .font(GravitiTypography.headline)
+            Text(prompt)
+                .font(GravitiTypography.subheadline)
+            if let feedbackResponse {
+                Label(
+                    feedbackResponse == .notSure ? String(localized: "Noted as uncertain") : String(localized: "Thanks — you can change this later in Data & Privacy."),
+                    systemImage: "checkmark.circle.fill"
+                )
+                .font(GravitiTypography.captionSemibold)
+                .foregroundStyle(GravitiColors.signalMint)
+            } else {
+                HStack(spacing: 8) {
+                    feedbackButton("Yes", response: .yes, prompt: prompt)
+                    feedbackButton("No", response: .no, prompt: prompt)
+                    feedbackButton("Not sure", response: .notSure, prompt: prompt)
+                }
+                Button("Dismiss") {
+                    promptLedgerJSON = RecommendationPromptStore.dismissing(
+                        recommendationID: recommendation.id,
+                        prompt: prompt,
+                        in: promptLedgerJSON
+                    )
+                    promptVisible = false
+                }
+                .font(GravitiTypography.captionSemibold)
+                .foregroundStyle(.secondary)
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 18))
+    }
+
+    private func preparePrompt() {
+        guard let interest = recommendation.matchedInterests.first else { return }
+        let prompt = String(localized: "Should \(InterestDisplayName.localized(interest)) influence future recommendations?")
+        promptVisible = RecommendationPromptStore.shouldShow(
+            recommendationID: recommendation.id,
+            prompt: prompt,
+            in: promptLedgerJSON
+        )
+        guard promptVisible else { return }
+        promptLedgerJSON = RecommendationPromptStore.markingShown(
+            recommendationID: recommendation.id,
+            prompt: prompt,
+            in: promptLedgerJSON
+        )
+    }
+
+    private func feedbackButton(_ title: LocalizedStringKey, response: RecommendationFeedbackResponse, prompt: String) -> some View {
+        Button(title) {
+            feedbackResponse = response
+            feedbackJSON = RecommendationFeedbackStore.appending(
+                RecommendationFeedbackEvent(
+                    id: UUID(),
+                    recommendationID: recommendation.id,
+                    prompt: prompt,
+                    response: response,
+                    createdAt: .now
+                ),
+                to: feedbackJSON
+            )
+        }
+        .font(GravitiTypography.captionSemibold)
+        .buttonStyle(.bordered)
+        .frame(maxWidth: .infinity)
     }
 
     private func fitContributionRow(

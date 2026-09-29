@@ -4,6 +4,8 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Graviti uses your location only while you search to sort saved and suggested places by distance.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Sora-Regular.ttf</string>

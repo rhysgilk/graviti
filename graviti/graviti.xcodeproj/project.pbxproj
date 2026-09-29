@@ -12,19 +12,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		B10000000000000000000007 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4076AA9C305CBC1700E032E4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4076AAA3305CBC1700E032E4;
-			remoteInfo = graviti;
-		};
 		A10000000000000000000005 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4076AA9C305CBC1700E032E4 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A10000000000000000000006;
 			remoteInfo = GravitiShareExtension;
+		};
+		B10000000000000000000007 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4076AA9C305CBC1700E032E4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4076AAA3305CBC1700E032E4;
+			remoteInfo = graviti;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -54,12 +54,12 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Resources/Fonts/Sora-Bold.ttf,
-				Resources/Fonts/Sora-ExtraBold.ttf,
-				Resources/Fonts/Sora-ExtraLight.ttf,
-				Resources/Fonts/Sora-Light.ttf,
-				Resources/Fonts/Sora-Medium.ttf,
-				Resources/Fonts/Sora-Thin.ttf,
+				"Resources/Fonts/Sora-Bold.ttf",
+				"Resources/Fonts/Sora-ExtraBold.ttf",
+				"Resources/Fonts/Sora-ExtraLight.ttf",
+				"Resources/Fonts/Sora-Light.ttf",
+				"Resources/Fonts/Sora-Medium.ttf",
+				"Resources/Fonts/Sora-Thin.ttf",
 			);
 			target = 4076AAA3305CBC1700E032E4 /* graviti */;
 		};
@@ -573,7 +573,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/graviti.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/graviti";
-		};
+			};
 			name = Debug;
 		};
 		B1000000000000000000000C /* Release */ = {

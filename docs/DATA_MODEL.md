@@ -1,12 +1,20 @@
 # Graviti Implemented Data Model
 
+## Place lifecycle
+
+`ArtifactUserDetails.placeStatus` stores an optional `PlaceLifecycleStatus` in the existing JSON user details payload. Older SwiftData rows remain readable without a stored column migration. `ArtifactLibrary.setPlaceStatus` writes the chosen state to every Artifact with the same `SavedPlace.id`, so repeated saves present one coherent place state.
+
+The current values are `saved`, `curious`, `shortlisted`, `visited`, `loved`, and `didNotFit`. A missing value behaves as Saved. Lifecycle state is user authored and survives enrichment refreshes, detail edits, backup export, and restore.
+
+Import Inbox sections combine Artifact processing state with persisted `ImportAttempt` records. The independent record retains active, successful, duplicate, and failed collection/file attempts even when no Artifact is created, and stores imported, refreshed, duplicate, and skipped counts for retry and explanation.
+
 **Version:** 1.0
 
 **Status:** Local MVP
 
 **Storage:** SwiftData domain record plus App Group image files
 
-**Backup schema:** Version 3 JSON, with version 1 and version 2 restore compatibility
+**Backup schema:** Version 4 JSON, with version 1 through version 3 restore compatibility
 
 This document describes persisted and derived values in the current app. Future normalized server entities are listed separately.
 
@@ -139,7 +147,9 @@ Multiple Artifacts can reference the same SavedPlace. Removing a Place from the 
 - resolved URL
 - fetched date
 
-This is cached evidence. It never replaces `sourceURL` or user-authored text.
+This is cached evidence. It never replaces `sourceURL`, notes, descriptions, or corrections written by the user. For supported social links, a cleaned metadata title can replace the platform-supplied source-title wrapper used for display. The useful caption remains in `summary` and participates in enrichment.
+
+Processed Instagram metadata can also provide a transient place-search hint. Graviti accepts only explicit caption signals, including pinned place/city tuples, nearby business handles and addresses, leading business handles, and named venues on streets. It excludes later creator-follow prompts and stores the resulting `SavedPlace` only after an unambiguous MapKit name match. The hint itself adds no persisted field. Unmatched social hints finish processing without entering the manual map-review state. A persisted social place whose name conflicts with newly extracted caption evidence is cleared and resolved again during resumed processing.
 
 ## 7. Generated enrichment
 
@@ -152,6 +162,7 @@ This is cached evidence. It never replaces `sourceURL` or user-authored text.
 - confidence from 0 through 1
 - generation date
 - optional per-interest evidence records
+- optional `GeneratedDataProvenance`
 
 Each `ArtifactInterestEvidence` record contains:
 
@@ -170,6 +181,8 @@ Provenance values distinguish:
 - MapKit plus detected text
 - link metadata
 - MapKit plus link metadata
+
+`GeneratedDataProvenance` identifies the producer, producer version, generation time, and optional input fingerprint. The same value type is used by enrichment, link metadata, processing-job outputs, and Fit outcome evidence. It allows selective regeneration after an algorithm upgrade while old records remain decodable and user corrections remain untouched.
 
 `ExperienceCategory` currently supports:
 
@@ -201,7 +214,7 @@ Changing a place clears generated enrichment when the place identity changes, th
 
 ## 9. Source collection membership
 
-Collection membership is stored as strings on the Artifact.
+Imported collection context is stored as strings on the Artifact. Fit Guide membership uses a separate durable relationship.
 
 Examples:
 
@@ -209,9 +222,9 @@ Examples:
 - `Vanessa and Rhys`
 - `New York City Fit Guide · Museums`
 
-One Artifact can belong to several Apple/Google collections and Fit Guides. Adding a new membership clears generated enrichment and schedules a refresh because the collection title may explain why the item was saved.
+One Artifact can belong to several Apple/Google collections. Adding a collection title clears generated enrichment and schedules a refresh because the title may explain why the item was saved.
 
-Fit Guide membership is recognized by an exact guide title or its `guide · pattern` prefix.
+`FitGuideMembership` links one guide ID to one Artifact ID and optionally remembers the interest section that produced the suggestion. Legacy exact titles and `guide · pattern` prefixes are migration input; after migration the membership record is authoritative.
 
 ## 10. SwiftData record
 
@@ -291,7 +304,27 @@ Recommendations are not persisted as Library records.
 
 ### FitGuide
 
-`FitGuide` contains a `SavedDestination` and up to four interests. Its live result sections are transient MapKit results. Saved guide membership persists through Artifact collection titles.
+`FitGuide` contains a stable guide ID, a `SavedDestination`, and up to four interests. Its live result sections are transient MapKit results.
+
+`FitGuideLibraryState` contains versioned `FitGuideRecord` and `FitGuideMembership` arrays. A record preserves destination identity, display fields, search span, interests, and creation/update times. A membership preserves guide ID, Artifact ID, optional interest section, and add time. `FitGuideMetadata` stores the user title, note, archive state, cover Artifact ID, shortlist place IDs, ordered Artifact IDs, and update time.
+
+### Durable processing jobs
+
+`ArtifactProcessingJob` contains:
+
+- stable job ID and Artifact ID
+- kind: link metadata, text extraction, place identification, enrichment, profile indexing, or thumbnail generation
+- producer version
+- pending, running, waiting-for-retry, completed, unavailable, or cancelled status
+- attempt count, last error, next retry, and dependency kinds
+- creation, start, completion, and update times
+- optional output summary and provenance
+
+The ledger is persisted as schema-versioned JSON in the App Group/application-support container. It is operational state rather than user content; reconciliation recreates missing records from Artifacts and removes jobs whose Artifact was deleted.
+
+### Rebuildable Library index
+
+`LibraryDerivedIndex` contains a schema version, source fingerprint, build time, and mappings for place, destination, interest, guide, processing state, and normalized search term. It is a disposable cache. Deleting or failing to decode it causes a rebuild from Artifacts and Fit Guide memberships.
 
 ### DestinationKnowledgeCatalog
 
@@ -320,16 +353,25 @@ The following values use `UserDefaults` through `@AppStorage`:
 | `explore.excludedDestinations` | Not for me IDs |
 | `explore.visitedLikedDestinations` | IDs marked visited and liked |
 | `explore.visitedNotFitDestinations` | IDs marked visited and did not fit |
+| `fitGuide.library.v1` | guide records and Artifact memberships |
+| `fitGuide.metadata.v1` | title, note, archive, cover, shortlist, and order |
+| `recommendation.feedback.v1` | editable Yes/No/Not sure answers |
+| `recommendation.outcomes.v1` | local recommendation exposure and action events |
+| `recommendation.prompts.v1` | prompt rate-limit and dismissal ledger |
+| `import.attempts.v1` | independent collection and file import attempts |
+| `library.savedFilters.v1` | user-created derived Library filters |
+| `search.recentQueries` | bounded recent local searches |
+| `library.sort.*`, `fitGuide.sort` | per-surface sort choices |
 | `debug.dogfoodArtifactIDs` | Debug-only fixture cleanup |
 
-The Explore region, preferred and avoided interests, saved destinations, Not for Me exclusions, and both visited-feedback sets are included in backup schema version 3. Version 2 contains the same preference snapshot without visited feedback. Display and debug preferences remain device-specific. Artifact-based Fit Guide memberships are stored on Artifacts and are also backed up.
+Backup schema version 4 includes the durable product data in this table except onboarding, display mode, selected filter, sort choices, recent queries, and Debug fixture IDs. Version 3 contains Explore state through visited feedback; version 2 contains Explore preferences without visited feedback. Display and Debug preferences remain device specific.
 
 ## 14. Backup schema
 
 `LibraryBackupArchive`:
 
 ```text
-schemaVersion: Int = 3
+schemaVersion: Int = 4
 exportedAt: Date
 artifacts: [LibraryBackupEntry]
 preferences: LibraryBackupPreferences?
@@ -353,9 +395,16 @@ savedDestinationIDs: [String]
 excludedDestinationIDs: [String]
 visitedLikedDestinationIDs: [String]
 visitedNotFitDestinationIDs: [String]
+fitGuideLibraryJSON: String
+fitGuideMetadataJSON: String
+recommendationFeedbackJSON: String
+recommendationOutcomesJSON: String
+recommendationPromptsJSON: String
+importAttemptsJSON: String
+savedLibraryFiltersJSON: String
 ```
 
-Dates encode as seconds since 1970. JSON is pretty printed and sorted. Preference values are bounded, trimmed, deduplicated, and sorted during restore. Version 1 archives decode without preferences and leave current Explore settings unchanged. Version 2 preference snapshots decode with empty visited-feedback sets.
+Dates encode as seconds since 1970. JSON is pretty printed and sorted. Preference values are bounded, trimmed, deduplicated, and sorted during restore. Nested local-state JSON is size bounded and decoded against its concrete model before restore. Version 1 archives decode without preferences and leave current state unchanged. Version 2 preference snapshots decode with empty visited-feedback sets. Version 3 snapshots decode with empty guide, event, import-attempt, and saved-filter payloads.
 
 Restore identity is `Artifact.id`. Existing IDs are skipped; place identity alone does not suppress restoration of a separate source Artifact.
 

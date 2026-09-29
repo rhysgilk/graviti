@@ -348,6 +348,32 @@ struct Artifact: Identifiable, Hashable, Codable {
         )
     }
 
+    func removingSourceCollectionTitles(where shouldRemove: (String) -> Bool) -> Artifact {
+        let retained = sourceCollectionTitles.filter { !shouldRemove($0) }
+        guard retained != sourceCollectionTitles else { return self }
+        return Artifact(
+            id: id,
+            kind: kind,
+            sourceURL: sourceURL,
+            sourceCollectionTitle: retained.first,
+            additionalSourceCollectionTitles: retained.count > 1 ? Array(retained.dropFirst()) : nil,
+            originalText: originalText,
+            userNote: userNote,
+            mediaKey: mediaKey,
+            extractedText: extractedText,
+            extractedTextSource: extractedTextSource,
+            textExtractionState: textExtractionState,
+            linkMetadata: linkMetadata,
+            linkMetadataState: linkMetadataState,
+            place: place,
+            enrichment: enrichment,
+            enrichmentState: enrichmentState,
+            userDetails: userDetails,
+            processingState: processingState,
+            capturedAt: capturedAt
+        )
+    }
+
     func withMediaKey(_ mediaKey: String?) -> Artifact {
         Artifact(
             id: id,
@@ -372,7 +398,24 @@ struct Artifact: Identifiable, Hashable, Codable {
         )
     }
 
-    var effectiveSummary: String? { userDetails == nil ? enrichment?.summary : userDetails?.summary }
-    var effectiveCategory: ExperienceCategory? { userDetails == nil ? enrichment?.category : userDetails?.category }
-    var effectiveInterests: [String] { userDetails?.interests ?? enrichment?.interests ?? [] }
+    var effectiveSummary: String? { userDetails?.summary ?? enrichment?.summary }
+    var effectiveCategory: ExperienceCategory? { userDetails?.category ?? enrichment?.category }
+    var effectiveInterests: [String] {
+        guard let interests = userDetails?.interests, !interests.isEmpty else { return enrichment?.interests ?? [] }
+        return interests
+    }
+
+    func withPlaceStatus(_ status: PlaceLifecycleStatus?) -> Artifact {
+        withEditedDetails(
+            ArtifactUserDetails(
+                summary: userDetails?.summary,
+                category: userDetails?.category,
+                interests: userDetails?.interests ?? [],
+                placeStatus: status,
+                isHighPriority: userDetails?.isHighPriority ?? false,
+                tags: userDetails?.tags ?? []
+            ),
+            note: userNote
+        )
+    }
 }

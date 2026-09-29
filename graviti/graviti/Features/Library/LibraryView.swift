@@ -12,6 +12,12 @@ struct LibraryView: View {
     @AppStorage("explore.excludedDestinations") private var excludedDestinationsRaw = ""
     @AppStorage("explore.visitedLikedDestinations") private var visitedLikedDestinationsRaw = ""
     @AppStorage("explore.visitedNotFitDestinations") private var visitedNotFitDestinationsRaw = ""
+    @AppStorage("fitGuide.library.v1") private var fitGuideLibraryJSON = ""
+    @AppStorage("fitGuide.metadata.v1") private var fitGuideMetadataJSON = ""
+    @AppStorage("recommendation.feedback.v1") private var recommendationFeedbackJSON = ""
+    @AppStorage("recommendation.outcomes.v1") private var recommendationOutcomesJSON = ""
+    @AppStorage("recommendation.prompts.v1") private var recommendationPromptsJSON = ""
+    @AppStorage("import.attempts.v1") private var importAttemptsJSON = ""
     @State private var selectedMapPlace: SavedPlace?
     @State private var query = ""
     @State private var showsNeedsReviewOnly = false
@@ -25,11 +31,27 @@ struct LibraryView: View {
     @State private var showingBulkDeleteConfirmation = false
     @State private var isDeletingSaves = false
     @State private var saveActionError: String?
+    @State private var selectionRowFrames: [String: CGRect] = [:]
+    @State private var dragSelectionAdds: Bool?
+    @State private var dragSelectionStartY: CGFloat?
+    @State private var dragVisitedSelectionKeys: Set<String> = []
+    @State private var rowActionError: LibraryActionError?
     @State private var backupDocument = LibraryBackupDocument()
     @State private var isExportingBackup = false
     @State private var isImportingBackup = false
     @State private var backupStatus: LibraryBackupStatus?
     @State private var showingDataPrivacy = false
+    @State private var smartFilter: LibrarySmartFilter = .all
+    @AppStorage("library.savedFilters.v1") private var savedFiltersJSON = ""
+    @AppStorage("library.selectedSavedFilter") private var selectedSavedFilterRaw = ""
+    @State private var showingSavedFilters = false
+    @AppStorage("library.sort.destinations") private var destinationSortRawValue = LibrarySort.gravity.rawValue
+    @AppStorage("library.sort.places") private var placeSortRawValue = LibrarySort.recentlySaved.rawValue
+    @AppStorage("library.sort.saves") private var saveSortRawValue = LibrarySort.recentlySaved.rawValue
+    @StateObject private var locationManager = SearchLocationManager()
+    @State private var pendingUndo: PendingLibraryUndo?
+    @State private var undoExpirationTask: Task<Void, Never>?
+    @State private var showingCompletenessReview = false
 
     private var mode: LibraryMode {
         get { LibraryMode(rawValue: modeRawValue) ?? .destinations }
@@ -41,8 +63,16 @@ struct LibraryView: View {
             VStack(spacing: 0) {
                 modePicker
 
+                if mode != .map && mode != .inbox {
+                    smartFilterPicker
+                }
+
                 if needsReviewCount > 0 || showsNeedsReviewOnly {
                     reviewFilter
+                }
+
+                if incompleteCount > 0, mode != .inbox {
+                    completenessReviewButton
                 }
 
                 if !repeatedPlaceGroups.isEmpty {
@@ -62,6 +92,8 @@ struct LibraryView: View {
                             savesContent
                         case .map:
                             mapContent
+                        case .inbox:
+                            ImportInboxView(library: library)
                         }
                     }
                 }
@@ -87,6 +119,20 @@ struct LibraryView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
+                        if !availableSorts.isEmpty {
+                            Menu("Sort") {
+                                ForEach(availableSorts) { option in
+                                    Button {
+                                        setSort(option)
+                                        if option == .distance { locationManager.requestLocation() }
+                                    } label: {
+                                        if sort == option { Label(option.title, systemImage: "checkmark") }
+                                        else { Text(option.title) }
+                                    }
+                                }
+                            }
+                            Divider()
+                        }
                         Button {
                             exportBackup()
                         } label: {
@@ -102,6 +148,11 @@ struct LibraryView: View {
                             showingDataPrivacy = true
                         } label: {
                             Label("Data & privacy", systemImage: "lock.shield")
+                        }
+                        Button {
+                            showingSavedFilters = true
+                        } label: {
+                            Label("Manage saved views", systemImage: "line.3.horizontal.decrease.circle")
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
@@ -133,6 +184,8 @@ struct LibraryView: View {
                     bulkPlaceActions
                 } else if mode == .saves, isSelectingSaves {
                     bulkSaveActions
+                } else if let pendingUndo {
+                    undoBar(pendingUndo)
                 }
             }
             .confirmationDialog(
@@ -170,11 +223,24 @@ struct LibraryView: View {
                 restoreBackup(result)
             }
             .sheet(isPresented: $showingDataPrivacy) {
-                DataPrivacyView()
+                DataPrivacyView(library: library)
+            }
+            .sheet(isPresented: $showingCompletenessReview) {
+                CompletenessReviewView(library: library)
+            }
+            .sheet(isPresented: $showingSavedFilters) {
+                SavedLibraryFiltersView(filtersJSON: $savedFiltersJSON) { id in
+                    selectedSavedFilterRaw = id.uuidString
+                    smartFilter = .all
+                }
             }
             .alert(item: $backupStatus) { status in
                 Alert(title: Text("Library backup"), message: Text(status.message), dismissButton: .default(Text("OK")))
             }
+            .alert(item: $rowActionError) { error in
+                Alert(title: Text("Library action failed"), message: Text(error.message), dismissButton: .default(Text("OK")))
+            }
+            .onDisappear { finalizePendingUndo() }
         }
         .font(GravitiTypography.body)
     }
@@ -207,7 +273,7 @@ struct LibraryView: View {
                     backupStatus = LibraryBackupStatus(
                         message: summary.preferences == nil
                             ? itemSummary
-                            : "\(itemSummary) \(String(localized: "Your Explore preferences were restored."))"
+                            : "\(itemSummary) \(String(localized: "Your preferences, guides, and local activity were restored."))"
                     )
                 } catch {
                     backupStatus = LibraryBackupStatus(message: error.localizedDescription)
@@ -226,7 +292,14 @@ struct LibraryView: View {
             savedDestinationIDs: Self.decodePreferenceSet(savedDestinationsRaw),
             excludedDestinationIDs: Self.decodePreferenceSet(excludedDestinationsRaw),
             visitedLikedDestinationIDs: Self.decodePreferenceSet(visitedLikedDestinationsRaw),
-            visitedNotFitDestinationIDs: Self.decodePreferenceSet(visitedNotFitDestinationsRaw)
+            visitedNotFitDestinationIDs: Self.decodePreferenceSet(visitedNotFitDestinationsRaw),
+            fitGuideLibraryJSON: fitGuideLibraryJSON,
+            fitGuideMetadataJSON: fitGuideMetadataJSON,
+            recommendationFeedbackJSON: recommendationFeedbackJSON,
+            recommendationOutcomesJSON: recommendationOutcomesJSON,
+            recommendationPromptsJSON: recommendationPromptsJSON,
+            importAttemptsJSON: importAttemptsJSON,
+            savedLibraryFiltersJSON: savedFiltersJSON
         )
     }
 
@@ -238,6 +311,13 @@ struct LibraryView: View {
         excludedDestinationsRaw = Self.encodePreferenceSet(preferences.excludedDestinationIDs)
         visitedLikedDestinationsRaw = Self.encodePreferenceSet(preferences.visitedLikedDestinationIDs)
         visitedNotFitDestinationsRaw = Self.encodePreferenceSet(preferences.visitedNotFitDestinationIDs)
+        fitGuideLibraryJSON = preferences.fitGuideLibraryJSON
+        fitGuideMetadataJSON = preferences.fitGuideMetadataJSON
+        recommendationFeedbackJSON = preferences.recommendationFeedbackJSON
+        recommendationOutcomesJSON = preferences.recommendationOutcomesJSON
+        recommendationPromptsJSON = preferences.recommendationPromptsJSON
+        importAttemptsJSON = preferences.importAttemptsJSON
+        savedFiltersJSON = preferences.savedLibraryFiltersJSON
     }
 
     private static func decodePreferenceSet(_ raw: String) -> [String] {
@@ -277,6 +357,30 @@ struct LibraryView: View {
         .padding(.horizontal, 20)
         .padding(.bottom, 8)
         .accessibilityValue(showsNeedsReviewOnly ? "Showing only items that need review" : "")
+    }
+
+    private var completenessReviewButton: some View {
+        Button { showingCompletenessReview = true } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "wand.and.stars")
+                    .foregroundStyle(GravitiColors.signalMint)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Complete \(min(incompleteCount, 6)) saves")
+                        .font(GravitiTypography.subheadlineSemibold)
+                    Text("Add the details only you know")
+                        .font(GravitiTypography.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.forward").foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 16)
+            .frame(minHeight: 58)
+            .background(GravitiColors.deepInk, in: RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 20)
+        .padding(.bottom, 8)
     }
 
     private var repeatedPlacesLink: some View {
@@ -332,9 +436,55 @@ struct LibraryView: View {
         }
     }
 
+    private var smartFilterPicker: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(LibrarySmartFilter.allCases) { filter in
+                    Button {
+                        smartFilter = filter
+                        selectedSavedFilterRaw = ""
+                    } label: {
+                        Label(filter.title, systemImage: filter.symbol)
+                            .font(GravitiTypography.captionSemibold)
+                            .foregroundStyle(selectedSavedFilter == nil && smartFilter == filter ? .white : .white.opacity(0.62))
+                            .padding(.horizontal, 12)
+                            .frame(minHeight: 36)
+                            .background(selectedSavedFilter == nil && smartFilter == filter ? GravitiColors.iris.opacity(0.82) : GravitiColors.deepInk, in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(selectedSavedFilter == nil && smartFilter == filter ? .isSelected : [])
+                }
+                ForEach(savedFilters) { filter in
+                    Button {
+                        selectedSavedFilterRaw = filter.id.uuidString
+                        smartFilter = .all
+                    } label: {
+                        Label(filter.name, systemImage: "line.3.horizontal.decrease.circle.fill")
+                            .font(GravitiTypography.captionSemibold)
+                            .foregroundStyle(selectedSavedFilter?.id == filter.id ? .white : .white.opacity(0.62))
+                            .padding(.horizontal, 12)
+                            .frame(minHeight: 36)
+                            .background(selectedSavedFilter?.id == filter.id ? GravitiColors.iris.opacity(0.82) : GravitiColors.deepInk, in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+                Button { showingSavedFilters = true } label: {
+                    Label("Save view", systemImage: "plus")
+                        .font(GravitiTypography.captionSemibold)
+                        .padding(.horizontal, 12)
+                        .frame(minHeight: 36)
+                        .background(GravitiColors.deepInk, in: Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 10)
+        }
+    }
+
     @ViewBuilder
     private var destinationsContent: some View {
-        let destinations = DestinationOrbitBuilder.nodes(from: filteredArtifacts, limit: nil)
+        let destinations = sortedDestinations(DestinationOrbitBuilder.nodes(from: filteredArtifacts, limit: nil))
         if destinations.isEmpty {
             if query.isEmpty {
                 emptyState("No destinations yet", icon: "globe", detail: "Destinations appear as your saves are connected to places.")
@@ -369,10 +519,10 @@ struct LibraryView: View {
             } else {
                 noResultsState()
             }
-        } else {
-            List(savedPlaces) { place in
-                Group {
-                    if isSelectingPlaces {
+        } else if isSelectingPlaces {
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    ForEach(savedPlaces) { place in
                         Button {
                             if selectedPlaceIDs.contains(place.id) {
                                 selectedPlaceIDs.remove(place.id)
@@ -389,12 +539,27 @@ struct LibraryView: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityValue(selectedPlaceIDs.contains(place.id) ? "Selected" : "Not selected")
-                    } else {
-                        NavigationLink {
-                            SavedPlaceDetailView(place: place, library: library)
-                        } label: {
-                            placeLabel(place)
-                        }
+                        .padding(.horizontal, 20)
+                        .background(selectionFrame(for: "place:\(place.id)"))
+                        Divider().padding(.leading, 20)
+                    }
+                }
+            }
+            .coordinateSpace(name: "librarySelectionList")
+            .onPreferenceChange(LibrarySelectionFramePreferenceKey.self) { selectionRowFrames = $0 }
+            .highPriorityGesture(selectionDragGesture(for: .places))
+        } else {
+            List(savedPlaces) { place in
+                NavigationLink {
+                    SavedPlaceDetailView(place: place, library: library)
+                } label: {
+                    placeLabel(place)
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        removePlace(place.id)
+                    } label: {
+                        Label("Remove", systemImage: "trash")
                     }
                 }
                 .listRowBackground(GravitiColors.deepInk)
@@ -504,6 +669,152 @@ struct LibraryView: View {
         }
     }
 
+    private func removePlace(_ id: String) {
+        let title = library.artifacts.first(where: { $0.place?.id == id })?.place?.name ?? String(localized: "Place")
+        Task {
+            do {
+                finalizePendingUndo()
+                let originals = try await library.stagePlaceRemoval(id)
+                guard !originals.isEmpty else { return }
+                scheduleUndo(PendingLibraryUndo(message: String(localized: "Removed \(title)"), payload: .place(originals)))
+            } catch {
+                rowActionError = LibraryActionError(message: error.localizedDescription)
+            }
+        }
+    }
+
+    private func deleteSave(_ id: UUID) {
+        let title = library.artifacts.first(where: { $0.id == id })?.libraryTitle ?? String(localized: "Saved item")
+        Task {
+            do {
+                finalizePendingUndo()
+                if let artifact = try await library.stageArtifactDeletion(id) {
+                    scheduleUndo(PendingLibraryUndo(message: String(localized: "Deleted \(title)"), payload: .artifact(artifact)))
+                }
+            } catch {
+                rowActionError = LibraryActionError(message: error.localizedDescription)
+            }
+        }
+    }
+
+    private func undoBar(_ pending: PendingLibraryUndo) -> some View {
+        HStack(spacing: 12) {
+            Text(pending.message)
+                .font(GravitiTypography.subheadline)
+                .lineLimit(1)
+            Spacer()
+            Button("Undo") { undo(pending) }
+                .font(GravitiTypography.subheadlineSemibold)
+                .foregroundStyle(GravitiColors.signalMint)
+        }
+        .padding(.horizontal, 18)
+        .frame(minHeight: 52)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 15))
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func scheduleUndo(_ pending: PendingLibraryUndo) {
+        undoExpirationTask?.cancel()
+        pendingUndo = pending
+        undoExpirationTask = Task {
+            try? await Task.sleep(for: .seconds(6))
+            guard !Task.isCancelled, pendingUndo?.id == pending.id else { return }
+            finalizePendingUndo()
+        }
+    }
+
+    private func undo(_ pending: PendingLibraryUndo) {
+        undoExpirationTask?.cancel()
+        undoExpirationTask = nil
+        pendingUndo = nil
+        Task {
+            do {
+                switch pending.payload {
+                case .artifact(let artifact): try await library.restoreArtifactDeletion(artifact)
+                case .place(let originals): try await library.restorePlaceRemoval(originals)
+                }
+            } catch {
+                rowActionError = LibraryActionError(message: error.localizedDescription)
+            }
+        }
+    }
+
+    private func finalizePendingUndo() {
+        undoExpirationTask?.cancel()
+        undoExpirationTask = nil
+        guard let pending = pendingUndo else { return }
+        pendingUndo = nil
+        if case .artifact(let artifact) = pending.payload {
+            library.finalizeArtifactDeletion(artifact)
+        }
+    }
+
+    private func selectionFrame(for key: String) -> some View {
+        GeometryReader { proxy in
+            Color.clear.preference(
+                key: LibrarySelectionFramePreferenceKey.self,
+                value: [key: proxy.frame(in: .named("librarySelectionList"))]
+            )
+        }
+    }
+
+    private func selectionDragGesture(for kind: LibrarySelectionKind) -> some Gesture {
+        DragGesture(minimumDistance: 8, coordinateSpace: .named("librarySelectionList"))
+            .onChanged { value in
+                guard (kind == .places && isSelectingPlaces) || (kind == .saves && isSelectingSaves) else { return }
+                if dragSelectionAdds == nil {
+                    guard let startKey = selectionKey(at: value.startLocation, kind: kind) else { return }
+                    dragSelectionAdds = !selectionContains(startKey, kind: kind)
+                    dragSelectionStartY = value.startLocation.y
+                    dragVisitedSelectionKeys.insert(startKey)
+                    setSelection(startKey, kind: kind, selected: dragSelectionAdds == true)
+                }
+                guard let adds = dragSelectionAdds, let startY = dragSelectionStartY else { return }
+                let bounds = min(startY, value.location.y)...max(startY, value.location.y)
+                let crossedKeys = selectionRowFrames
+                    .filter { key, frame in key.hasPrefix(kind.keyPrefix) && bounds.contains(frame.midY) }
+                    .sorted { $0.value.midY < $1.value.midY }
+                    .map(\.key)
+                for key in crossedKeys where dragVisitedSelectionKeys.insert(key).inserted {
+                    setSelection(key, kind: kind, selected: adds)
+                }
+            }
+            .onEnded { _ in
+                dragSelectionAdds = nil
+                dragSelectionStartY = nil
+                dragVisitedSelectionKeys.removeAll()
+            }
+    }
+
+    private func selectionKey(at point: CGPoint, kind: LibrarySelectionKind) -> String? {
+        selectionRowFrames.first { key, frame in
+            key.hasPrefix(kind.keyPrefix) && frame.contains(point)
+        }?.key
+    }
+
+    private func selectionContains(_ key: String, kind: LibrarySelectionKind) -> Bool {
+        switch kind {
+        case .places:
+            return selectedPlaceIDs.contains(String(key.dropFirst(kind.keyPrefix.count)))
+        case .saves:
+            guard let id = UUID(uuidString: String(key.dropFirst(kind.keyPrefix.count))) else { return false }
+            return selectedArtifactIDs.contains(id)
+        }
+    }
+
+    private func setSelection(_ key: String, kind: LibrarySelectionKind, selected: Bool) {
+        switch kind {
+        case .places:
+            let id = String(key.dropFirst(kind.keyPrefix.count))
+            if selected { selectedPlaceIDs.insert(id) } else { selectedPlaceIDs.remove(id) }
+        case .saves:
+            guard let id = UUID(uuidString: String(key.dropFirst(kind.keyPrefix.count))) else { return }
+            if selected { selectedArtifactIDs.insert(id) } else { selectedArtifactIDs.remove(id) }
+        }
+    }
+
     @ViewBuilder
     private var mapContent: some View {
         if savedPlaces.isEmpty {
@@ -515,8 +826,14 @@ struct LibraryView: View {
         } else {
             Map(initialPosition: .automatic, selection: $selectedMapPlace) {
                 ForEach(savedPlaces) { place in
-                    Marker(place.name, coordinate: CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude))
-                        .tag(place)
+                    let category = PlaceMapCategoryStyle.category(for: place.id, in: filteredArtifacts)
+                    Marker(
+                        place.name,
+                        systemImage: category.mapSymbolName,
+                        coordinate: CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude)
+                    )
+                    .tint(category.mapTint)
+                    .tag(place)
                 }
             }
             .mapStyle(.standard(elevation: .flat))
@@ -535,21 +852,147 @@ struct LibraryView: View {
 
     private var savedPlaces: [SavedPlace] {
         var seen = Set<String>()
-        return filteredArtifacts.compactMap(\.place).filter { seen.insert($0.id).inserted }
+        let places = filteredArtifacts.compactMap(\.place).filter { seen.insert($0.id).inserted }
+        return places.sorted(by: placeSort)
     }
 
     private var filteredArtifacts: [Artifact] {
         let reviewFiltered = showsNeedsReviewOnly
             ? library.artifacts.filter(\.needsPlaceReview)
             : library.artifacts
+        let smartFiltered = reviewFiltered.filter { artifact in
+            selectedSavedFilter?.matches(artifact) ?? smartFilter.matches(artifact)
+        }
         let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !term.isEmpty else { return reviewFiltered }
-        return reviewFiltered.filter { $0.librarySearchText.localizedCaseInsensitiveContains(term) }
+        let searched = term.isEmpty ? smartFiltered : smartFiltered.filter {
+            $0.librarySearchText.localizedCaseInsensitiveContains(term)
+        }
+        guard mode == .saves else { return searched }
+        if sort == .distance, let location = locationManager.location {
+            return searched.sorted { lhs, rhs in
+                guard let left = lhs.place else { return false }
+                guard let right = rhs.place else { return true }
+                return NearbyPlaceSorter.distance(from: location, to: left) < NearbyPlaceSorter.distance(from: location, to: right)
+            }
+        }
+        if sort == .recentlyUpdated {
+            return searched.sorted { latestUpdate([$0]) > latestUpdate([$1]) }
+        }
+        return searched.sorted(by: sort.areInIncreasingOrder)
+    }
+
+    private var sort: LibrarySort {
+        let raw: String
+        switch mode {
+        case .destinations: raw = destinationSortRawValue
+        case .places: raw = placeSortRawValue
+        case .saves: raw = saveSortRawValue
+        case .map, .inbox: return .recentlySaved
+        }
+        let selected = LibrarySort(rawValue: raw) ?? .recentlySaved
+        return availableSorts.contains(selected) ? selected : (availableSorts.first ?? .recentlySaved)
+    }
+
+    private var availableSorts: [LibrarySort] {
+        switch mode {
+        case .destinations: [.gravity, .recentlySaved, .alphabetical, .mostEvidence]
+        case .places: [.recentlySaved, .alphabetical, .distance, .mostEvidence, .leastComplete, .recentlyUpdated]
+        case .saves: [.recentlySaved, .alphabetical, .distance, .mostEvidence, .leastComplete, .recentlyUpdated]
+        case .map, .inbox: []
+        }
+    }
+
+    private func setSort(_ value: LibrarySort) {
+        switch mode {
+        case .destinations: destinationSortRawValue = value.rawValue
+        case .places: placeSortRawValue = value.rawValue
+        case .saves: saveSortRawValue = value.rawValue
+        case .map, .inbox: break
+        }
+    }
+
+    private func placeSort(_ lhs: SavedPlace, _ rhs: SavedPlace) -> Bool {
+        let lhsArtifacts = filteredArtifacts.filter { $0.place?.id == lhs.id }
+        let rhsArtifacts = filteredArtifacts.filter { $0.place?.id == rhs.id }
+        switch sort {
+        case .alphabetical:
+            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+        case .distance:
+            guard let location = locationManager.location else {
+                return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+            }
+            return NearbyPlaceSorter.distance(from: location, to: lhs) < NearbyPlaceSorter.distance(from: location, to: rhs)
+        case .mostEvidence:
+            return evidenceScore(lhsArtifacts) == evidenceScore(rhsArtifacts)
+                ? lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+                : evidenceScore(lhsArtifacts) > evidenceScore(rhsArtifacts)
+        case .leastComplete:
+            return averageCompleteness(lhsArtifacts) == averageCompleteness(rhsArtifacts)
+                ? lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+                : averageCompleteness(lhsArtifacts) < averageCompleteness(rhsArtifacts)
+        case .recentlyUpdated:
+            return latestUpdate(lhsArtifacts) > latestUpdate(rhsArtifacts)
+        case .recentlySaved, .gravity, .fit:
+            return (lhsArtifacts.map(\.capturedAt).max() ?? .distantPast) > (rhsArtifacts.map(\.capturedAt).max() ?? .distantPast)
+        }
+    }
+
+    private func sortedDestinations(_ nodes: [OrbitNode]) -> [OrbitNode] {
+        nodes.sorted { lhs, rhs in
+            let lhsArtifacts = DestinationOrbitBuilder.artifacts(for: lhs, from: filteredArtifacts)
+            let rhsArtifacts = DestinationOrbitBuilder.artifacts(for: rhs, from: filteredArtifacts)
+            switch sort {
+            case .alphabetical:
+                return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+            case .mostEvidence:
+                return evidenceScore(lhsArtifacts) == evidenceScore(rhsArtifacts)
+                    ? OrbitNode.ranksBefore(lhs, rhs)
+                    : evidenceScore(lhsArtifacts) > evidenceScore(rhsArtifacts)
+            case .recentlySaved, .recentlyUpdated:
+                return latestUpdate(lhsArtifacts) == latestUpdate(rhsArtifacts)
+                    ? OrbitNode.ranksBefore(lhs, rhs)
+                    : latestUpdate(lhsArtifacts) > latestUpdate(rhsArtifacts)
+            case .gravity, .fit, .distance, .leastComplete:
+                return OrbitNode.ranksBefore(lhs, rhs)
+            }
+        }
+    }
+
+    private func evidenceScore(_ artifacts: [Artifact]) -> Int {
+        artifacts.reduce(0) { score, artifact in
+            score + artifact.effectiveInterests.count
+                + (artifact.userNote?.trimmedNil == nil ? 0 : 2)
+                + (artifact.effectiveSummary?.trimmedNil == nil ? 0 : 1)
+                + (artifact.place == nil ? 0 : 1)
+        }
+    }
+
+    private func averageCompleteness(_ artifacts: [Artifact]) -> Double {
+        guard !artifacts.isEmpty else { return 0 }
+        return Double(artifacts.reduce(0) { $0 + $1.completeness.score }) / Double(artifacts.count)
+    }
+
+    private func latestUpdate(_ artifacts: [Artifact]) -> Date {
+        artifacts.map { artifact in
+            [artifact.capturedAt, artifact.enrichment?.generatedAt, artifact.linkMetadata?.fetchedAt]
+                .compactMap { $0 }.max() ?? artifact.capturedAt
+        }.max() ?? .distantPast
     }
 
     private var needsReviewCount: Int {
         library.artifacts.lazy.filter(\.needsPlaceReview).count
     }
+
+    private var savedFilters: [SavedLibraryFilter] {
+        SavedLibraryFilterStore.decode(savedFiltersJSON)
+    }
+
+    private var selectedSavedFilter: SavedLibraryFilter? {
+        guard let id = UUID(uuidString: selectedSavedFilterRaw) else { return nil }
+        return savedFilters.first { $0.id == id }
+    }
+
+    private var incompleteCount: Int { library.artifacts.lazy.filter { !$0.completeness.isComplete }.count }
 
     private var repeatedPlaceGroups: [RepeatedPlaceGroup] {
         Dictionary(grouping: library.artifacts.compactMap { artifact -> (SavedPlace, Artifact)? in
@@ -577,10 +1020,10 @@ struct LibraryView: View {
             } else {
                 noResultsState()
             }
-        } else {
-            List(filteredArtifacts) { artifact in
-                Group {
-                    if isSelectingSaves {
+        } else if isSelectingSaves {
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    ForEach(filteredArtifacts) { artifact in
                         Button {
                             if selectedArtifactIDs.contains(artifact.id) {
                                 selectedArtifactIDs.remove(artifact.id)
@@ -597,12 +1040,28 @@ struct LibraryView: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityValue(selectedArtifactIDs.contains(artifact.id) ? "Selected" : "Not selected")
-                    } else {
-                        NavigationLink {
-                            SavedArtifactDetailView(artifact: artifact, library: library)
-                        } label: {
-                            ArtifactRow(artifact: artifact)
-                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 6)
+                        .background(selectionFrame(for: "save:\(artifact.id.uuidString)"))
+                        Divider().padding(.leading, 20)
+                    }
+                }
+            }
+            .coordinateSpace(name: "librarySelectionList")
+            .onPreferenceChange(LibrarySelectionFramePreferenceKey.self) { selectionRowFrames = $0 }
+            .highPriorityGesture(selectionDragGesture(for: .saves))
+        } else {
+            List(filteredArtifacts) { artifact in
+                NavigationLink {
+                    SavedArtifactDetailView(artifact: artifact, library: library)
+                } label: {
+                    ArtifactRow(artifact: artifact)
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        deleteSave(artifact.id)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
                     }
                 }
                 .listRowBackground(GravitiColors.deepInk)
@@ -640,11 +1099,47 @@ private struct LibraryBackupStatus: Identifiable {
     let message: String
 }
 
+private struct LibraryActionError: Identifiable {
+    let id = UUID()
+    let message: String
+}
+
+private struct PendingLibraryUndo: Identifiable {
+    enum Payload {
+        case artifact(Artifact)
+        case place([Artifact])
+    }
+    let id = UUID()
+    let message: String
+    let payload: Payload
+}
+
+private enum LibrarySelectionKind {
+    case places
+    case saves
+
+    var keyPrefix: String {
+        switch self {
+        case .places: "place:"
+        case .saves: "save:"
+        }
+    }
+}
+
+private struct LibrarySelectionFramePreferenceKey: PreferenceKey {
+    static var defaultValue: [String: CGRect] = [:]
+
+    static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
+    }
+}
+
 private enum LibraryMode: String, CaseIterable, Identifiable {
     case destinations
     case places
     case saves
     case map
+    case inbox
 
     var id: Self { self }
 
@@ -654,6 +1149,97 @@ private enum LibraryMode: String, CaseIterable, Identifiable {
         case .places: "Places"
         case .saves: "Saves"
         case .map: "Map"
+        case .inbox: "Inbox"
+        }
+    }
+}
+
+private enum LibrarySort: String, CaseIterable, Identifiable {
+    case recentlySaved, alphabetical, distance, gravity, fit, mostEvidence, leastComplete, recentlyUpdated
+    var id: Self { self }
+    var title: String {
+        switch self {
+        case .recentlySaved: String(localized: "Recently saved")
+        case .alphabetical: String(localized: "Alphabetical")
+        case .distance: String(localized: "Distance")
+        case .gravity: String(localized: "Gravity")
+        case .fit: String(localized: "Fit")
+        case .mostEvidence: String(localized: "Most evidence")
+        case .leastComplete: String(localized: "Least complete")
+        case .recentlyUpdated: String(localized: "Recently updated")
+        }
+    }
+    func areInIncreasingOrder(_ lhs: Artifact, _ rhs: Artifact) -> Bool {
+        switch self {
+        case .recentlySaved, .recentlyUpdated: return lhs.capturedAt > rhs.capturedAt
+        case .alphabetical: return lhs.libraryTitle.localizedCaseInsensitiveCompare(rhs.libraryTitle) == .orderedAscending
+        case .distance:
+            if lhs.place == nil { return false }
+            if rhs.place == nil { return true }
+            return lhs.capturedAt > rhs.capturedAt
+        case .mostEvidence:
+            let left = lhs.effectiveInterests.count + (lhs.userNote?.trimmedNil == nil ? 0 : 2) + (lhs.effectiveSummary?.trimmedNil == nil ? 0 : 1)
+            let right = rhs.effectiveInterests.count + (rhs.userNote?.trimmedNil == nil ? 0 : 2) + (rhs.effectiveSummary?.trimmedNil == nil ? 0 : 1)
+            return left == right ? lhs.capturedAt > rhs.capturedAt : left > right
+        case .leastComplete:
+            return lhs.completeness.score == rhs.completeness.score
+                ? lhs.capturedAt > rhs.capturedAt
+                : lhs.completeness.score < rhs.completeness.score
+        case .gravity, .fit: return lhs.capturedAt > rhs.capturedAt
+        }
+    }
+}
+
+private enum LibrarySmartFilter: String, CaseIterable, Identifiable {
+    case all, unvisitedScenery, bostonRestaurants, nationalParks, recentlyAdded, needsDescription, instagram, withoutNotes, visitedLoved, matcha
+    var id: Self { self }
+    var title: String {
+        switch self {
+        case .all: String(localized: "All")
+        case .unvisitedScenery: String(localized: "Unvisited scenery")
+        case .bostonRestaurants: String(localized: "Boston restaurants")
+        case .nationalParks: String(localized: "National parks")
+        case .recentlyAdded: String(localized: "Recently added")
+        case .needsDescription: String(localized: "Needs description")
+        case .instagram: String(localized: "From Instagram")
+        case .withoutNotes: String(localized: "Without notes")
+        case .visitedLoved: String(localized: "Visited & loved")
+        case .matcha: String(localized: "Matcha everywhere")
+        }
+    }
+    var symbol: String {
+        switch self {
+        case .all: "square.grid.2x2"
+        case .unvisitedScenery: "mountain.2"
+        case .bostonRestaurants: "fork.knife"
+        case .nationalParks: "tree.fill"
+        case .recentlyAdded: "clock"
+        case .needsDescription: "text.badge.xmark"
+        case .instagram: "camera.fill"
+        case .withoutNotes: "note.text.badge.plus"
+        case .visitedLoved: "heart.fill"
+        case .matcha: "cup.and.saucer.fill"
+        }
+    }
+    func matches(_ artifact: Artifact) -> Bool {
+        let text = artifact.librarySearchText
+        switch self {
+        case .all: return true
+        case .unvisitedScenery:
+            return artifact.effectiveCategory == .sceneryAndNature &&
+                ![.visited, .loved, .didNotFit].contains(artifact.userDetails?.placeStatus ?? .saved)
+        case .bostonRestaurants:
+            let location = [artifact.place?.locality, artifact.place?.region].compactMap { $0 }.joined(separator: " ")
+            return artifact.effectiveCategory == .foodAndDrink && location.localizedCaseInsensitiveContains("Boston")
+        case .nationalParks: return text.localizedCaseInsensitiveContains("national park")
+        case .recentlyAdded: return artifact.capturedAt >= (Calendar.current.date(byAdding: .day, value: -30, to: .now) ?? .distantPast)
+        case .needsDescription: return artifact.effectiveSummary?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false
+        case .instagram:
+            guard let host = artifact.sourceURL.flatMap({ URLComponents(string: $0)?.host?.lowercased() }) else { return false }
+            return host == "instagram.com" || host.hasSuffix(".instagram.com")
+        case .withoutNotes: return artifact.userNote?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false
+        case .visitedLoved: return artifact.userDetails?.placeStatus == .loved
+        case .matcha: return text.localizedCaseInsensitiveContains("matcha")
         }
     }
 }

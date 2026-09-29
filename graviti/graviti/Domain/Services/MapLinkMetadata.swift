@@ -1,6 +1,6 @@
 import Foundation
 
-enum MapLinkMetadata {
+nonisolated enum MapLinkMetadata {
     struct Coordinate: Equatable {
         let latitude: Double
         let longitude: Double
@@ -73,11 +73,23 @@ enum MapLinkMetadata {
     static func searchQuery(from rawURL: String) -> String? {
         guard let components = URLComponents(string: rawURL),
               provider(for: rawURL) != nil else { return nil }
-        return components.queryItems?
-            .first(where: { ["q", "query"].contains($0.name.lowercased()) })?
-            .value?
-            .replacingOccurrences(of: "+", with: " ")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let items = components.queryItems ?? []
+        let name = items
+            .first(where: { ["q", "query", "name"].contains($0.name.lowercased()) })?
+            .value
+        let address = items
+            .first(where: { ["address", "addr"].contains($0.name.lowercased()) })?
+            .value
+        let parts = [name, address]
+            .compactMap(cleanQueryPart)
+            .reduce(into: [String]()) { result, value in
+                guard !result.contains(where: {
+                    $0.localizedCaseInsensitiveCompare(value) == .orderedSame ||
+                    $0.localizedCaseInsensitiveContains(value)
+                }) else { return }
+                result.append(value)
+            }
+        return parts.isEmpty ? nil : parts.joined(separator: ", ")
     }
 
     static func coordinateHint(from rawURL: String) -> Coordinate? {
@@ -91,5 +103,15 @@ enum MapLinkMetadata {
               let latitude = Double(parts[0]), let longitude = Double(parts[1]),
               (-90...90).contains(latitude), (-180...180).contains(longitude) else { return nil }
         return Coordinate(latitude: latitude, longitude: longitude)
+    }
+
+    private static func cleanQueryPart(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let cleaned = value
+            .replacingOccurrences(of: "+", with: " ")
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return cleaned.isEmpty ? nil : cleaned
     }
 }

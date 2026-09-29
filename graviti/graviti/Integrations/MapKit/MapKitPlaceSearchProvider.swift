@@ -2,7 +2,7 @@ import Foundation
 import MapKit
 
 @MainActor
-final class MapKitPlaceSearchProvider: PlaceSearchProviding {
+final class MapKitPlaceSearchProvider: PlaceSearchProviding, PlaceGeographyRepairing {
     private var destinationRegions = [String: MKCoordinateRegion]()
 
     func search(_ query: String) async throws -> [PlaceCandidate] {
@@ -66,7 +66,13 @@ final class MapKitPlaceSearchProvider: PlaceSearchProviding {
                 region: nil,
                 resultTypes: .address
             )
-            guard let center = response.mapItems.first?.placemark.coordinate else { return nil }
+            guard let item = response.mapItems.first else { return nil }
+            let center: CLLocationCoordinate2D
+            if #available(iOS 26.0, *) {
+                center = item.location.coordinate
+            } else {
+                center = item.placemark.coordinate
+            }
             let region = MKCoordinateRegion(
                 center: center,
                 span: MKCoordinateSpan(
@@ -91,5 +97,37 @@ final class MapKitPlaceSearchProvider: PlaceSearchProviding {
             URLQueryItem(name: "q", value: place.name)
         ]
         return components.url?.absoluteString
+    }
+
+    func repairedPlace(_ place: SavedPlace) async throws -> SavedPlace? {
+        guard place.region?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false else { return place }
+        let query = [place.name, place.locality, place.country]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: ", ")
+        let candidates = try await search(query).map(\.place).filter { $0.region != nil }
+        if let exact = candidates.first(where: { $0.id == place.id }) { return exact }
+        return candidates
+            .filter { namesAreCompatible(place.name, $0.name) }
+            .map { ($0, distance(from: place, to: $0)) }
+            .filter { $0.1 <= 1_000 }
+            .min { $0.1 < $1.1 }?.0
+    }
+
+    private func namesAreCompatible(_ lhs: String, _ rhs: String) -> Bool {
+        let left = normalized(lhs)
+        let right = normalized(rhs)
+        return left == right || left.contains(right) || right.contains(left)
+    }
+
+    private func normalized(_ value: String) -> String {
+        value.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+            .split(whereSeparator: { !$0.isLetter && !$0.isNumber })
+            .joined(separator: " ")
+    }
+
+    private func distance(from lhs: SavedPlace, to rhs: SavedPlace) -> CLLocationDistance {
+        CLLocation(latitude: lhs.latitude, longitude: lhs.longitude)
+            .distance(from: CLLocation(latitude: rhs.latitude, longitude: rhs.longitude))
     }
 }

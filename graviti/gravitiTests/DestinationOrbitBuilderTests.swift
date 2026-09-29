@@ -51,6 +51,20 @@ final class DestinationOrbitBuilderTests: XCTestCase {
         XCTAssertFalse(nodes.contains { $0.name == "United States" })
     }
 
+    func testAutomaticModeExpandsFourSavesAcrossMultipleCities() {
+        let artifacts = [
+            artifact("nyc-1", city: "New York", region: "New York", country: "United States"),
+            artifact("nyc-2", city: "New York", region: "New York", country: "United States"),
+            artifact("boston", city: "Boston", region: "Massachusetts", country: "United States"),
+            artifact("somerville", city: "Somerville", region: "Massachusetts", country: "United States")
+        ]
+
+        let nodes = DestinationOrbitBuilder.nodes(from: artifacts, mode: .automatic, limit: 10)
+
+        XCTAssertFalse(nodes.contains { $0.name == "United States" })
+        XCTAssertEqual(Set(nodes.map(\.name)), ["New York", "Boston", "Somerville"])
+    }
+
     func testAutomaticModeKeepsCountryGroupedWhenExpansionExceedsLabelBudget() {
         let japan = [
             artifact("k1", city: "Kyoto", region: "Kyoto", country: "Japan"),

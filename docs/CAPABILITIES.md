@@ -1,8 +1,23 @@
 # Graviti Capability Reference
 
+## September 2026 local MVP expansion
+
+- Place detail includes a persisted journey lifecycle: Saved, Curious, Shortlist, Visited, Loved, and Didn't fit. A change applies to every save attached to the same canonical place.
+- Search includes All, Places, Destinations, Interests, Guides, Notes, and Near me scopes. Its zero-query state surfaces recent searches, recently viewed destinations, strong interests, saved Fit Guides, and contextual search ideas.
+- Library includes a durable Import Inbox for active processing, successful place matches, unresolved items, failed work, duplicates, and retryable collection attempts. The original source appears before interpretation finishes.
+- Library includes built-in smart views plus user-created combinations of category, geography, interest, note state, source, lifecycle, recency, description completeness, and priority.
+- Places, Saves, Destinations, and Fit Guides expose the sort choices each surface can calculate, including recency, name, distance, Gravity, evidence, completeness, and update time.
+- Fit Guides are durable planning objects with independent identity and membership, title, note, cover, archive state, ordering, shortlist, category coverage, duplication, and clean export.
+- Recommendation questions use Yes, No, and Not sure, can be dismissed, are rate limited, and remain editable in a local feedback history. Recommendation exposure and outcome events are stored separately from Gravity and are not yet ranking inputs.
+- A custom Share Extension supports one-tap capture with optional guide, priority, tag, note, and save-without-identification controls.
+- First-run onboarding teaches the product through an actual save and offers a labeled, removable sample library.
+- Metadata, OCR, place identification, enrichment, profile indexing, and thumbnail work have independently persisted jobs with bounded retry. Search and grouping use a disposable derived index that can be rebuilt from canonical data.
+
+The delivery sequence, acceptance criteria, and remaining evaluation gate are tracked in [Next Phase Plan](NEXT_PHASE_PLAN.md).
+
 **Status:** Implemented local MVP
 
-**Last reviewed:** September 22, 2026
+**Last reviewed:** September 28, 2026
 
 **Minimum OS:** iOS 18.0
 
@@ -57,6 +72,10 @@ For public non-Maps pages, Graviti can fetch and cache:
 
 The fetcher uses an ephemeral, cookie-free session, rejects loopback and private-network destinations, validates content type, and enforces size limits.
 
+Instagram reel links receive provider-aware cleanup. Graviti removes engagement-count and platform-title wrappers, invisible characters, surplus quote markup, and trailing hashtag promotion. The first useful caption line becomes the source title, while the useful caption body remains available as the saved description and semantic evidence. Existing Instagram saves with the older wrapper format refresh automatically when the app resumes processing.
+
+After that metadata arrives, Graviti also looks for explicit caption location signals: a map pin with a place/city tuple, a nearby tagged business and street address, a business handle at the start of the caption, or a named venue on a street. Creator prompts such as `follow @account` are excluded. It searches Apple MapKit and attaches a canonical place only when the business name has one unambiguous match. A missing or ambiguous match leaves the social save intact and does not send it to **Needs Your Help**. When processing resumes, Graviti also repairs a previously inferred social place whose name conflicts with the stronger caption evidence.
+
 ### Manual note
 
 A user can save free-form text even when no place can be resolved. Notes remain useful evidence for generated categories and interests.
@@ -73,9 +92,9 @@ Search provides live Apple MapKit results. Selecting a result saves a canonical 
 
 ### Maps place links
 
-Apple Maps and Google Maps place links can be pasted or shared. Short links are expanded when possible. Graviti searches MapKit using the place name, address/query hints, and coordinates when supplied.
+Apple Maps and Google Maps place links can be pasted or shared. Short links are expanded when possible. Graviti searches MapKit using the place name, address/query hints, and coordinates when supplied. If the rich query does not produce a safe match, resolution retries a bounded set of simpler variants: the original name, a name without bracketed suffixes, a Latin-script-only variant for mixed-script titles, and transliteration when needed.
 
-A match is accepted only when name and proximity evidence are strong enough. Ambiguous items remain visible as **Needs Your Help** for manual selection.
+A match is accepted only when name, location context, or proximity evidence is strong enough. A unique cleaned-name match can resolve automatically, while multiple branches with the same name remain visible as **Needs Your Help** for manual selection.
 
 ## 4. Capture outside the app
 
@@ -120,7 +139,7 @@ Graviti accepts a public shared-list URL, including `maps.app.goo.gl` links. It 
 - coordinates
 - stable feature identifiers where present
 
-The importer generates stable Google source links with address and coordinate hints. MapKit then resolves the place. Ambiguous matches go to review.
+The importer generates stable Google source links with address and coordinate hints. MapKit tries the most specific query first and then safe cleaned-name variants when characters or provider naming differences prevent a direct result. Ambiguous matches still go to review.
 
 Reimport can upgrade unresolved records created by older builds, backfill the real list title, preserve user-selected matches, and avoid duplicate list wrappers. A saved list can retry or refresh from its detail screen.
 
@@ -145,7 +164,11 @@ Capture and interpretation have separate lifecycles. Each eligible artifact can 
 3. public link metadata fetching
 4. generated description, category, and interest enrichment
 
-Interrupted, transiently failed, and in-progress work resumes on launch or foreground activation. An offline or provider failure leaves the original save visible.
+Interrupted, transiently failed, and in-progress work resumes on launch or foreground activation. Place resolution is serialized with a short pause between imported items to reduce MapKit throttling. Transient failures enter a coalesced background retry queue with increasing delays, while the original save remains visible. URL enrichment waits for the link metadata attempt to finish so a public page description is included in the first analysis. Later metadata refreshes invalidate and regenerate derived details. If enrichment input changes while analysis is running, the stale result is discarded and the item restarts immediately so the visible “Learning” state can finish without an app relaunch.
+
+The durable queue stores one record per Artifact and job kind for link metadata, text extraction, place identification, enrichment, profile indexing, and thumbnail availability. Each record retains its producer version, state, attempts, last error, next retry, dependencies, timestamps, and a bounded output summary. A job left running by process termination is recovered as retryable work on the next activation. Six unsuccessful attempts cancel automatic retry until the user explicitly retries the item.
+
+Generated enrichment, link metadata, place hints, and Fit outcome evidence carry producer, version, timestamp, and optional input fingerprint data. Algorithm upgrades can reopen generated work without changing original sources or user-authored corrections.
 
 Network-dependent surfaces explain this preservation directly. Place matching states say when the original save is already safe and offer manual matching or retry after failure. Link previews show an unavailable state and retry action while retaining the saved URL. Fit Guides keep saved guide places visible during a live search, explain that slow connections can take longer, and allow retry after an error or empty response. Collection imports show active progress, report partial results, and direct the user to refresh the saved guide or list later when some entries fail.
 
@@ -200,23 +223,23 @@ Corrections are stored separately from generated enrichment. Refreshing generate
 
 ### Destinations
 
-Groups placed artifacts by adaptive geography and shows save count and Gravity. A destination detail exposes the contributing saves.
+Groups placed artifacts by adaptive geography and shows save count and Gravity. Destination detail opens with a map of all matching places and a horizontally scrollable category bar whose first option is **All saved**. Selecting Food & drink, Scenery & nature, Arts & culture, Activities, Shopping, Landmarks, Stay, or Place filters both the map and saves together. Card view centers one photo, link-preview, or map-backed card while the previous and next cards peek at the edges. Horizontal swipes snap to the next card with scale, fade, and perspective feedback; arrow controls remain available. Each card includes name, description, category, and location context. A segmented control switches to the compact list view. Broader destinations retain direct navigation into their child areas.
 
 ### Places
 
 Shows canonical places deduplicated by provider identity. Multiple source artifacts can connect to one place. Repeated-place detail shows every contributing save.
 
-Place multi-select removes selected place associations in one action. Source saves remain in the Library and move to review.
+Place multi-select removes selected place associations in one action. In Select mode, dragging across rows adds or removes every crossed place from the selection. Source saves remain in the Library and move to review. Outside Select mode, a trailing row swipe reveals **Remove**.
 
 ### Saves
 
 Shows original artifacts with photo, link, note, collection, place, and generated-detail fallbacks. Saved Item detail exposes source material, source collection history, detected text provenance, processing state, place, generated or edited details, and refresh/retry actions.
 
-Saves can be deleted individually. Multi-select performs an atomic bulk delete after confirmation. Deleting saves updates Places, Gravity, patterns, and Fit evidence, and removes associated local image files.
+Saves can be deleted individually with a trailing row swipe. Multi-select performs an atomic bulk delete after confirmation, and dragging across rows in Select mode selects or deselects the crossed saves. Deleting saves updates Places, Gravity, patterns, and Fit evidence, and removes associated local image files.
 
 ### Map
 
-Plots saved places geographically and provides a conventional spatial alternative to Home.
+Plots saved places geographically and provides a conventional spatial alternative to Home. Map markers use distinct symbols and colors for Food & drink, Scenery & nature, Arts & culture, Activities, Shopping, Landmarks, Stay, and Place. A place backed by several saves uses its most frequent category, with a stable category order for ties.
 
 ### Actions
 
@@ -250,7 +273,9 @@ One query searches the local Library across:
 - destination names
 - interest evidence areas
 
-Results are grouped into Your Saves, Your Destinations, Your Interests, and Your Places.
+Results are grouped into Your Saves, Your Destinations, Your Interests, Your Guides, and Your Places. Scope chips narrow results to All, Places, Destinations, Interests, Guides, Notes, or Near me. Near me requests location permission only when selected and orders canonical places by measured distance.
+
+Before typing, Search offers recent searches, recently viewed destinations, strong interests, saved guides, and derived query suggestions. Recent searches and viewed destinations persist locally. A rebuildable token index reduces full-library scanning while the Artifact Library remains authoritative.
 
 The same screen also performs live Apple MapKit search. External results can be saved directly; already-saved place identity is recognized.
 
@@ -261,12 +286,14 @@ Gravity represents explicit saved-place concentration. Recommended destinations 
 The builder derives country, state/province, and city nodes from resolved places. Automatic mode:
 
 - keeps a country grouped when child areas do not add enough information
-- expands a country when it has enough saves, at least two meaningful child clusters, sufficient coverage, and space in the label budget
+- expands a country when four or more saves span at least two useful child areas, or when established child clusters have enough coverage, provided the result fits the label budget
 - uses state/province grouping when several cities in the same region make that level useful
 - displays at most ten labeled destinations
 - ranks by Gravity, then save count, then stable name order
 
 Users can force Countries, States & Provinces, or Cities. The choice persists.
+
+State and province values are normalized from the current MapKit address APIs. Existing iOS 26 saves that have a city and country but are missing this middle level are repaired quietly after launch and persisted, allowing States & Provinces and Automatic to recover without reimporting the places.
 
 Planet size uses bounded nonlinear scaling so a strong destination does not overwhelm the field. Layout is deterministic, bounded, and collision-aware. Planets drift gently unless Reduce Motion is enabled.
 
@@ -372,11 +399,13 @@ Examples include matcha cafés, tea houses, museums, historic landmarks, scenic 
 
 Each row opens its Apple Maps listing for current ratings, hours, and details. MapKit does not expose a reliable rating field to this app, so Graviti does not invent, scrape, or display review scores.
 
-Saving a suggestion records collection membership such as `Mexico City Fit Guide · Museums`. If that canonical place already exists, Graviti adds the guide membership to the existing artifact instead of duplicating it. Explore previews the first three saved Fit Guides and provides a searchable guide library for the complete collection. Guide search matches destination, country, contributing interests, and saved place names. Guides remain available there even when the destination leaves the current recommendation list. Graviti reconstructs guides from the destination catalog plus the current interest profile; saved membership survives backup and restore.
+Saving a suggestion creates or reuses the canonical Artifact and adds a `FitGuideMembership` record, without duplicating an existing saved place. Older title-encoded memberships such as `Mexico City Fit Guide · Museums` migrate into the durable guide store. Explore previews recent saved Fit Guides and provides a searchable guide library for the complete collection. Guide search matches title, destination, country, contributing interests, and saved place names. Guides remain available even when the destination leaves the current recommendation list.
+
+Each guide can be renamed, annotated, assigned a cover, archived, duplicated, reordered, and exported as clean text with map links. Removing membership does not delete the source Artifact. A Shortlist holds the places under serious consideration, while category coverage shows how balanced the saved guide has become.
 
 ## 12. Backup, restore, and deletion
 
-Backup schema version 3 includes every Artifact field, embeds local image bytes, and preserves the Explore recommendation region, preferred and avoided interests, saved destinations, Not for Me exclusions, and both visited-feedback states. Version 1 and version 2 archives remain restorable; missing newer preference fields decode as empty. Current safeguards include:
+Backup schema version 4 includes every Artifact field, embeds local image bytes, and preserves Explore preferences, both visited-feedback states, durable Fit Guides and memberships, guide metadata, recommendation feedback and outcome history, prompt rate-limit records, Import Inbox attempts, and saved Library filters. Versions 1 through 3 remain restorable; missing newer state decodes as empty. Current safeguards include:
 
 - schema-version check
 - 500 MB maximum archive input
@@ -467,7 +496,7 @@ The tracked fixture can be removed without deleting unrelated saves. Release pac
 
 ## 17. Verification summary
 
-The current automated suite has 98 tests and passes on iOS 18.6 and iOS 26.2 simulators. It includes legacy persisted-state fallback coverage and focused checks that diagnostics use aggregate counts and omit saved content and identifiers. A prior 62-test suite passed on a physical iPhone 13 Pro Max running iOS 26.3.1 before the latest Fit Guide, backup v3, visited-feedback, Gravity Insights, Destination Readiness, semantic-evidence, destination-catalog, diagnostics, and compatibility tests were added.
+The current automated suite has 144 tests. The 141-test suite then present passed on iOS 18.6 and iOS 26.2 simulators on September 28, 2026, and the three subsequently added Home geography checks passed inside a focused 13-test iOS 26.2 run. Coverage includes legacy persisted-state fallback, backup versions 1 through 4, durable job recovery, derived-index rebuilding, Import Inbox attempts, place lifecycle, smart filters, completeness, distance sorting, undo, Fit Guide metadata and membership, recommendation feedback and outcomes, paced place-resolution retries, social-caption venue extraction, map-category selection, stale-enrichment recovery, and focused checks that diagnostics use aggregate counts and omit saved content and identifiers. A 62-test suite also passed on a physical iPhone 13 Pro Max running iOS 26.3.1, and the owner completed and confirmed the expanded hands-on physical checklist after the final fixes.
 
 Manual and live-service checks include:
 

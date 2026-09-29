@@ -21,6 +21,7 @@ struct SaveView: View {
     @State private var importMessage: String?
     @State private var importSummary: SaveImportSummary?
     @State private var isImportingCollection = false
+    @AppStorage("import.attempts.v1") private var importAttemptsJSON = ""
     @FocusState private var focusedField: SaveField?
 #if DEBUG
     @AppStorage("debug.dogfoodArtifactIDs") private var dogfoodArtifactIDs = ""
@@ -251,8 +252,21 @@ struct SaveView: View {
             switch result {
             case .success(let fileURL):
                 Task {
+                    let attemptID = ImportAttemptStore.beginning(
+                        kind: .csv,
+                        label: fileURL.lastPathComponent,
+                        in: &importAttemptsJSON
+                    )
                     do {
                         let summary = try await library.importGoogleSavedCSV(from: fileURL)
+                        ImportAttemptStore.completing(
+                            attemptID,
+                            title: String(localized: "Google Maps CSV"),
+                            imported: summary.imported,
+                            duplicates: summary.duplicates,
+                            skipped: summary.skipped,
+                            in: &importAttemptsJSON
+                        )
                         importMessage = nil
                         importSummary = SaveImportSummary(
                             title: String(localized: "Google Maps import complete"),
@@ -262,6 +276,7 @@ struct SaveView: View {
                             processingContinues: summary.imported > 0
                         )
                     } catch {
+                        ImportAttemptStore.failing(attemptID, message: error.localizedDescription, in: &importAttemptsJSON)
                         importSummary = nil
                         importMessage = error.localizedDescription
                     }
@@ -278,12 +293,26 @@ struct SaveView: View {
             switch result {
             case .success(let fileURL):
                 Task {
+                    let attemptID = ImportAttemptStore.beginning(
+                        kind: .mapsFile,
+                        label: fileURL.lastPathComponent,
+                        in: &importAttemptsJSON
+                    )
                     do {
                         let url = try await library.importMapsLinkFile(from: fileURL)
+                        ImportAttemptStore.completing(
+                            attemptID,
+                            title: String(localized: "Maps link file"),
+                            imported: 1,
+                            duplicates: 0,
+                            skipped: 0,
+                            in: &importAttemptsJSON
+                        )
                         importSummary = nil
                         importMessage = String(localized: "Maps link saved to Library.")
                         await importMapCollectionIfNeeded(url)
                     } catch {
+                        ImportAttemptStore.failing(attemptID, message: error.localizedDescription, in: &importAttemptsJSON)
                         importSummary = nil
                         importMessage = error.localizedDescription
                     }
@@ -378,9 +407,24 @@ struct SaveView: View {
         switch provider {
         case .apple:
             guard MapLinkMetadata.isCollectionLink(url) else { return }
+            let attemptID = ImportAttemptStore.beginning(
+                kind: .appleGuide,
+                label: String(localized: "Apple Maps guide"),
+                sourceURL: url,
+                in: &importAttemptsJSON
+            )
             importMessage = String(localized: "Importing places from Apple Maps guide…")
             do {
                 let summary = try await library.importAppleGuidePlaces(from: url)
+                ImportAttemptStore.completing(
+                    attemptID,
+                    title: summary.title,
+                    imported: summary.imported,
+                    refreshed: summary.refreshed,
+                    duplicates: summary.duplicates,
+                    skipped: summary.skipped,
+                    in: &importAttemptsJSON
+                )
                 importMessage = nil
                 importSummary = SaveImportSummary(
                     title: summary.title,
@@ -392,12 +436,28 @@ struct SaveView: View {
                     cities: summary.cities
                 )
             } catch {
+                ImportAttemptStore.failing(attemptID, message: error.localizedDescription, in: &importAttemptsJSON)
                 importMessage = error.localizedDescription
             }
         case .google:
+            let attemptID = ImportAttemptStore.beginning(
+                kind: .googleList,
+                label: String(localized: "Google Maps list"),
+                sourceURL: url,
+                in: &importAttemptsJSON
+            )
             importMessage = String(localized: "Checking for places in this Google Maps list…")
             do {
                 let summary = try await library.importGoogleMapsListPlaces(from: url)
+                ImportAttemptStore.completing(
+                    attemptID,
+                    title: summary.title,
+                    imported: summary.imported,
+                    refreshed: summary.refreshed,
+                    duplicates: summary.duplicates,
+                    skipped: summary.skipped,
+                    in: &importAttemptsJSON
+                )
                 importMessage = nil
                 importSummary = SaveImportSummary(
                     title: summary.title,
@@ -408,8 +468,10 @@ struct SaveView: View {
                     processingContinues: summary.imported + summary.refreshed > 0
                 )
             } catch GoogleMapsListError.notAList {
+                ImportAttemptStore.remove(attemptID, from: &importAttemptsJSON)
                 importMessage = nil
             } catch {
+                ImportAttemptStore.failing(attemptID, message: error.localizedDescription, in: &importAttemptsJSON)
                 importMessage = error.localizedDescription
             }
         }

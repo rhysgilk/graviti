@@ -1,6 +1,10 @@
 import Foundation
 
-struct LinkMetadataFetcher {
+protocol LinkMetadataProviding {
+    func fetch(_ rawURL: String) async throws -> ArtifactLinkMetadata?
+}
+
+struct LinkMetadataFetcher: LinkMetadataProviding {
     private let session: URLSession
 
     init(session: URLSession? = nil) {
@@ -32,9 +36,12 @@ struct LinkMetadataFetcher {
         }
 
         let values = metaValues(in: html)
-        let title = clean(values["og:title"] ?? values["twitter:title"] ?? tagContent("title", in: html))
-        let summary = clean(values["og:description"] ?? values["twitter:description"] ?? values["description"])
-        let siteName = clean(values["og:site_name"]) ?? finalURL.host(percentEncoded: false)?.replacingOccurrences(of: "www.", with: "") ?? "Saved link"
+        let rawTitle = values["og:title"] ?? values["twitter:title"] ?? tagContent("title", in: html)
+        let rawSummary = values["og:description"] ?? values["twitter:description"] ?? values["description"]
+        let normalized = normalizedMetadata(title: rawTitle, summary: rawSummary, pageURL: finalURL)
+        let title = normalized.title
+        let summary = normalized.summary
+        let siteName = clean(values["og:site_name"], limit: 120) ?? finalURL.host(percentEncoded: false)?.replacingOccurrences(of: "www.", with: "") ?? "Saved link"
         let imageData = await fetchImage(values["og:image"] ?? values["twitter:image"], relativeTo: finalURL)
         guard title != nil || summary != nil || imageData != nil else { return nil }
         return ArtifactLinkMetadata(
@@ -43,7 +50,12 @@ struct LinkMetadataFetcher {
             siteName: siteName,
             imageData: imageData,
             resolvedURL: finalURL.absoluteString,
-            fetchedAt: .now
+            fetchedAt: .now,
+            provenance: GeneratedDataProvenance(
+                producer: "LinkMetadataFetcher",
+                version: ArtifactProcessingJobKind.linkMetadata.currentVersion,
+                generatedAt: .now
+            )
         )
     }
 
@@ -114,20 +126,105 @@ struct LinkMetadataFetcher {
         }
     }
 
-    private func clean(_ value: String?) -> String? {
+    private func normalizedMetadata(
+        title rawTitle: String?,
+        summary rawSummary: String?,
+        pageURL: URL
+    ) -> (title: String?, summary: String?) {
+        guard isInstagram(pageURL) else {
+            return (clean(rawTitle, limit: 240), clean(rawSummary, limit: 2_000))
+        }
+
+        let caption = instagramCaption(from: rawSummary)
+            ?? instagramCaption(from: rawTitle)
+        let captionTitle = caption.flatMap(firstUsefulLine)
+        return (
+            clean(captionTitle ?? rawTitle, limit: 180),
+            clean(caption ?? rawSummary, limit: 2_000)
+        )
+    }
+
+    private func isInstagram(_ url: URL) -> Bool {
+        guard let host = url.host?.lowercased() else { return false }
+        return host == "instagram.com" || host.hasSuffix(".instagram.com")
+    }
+
+    private func instagramCaption(from value: String?) -> String? {
+        guard let value else { return nil }
+        var caption = decodeEntities(value)
+            .replacingOccurrences(of: "\u{200B}", with: "")
+            .replacingOccurrences(of: "\u{200C}", with: "")
+            .replacingOccurrences(of: "\u{200D}", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let engagementPrefix = #"^\s*[\d.,]+(?:[KMB])?\s+likes?,\s*[\d.,]+(?:[KMB])?\s+comments?\s*-\s*.+?\s+on\s+[A-Za-z]+\s+\d{1,2},\s+\d{4}:\s*[\"“]"#
+        caption = caption.replacingOccurrences(
+            of: engagementPrefix,
+            with: "",
+            options: [.regularExpression, .caseInsensitive]
+        )
+
+        if let range = caption.range(of: #"\s+on Instagram:\s*[\"“]"#, options: [.regularExpression, .caseInsensitive]) {
+            caption = String(caption[range.upperBound...])
+        }
+
+        caption = caption.replacingOccurrences(
+            of: #"[\"”]\.?\s*$"#,
+            with: "",
+            options: .regularExpression
+        )
+        caption = caption.replacingOccurrences(
+            of: #"\s+#[\p{L}\p{N}_]+(?:\s+#[\p{L}\p{N}_]+)*(?:\s+.*)?$"#,
+            with: "",
+            options: .regularExpression
+        )
+        caption = caption.trimmingCharacters(in: .whitespacesAndNewlines)
+        return caption.isEmpty ? nil : caption
+    }
+
+    private func firstUsefulLine(_ value: String) -> String? {
+        let line = value
+            .split(whereSeparator: \.isNewline)
+            .map(String.init)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { !$0.isEmpty }
+        guard let line else { return nil }
+        return String(line.prefix(180)).trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func clean(_ value: String?, limit: Int) -> String? {
         guard let value else { return nil }
         let cleaned = decodeEntities(value)
+            .replacingOccurrences(of: "\u{200B}", with: "")
+            .replacingOccurrences(of: "\u{200C}", with: "")
+            .replacingOccurrences(of: "\u{200D}", with: "")
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        return cleaned.isEmpty ? nil : String(cleaned.prefix(1_000))
+        return cleaned.isEmpty ? nil : String(cleaned.prefix(limit))
     }
 
     private func decodeEntities(_ value: String) -> String {
-        value.replacingOccurrences(of: "&amp;", with: "&")
+        let named = value.replacingOccurrences(of: "&amp;", with: "&")
             .replacingOccurrences(of: "&quot;", with: "\"")
             .replacingOccurrences(of: "&#39;", with: "'")
             .replacingOccurrences(of: "&lt;", with: "<")
             .replacingOccurrences(of: "&gt;", with: ">")
+        guard let regex = try? NSRegularExpression(pattern: #"&#(x[0-9A-Fa-f]+|[0-9]+);"#) else {
+            return named
+        }
+        let range = NSRange(named.startIndex..., in: named)
+        var decoded = named
+        for match in regex.matches(in: named, range: range).reversed() {
+            guard let tokenRange = Range(match.range(at: 1), in: named),
+                  let fullRange = Range(match.range(at: 0), in: decoded) else { continue }
+            let token = String(named[tokenRange])
+            let number = token.lowercased().hasPrefix("x")
+                ? UInt32(token.dropFirst(), radix: 16)
+                : UInt32(token, radix: 10)
+            guard let number, let scalar = UnicodeScalar(number) else { continue }
+            decoded.replaceSubrange(fullRange, with: String(scalar))
+        }
+        return decoded
     }
 }
 

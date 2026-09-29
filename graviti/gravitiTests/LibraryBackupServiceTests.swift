@@ -47,7 +47,7 @@ final class LibraryBackupServiceTests: XCTestCase {
         }
         let decoded = try LibraryBackupService.decode(encoded)
 
-        XCTAssertEqual(decoded.schemaVersion, 3)
+        XCTAssertEqual(decoded.schemaVersion, 4)
         XCTAssertEqual(decoded.artifacts.first?.artifact, artifact)
         XCTAssertEqual(decoded.artifacts.first?.mediaData, media)
         XCTAssertEqual(decoded.artifacts.first?.mediaFileExtension, "jpg")
@@ -107,6 +107,50 @@ final class LibraryBackupServiceTests: XCTestCase {
         XCTAssertEqual(decoded.preferences?.preferredInterests, ["Museums"])
         XCTAssertEqual(decoded.preferences?.visitedLikedDestinationIDs, [])
         XCTAssertEqual(decoded.preferences?.visitedNotFitDestinationIDs, [])
+    }
+
+    func testRoundTripPreservesDurableLocalAppState() throws {
+        let guide = FitGuide(
+            destination: SavedDestination(name: "Kyoto", country: "Japan"),
+            interests: ["Tea", "Temples"]
+        )
+        var guideLibraryJSON = ""
+        FitGuideLibraryStore.ensureGuide(guide, in: &guideLibraryJSON)
+        let metadata = [guide.id: FitGuideMetadata(
+            customTitle: "Quiet Kyoto",
+            note: "Spring ideas",
+            archived: false,
+            coverArtifactID: nil,
+            shortlistPlaceIDs: [],
+            orderedArtifactIDs: [],
+            updatedAt: .now
+        )]
+        let metadataJSON = String(decoding: try JSONEncoder().encode(metadata), as: UTF8.self)
+        let feedbackJSON = String(decoding: try JSONEncoder().encode([
+            RecommendationFeedbackEvent(
+                id: UUID(), recommendationID: guide.id, prompt: "Good fit?", response: .yes, createdAt: .now
+            )
+        ]), as: UTF8.self)
+        var attemptsJSON = ""
+        _ = ImportAttemptStore.beginning(kind: .googleList, label: "Test list", in: &attemptsJSON)
+        let preferences = LibraryBackupPreferences(
+            recommendationRegion: RecommendationRegion.anywhere.rawValue,
+            preferredInterests: [],
+            avoidedInterests: [],
+            savedDestinationIDs: [],
+            excludedDestinationIDs: [],
+            fitGuideLibraryJSON: guideLibraryJSON,
+            fitGuideMetadataJSON: metadataJSON,
+            recommendationFeedbackJSON: feedbackJSON,
+            importAttemptsJSON: attemptsJSON
+        )
+
+        let decoded = try LibraryBackupService.decode(LibraryBackupService.encode([], preferences: preferences))
+
+        XCTAssertEqual(decoded.preferences, preferences)
+        XCTAssertEqual(FitGuideLibraryStore.guides(in: decoded.preferences?.fitGuideLibraryJSON ?? "").first?.id, guide.id)
+        XCTAssertEqual(RecommendationFeedbackStore.decode(decoded.preferences?.recommendationFeedbackJSON ?? "").count, 1)
+        XCTAssertEqual(ImportAttemptStore.decode(decoded.preferences?.importAttemptsJSON ?? "").count, 1)
     }
 
     func testDecodeRejectsTripFeedbackAttachedToVersionTwoArchive() throws {

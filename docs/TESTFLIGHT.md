@@ -41,13 +41,13 @@ This beta stores its Library on the device. Graviti does not require an account 
 - Destination recommendations use a small reviewed offline catalog during the MVP beta.
 - Fit Guide ordering follows Apple Maps relevance; MapKit does not provide Graviti with a review score to display or sort directly.
 - Some imported or shared items may require manual place matching.
-- Backup schema version 3 includes Explore preferences, Save Destination, Not for Me, and both visited-feedback outcomes. Version 2 backups restore with no visited feedback; version 1 backups still restore their Library content but do not change current Explore settings. Places saved inside Fit Guides keep their guide membership in every supported backup version.
+- Backup schema version 4 includes Explore preferences, durable Fit Guides and metadata, recommendation feedback and outcomes, Import Inbox attempts, saved Library filters, Save Destination, Not for Me, and both visited-feedback outcomes. Versions 1 through 3 remain restorable with safe defaults for newer state.
 
 ## Latest simulator validation
 
-Validated on September 22, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
+Validated on September 28, 2026 with an iPhone 17 Pro simulator running iOS 26.2 and an iPhone 16 Pro simulator running iOS 18.6:
 
-- All 98 automated tests passed on iOS 18.6 and iOS 26.2 simulators. Coverage includes import parsing, legacy persisted-state fallback, Fit scoring, destination-catalog validation and motif generalization, region-scoped Fit Guide search and fallback behavior, Fit Guide grouping and persistence, backup v1 and v2 compatibility and v3 Explore-state restore, aggregate-only diagnostics privacy, offline save preservation and recovery, safe map URL generation, deterministic ten-destination Gravity Field layout, evidence-based Gravity Insights, varied-evidence Destination Readiness, and fine-grained semantic provenance.
+- All 141 automated tests then present passed on iOS 18.6 and iOS 26.2 simulators. The current 144-test suite adds three Home geography checks, all of which passed inside a focused 13-test iOS 26.2 run. Coverage includes import parsing, durable Import Inbox attempts, place lifecycle, saved filters, completeness, distance sorting, undo, Fit Guide metadata and membership, recommendation feedback and outcomes, durable job recovery, rebuildable derived indexes, backup v1 through v4 compatibility, Fit scoring, destination-catalog validation, semantic evidence, private diagnostics, OCR, social-caption venue extraction, MapKit resolution, retry behavior, and SwiftData persistence.
 - Clean signed Debug and Release archive builds completed. The app and Share Extension generated the same App Group entitlement.
 - Safari shared a live National Park Service link through the Graviti Share Extension. Reopening Graviti imported it into Library > Saves and displayed the shared-save confirmation.
 - Home, Explore, and every Library mode were exercised with 14 varied saves covering scenery, national parks, architecture, history, seafood, coastlines, wildlife, museums, hiking, and drinks.
@@ -70,13 +70,13 @@ Validated on September 22, 2026 with an iPhone 17 Pro simulator running iOS 26.2
 - Spanish coverage was completed for the app and Share Extension. Home, Explore, Library, canonical interest names, singular/plural counts, accessibility labels, and bulk-selection copy were inspected in Spanish without clipping.
 - The iOS 18.6 minimum runtime was validated on an iPhone 16 Pro simulator. MapKit search found and saved Nishiki Market, Home generated its Gravity destination, Library showed the enriched save, and the record persisted after force quit and relaunch.
 - A device-specific Debug build from the current source, including the Share Extension, was provisioned for and installed on an iPhone 13 Pro Max running iOS 26.3.1. Device services confirmed installation, successful launch, and a live Graviti process after launch. The full 62-test suite then passed on the physical phone with no failures or skips. After restoring the normal build, an Xcode device screenshot confirmed that Home reopened with the retained real Library and a readable ten-destination Gravity Field.
+- The owner completed the expanded hands-on physical checklist and confirmed the final retest on September 29, 2026. This included the Share Extension note keyboard dismissal, initial destination-card centering, and Home Cities, States & Provinces, and Automatic geography modes after the iOS 26 MapKit repair.
 - The public privacy policy URL returned HTTP 200 and exposed the current effective date and support route without repository authentication.
 - A signed arm64 Release archive was produced with an iOS 18 minimum, matching app and extension versions, both privacy manifests, non-exempt encryption disabled, exactly the two registered Sora fonts, no dogfood CSVs, valid nested signatures, and matching App Group entitlements.
 - The current archive uses a seven-day Apple Development provisioning profile. It verifies the packaged release contents but is not eligible for TestFlight upload; the upload archive must use App Store distribution provisioning.
 
 If external TestFlight distribution is chosen later:
 
-- Complete the remaining hands-on core-flow checklist on the provisioned physical device. Initial manual testing and automated install/launch verification have passed.
 - Supply the feedback email and App Store Connect review contact.
 - Enroll or associate team `V9W8HRDJQT` with an App Store Connect provider that can create App Store provisioning profiles. The September 20 export attempt reached Apple's signing service but reported no provider for the account and no permission to create profiles for either bundle.
 - Produce and upload the distribution archive in the owner's App Store Connect account after that account gate is resolved.

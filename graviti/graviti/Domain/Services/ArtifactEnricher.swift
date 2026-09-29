@@ -72,6 +72,11 @@ struct ArtifactEnricher {
             }
         } else if let place = artifact.place, !interests.isEmpty {
             summary = String(localized: "\(place.name) is saved for \(interestPhrase(interests)).")
+        } else if artifact.place == nil,
+                  artifact.kind == .url,
+                  let linkSummary = artifact.linkMetadata?.summary?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !linkSummary.isEmpty {
+            summary = linkSummary
         } else if !interests.isEmpty {
             summary = artifact.kind == .photo
                 ? String(localized: "A saved photo about \(interestPhrase(interests)).")
@@ -108,7 +113,12 @@ struct ArtifactEnricher {
                 interestEvidence.map(\.confidence).max() ?? categoryCandidates.map(\.1).max() ?? 0.55
             ),
             generatedAt: .now,
-            interestEvidence: interestEvidence
+            interestEvidence: interestEvidence,
+            provenance: GeneratedDataProvenance(
+                producer: "ArtifactEnricher",
+                version: ArtifactProcessingJobKind.enrichment.currentVersion,
+                generatedAt: .now
+            )
         )
     }
 
@@ -195,7 +205,7 @@ struct ArtifactEnricher {
         if !words.isDisjoint(with: ["museum", "gallery", "theater", "architecture", "historic", "historical", "history", "heritage", "cathedral", "palace", "modernist", "brutalist", "contemporary"]) {
             return .artsAndCulture
         }
-        if !words.isDisjoint(with: ["restaurant", "cafe", "café", "bakery", "ramen", "matcha", "coffee", "dessert", "seafood", "oyster", "lobster", "crab", "sushi", "taco", "tacos", "pizza", "pasta", "pho", "dimsum", "barbecue", "bbq"]) {
+        if !words.isDisjoint(with: ["restaurant", "cafe", "café", "bakery", "deli", "sandwich", "sandwiches", "ramen", "matcha", "coffee", "dessert", "seafood", "oyster", "lobster", "crab", "sushi", "taco", "tacos", "pizza", "pasta", "pho", "dimsum", "barbecue", "bbq"]) {
             return .foodAndDrink
         }
         if !words.isDisjoint(with: ["hike", "hiking", "surfing", "kayaking", "skiing"]) {

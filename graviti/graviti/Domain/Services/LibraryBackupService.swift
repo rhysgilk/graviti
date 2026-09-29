@@ -1,8 +1,8 @@
 import Foundation
 
 struct LibraryBackupArchive: Codable {
-    static let currentSchemaVersion = 3
-    static let supportedSchemaVersions = 1...3
+    static let currentSchemaVersion = 4
+    static let supportedSchemaVersions = 1...4
 
     let schemaVersion: Int
     let exportedAt: Date
@@ -30,6 +30,13 @@ struct LibraryBackupPreferences: Codable, Equatable {
     let excludedDestinationIDs: [String]
     let visitedLikedDestinationIDs: [String]
     let visitedNotFitDestinationIDs: [String]
+    let fitGuideLibraryJSON: String
+    let fitGuideMetadataJSON: String
+    let recommendationFeedbackJSON: String
+    let recommendationOutcomesJSON: String
+    let recommendationPromptsJSON: String
+    let importAttemptsJSON: String
+    let savedLibraryFiltersJSON: String
 
     init(
         recommendationRegion: String,
@@ -38,7 +45,14 @@ struct LibraryBackupPreferences: Codable, Equatable {
         savedDestinationIDs: [String],
         excludedDestinationIDs: [String],
         visitedLikedDestinationIDs: [String] = [],
-        visitedNotFitDestinationIDs: [String] = []
+        visitedNotFitDestinationIDs: [String] = [],
+        fitGuideLibraryJSON: String = "",
+        fitGuideMetadataJSON: String = "",
+        recommendationFeedbackJSON: String = "",
+        recommendationOutcomesJSON: String = "",
+        recommendationPromptsJSON: String = "",
+        importAttemptsJSON: String = "",
+        savedLibraryFiltersJSON: String = ""
     ) {
         self.recommendationRegion = recommendationRegion
         self.preferredInterests = Self.normalized(preferredInterests)
@@ -50,6 +64,13 @@ struct LibraryBackupPreferences: Codable, Equatable {
         self.visitedLikedDestinationIDs = Self.normalized(visitedLikedDestinationIDs)
             .filter { !notFitSet.contains($0) }
         self.visitedNotFitDestinationIDs = notFit
+        self.fitGuideLibraryJSON = fitGuideLibraryJSON
+        self.fitGuideMetadataJSON = fitGuideMetadataJSON
+        self.recommendationFeedbackJSON = recommendationFeedbackJSON
+        self.recommendationOutcomesJSON = recommendationOutcomesJSON
+        self.recommendationPromptsJSON = recommendationPromptsJSON
+        self.importAttemptsJSON = importAttemptsJSON
+        self.savedLibraryFiltersJSON = savedLibraryFiltersJSON
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -60,6 +81,8 @@ struct LibraryBackupPreferences: Codable, Equatable {
         case excludedDestinationIDs
         case visitedLikedDestinationIDs
         case visitedNotFitDestinationIDs
+        case fitGuideLibraryJSON, fitGuideMetadataJSON, recommendationFeedbackJSON
+        case recommendationOutcomesJSON, recommendationPromptsJSON, importAttemptsJSON, savedLibraryFiltersJSON
     }
 
     init(from decoder: Decoder) throws {
@@ -71,7 +94,14 @@ struct LibraryBackupPreferences: Codable, Equatable {
             savedDestinationIDs: try container.decode([String].self, forKey: .savedDestinationIDs),
             excludedDestinationIDs: try container.decode([String].self, forKey: .excludedDestinationIDs),
             visitedLikedDestinationIDs: try container.decodeIfPresent([String].self, forKey: .visitedLikedDestinationIDs) ?? [],
-            visitedNotFitDestinationIDs: try container.decodeIfPresent([String].self, forKey: .visitedNotFitDestinationIDs) ?? []
+            visitedNotFitDestinationIDs: try container.decodeIfPresent([String].self, forKey: .visitedNotFitDestinationIDs) ?? [],
+            fitGuideLibraryJSON: try container.decodeIfPresent(String.self, forKey: .fitGuideLibraryJSON) ?? "",
+            fitGuideMetadataJSON: try container.decodeIfPresent(String.self, forKey: .fitGuideMetadataJSON) ?? "",
+            recommendationFeedbackJSON: try container.decodeIfPresent(String.self, forKey: .recommendationFeedbackJSON) ?? "",
+            recommendationOutcomesJSON: try container.decodeIfPresent(String.self, forKey: .recommendationOutcomesJSON) ?? "",
+            recommendationPromptsJSON: try container.decodeIfPresent(String.self, forKey: .recommendationPromptsJSON) ?? "",
+            importAttemptsJSON: try container.decodeIfPresent(String.self, forKey: .importAttemptsJSON) ?? "",
+            savedLibraryFiltersJSON: try container.decodeIfPresent(String.self, forKey: .savedLibraryFiltersJSON) ?? ""
         )
     }
 
@@ -157,12 +187,30 @@ enum LibraryBackupService {
                 savedDestinationIDs: $0.savedDestinationIDs,
                 excludedDestinationIDs: $0.excludedDestinationIDs,
                 visitedLikedDestinationIDs: $0.visitedLikedDestinationIDs,
-                visitedNotFitDestinationIDs: $0.visitedNotFitDestinationIDs
+                visitedNotFitDestinationIDs: $0.visitedNotFitDestinationIDs,
+                fitGuideLibraryJSON: $0.fitGuideLibraryJSON,
+                fitGuideMetadataJSON: $0.fitGuideMetadataJSON,
+                recommendationFeedbackJSON: $0.recommendationFeedbackJSON,
+                recommendationOutcomesJSON: $0.recommendationOutcomesJSON,
+                recommendationPromptsJSON: $0.recommendationPromptsJSON,
+                importAttemptsJSON: $0.importAttemptsJSON,
+                savedLibraryFiltersJSON: $0.savedLibraryFiltersJSON
             )
         }
         if archive.schemaVersion < 3,
            let preferences = normalizedPreferences,
            !preferences.visitedLikedDestinationIDs.isEmpty || !preferences.visitedNotFitDestinationIDs.isEmpty {
+            throw LibraryBackupError.invalidFile
+        }
+        if archive.schemaVersion < 4,
+           let preferences = normalizedPreferences,
+           (!preferences.fitGuideLibraryJSON.isEmpty
+            || !preferences.fitGuideMetadataJSON.isEmpty
+            || !preferences.recommendationFeedbackJSON.isEmpty
+            || !preferences.recommendationOutcomesJSON.isEmpty
+            || !preferences.recommendationPromptsJSON.isEmpty
+            || !preferences.importAttemptsJSON.isEmpty
+            || !preferences.savedLibraryFiltersJSON.isEmpty) {
             throw LibraryBackupError.invalidFile
         }
         if let preferences = archive.preferences, let normalizedPreferences {
@@ -173,6 +221,7 @@ enum LibraryBackupService {
                   preferences.excludedDestinationIDs.count <= 1_000,
                   preferences.visitedLikedDestinationIDs.count <= 1_000,
                   preferences.visitedNotFitDestinationIDs.count <= 1_000,
+                  appStateIsValid(normalizedPreferences),
                   allValuesAreSafe(normalizedPreferences.preferredInterests),
                   allValuesAreSafe(normalizedPreferences.avoidedInterests),
                   allValuesAreSafe(normalizedPreferences.savedDestinationIDs),
@@ -205,6 +254,31 @@ enum LibraryBackupService {
 
     private static func allValuesAreSafe(_ values: [String]) -> Bool {
         values.allSatisfy { !$0.isEmpty && $0.count <= 200 }
+    }
+
+    private static func appStateIsValid(_ preferences: LibraryBackupPreferences) -> Bool {
+        let values = [
+            preferences.fitGuideLibraryJSON,
+            preferences.fitGuideMetadataJSON,
+            preferences.recommendationFeedbackJSON,
+            preferences.recommendationOutcomesJSON,
+            preferences.recommendationPromptsJSON,
+            preferences.importAttemptsJSON,
+            preferences.savedLibraryFiltersJSON
+        ]
+        guard values.allSatisfy({ $0.utf8.count <= 2_000_000 }) else { return false }
+        guard validJSON(preferences.fitGuideLibraryJSON, as: FitGuideLibraryState.self),
+              validJSON(preferences.fitGuideMetadataJSON, as: [String: FitGuideMetadata].self),
+              validJSON(preferences.recommendationFeedbackJSON, as: [RecommendationFeedbackEvent].self),
+              validJSON(preferences.recommendationOutcomesJSON, as: [RecommendationOutcomeEvent].self),
+              validJSON(preferences.recommendationPromptsJSON, as: [RecommendationPromptRecord].self),
+              validJSON(preferences.importAttemptsJSON, as: [ImportAttempt].self),
+              validJSON(preferences.savedLibraryFiltersJSON, as: [SavedLibraryFilter].self) else { return false }
+        return true
+    }
+
+    private static func validJSON<T: Decodable>(_ raw: String, as type: T.Type) -> Bool {
+        raw.isEmpty || (raw.data(using: .utf8).flatMap { try? JSONDecoder().decode(type, from: $0) } != nil)
     }
 }
 

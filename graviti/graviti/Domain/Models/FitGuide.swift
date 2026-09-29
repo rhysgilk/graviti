@@ -1,10 +1,15 @@
 import Foundation
 
 struct FitGuide: Identifiable, Hashable {
+    let id: String
     let destination: SavedDestination
     let interests: [String]
 
-    var id: String { destination.id }
+    init(id: String? = nil, destination: SavedDestination, interests: [String]) {
+        self.id = id ?? destination.id
+        self.destination = destination
+        self.interests = interests
+    }
 
     var collectionTitle: String {
         String(localized: "\(destination.name) Fit Guide")
